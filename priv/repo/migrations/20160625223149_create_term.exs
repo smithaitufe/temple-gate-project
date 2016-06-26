@@ -3,8 +3,8 @@ defmodule PortalApi.Repo.Migrations.CreateTerm do
 
   def change do
     create table(:terms) do
-      add :description, :string
-      add :term_set_id, references(:term_sets)
+      add :description, :string, limit: 255, null: false
+      add :term_set_id, references(:term_sets), null: false
 
       timestamps
     end
