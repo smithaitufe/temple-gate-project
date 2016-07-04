@@ -20,7 +20,12 @@ defmodule PortalApi.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", PortalApi do
-  #   pipe_through :api
-  # end
+  scope "/api", PortalApi do
+    pipe_through :api
+    scope "/v1", V1, as: :v1 do
+      resources "term_sets", TermSetController, except: [:new, :edit]
+      resources "terms", TermController, except: [:new, :edit]
+      resources "states", StateController, except: [:new, :edit]
+    end
+  end
 end
