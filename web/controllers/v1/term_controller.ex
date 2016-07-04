@@ -17,7 +17,7 @@ defmodule PortalApi.V1.TermController do
       {:ok, term} ->
         conn
         |> put_status(:created)
-        |> put_resp_header("location", term_path(conn, :show, term))
+        |> put_resp_header("location", v1_term_path(conn, :show, term))
         |> render("show.json", term: term)
       {:error, changeset} ->
         conn
