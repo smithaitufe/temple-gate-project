@@ -25,6 +25,7 @@ defmodule PortalApi.Router do
     scope "/v1", V1, as: :v1 do
       resources "term_sets", TermSetController, except: [:new, :edit]
       resources "terms", TermController, except: [:new, :edit]
+      resources "grades", GradeController, except: [:new, :edit]
       resources "states", StateController, except: [:new, :edit]
       resources "local_government_areas", LocalGovernmentAreaController, except: [:new, :edit]
       resources "programs", ProgramController, except: [:new, :edit]
@@ -34,7 +35,7 @@ defmodule PortalApi.Router do
       resources "program_departments", ProgramDepartmentController, except: [:new, :edit]
 
       resources "courses", CourseController, except: [:new, :edit]
-      resources "grades", GradeController, except: [:new, :edit]
+
     end
   end
 end
