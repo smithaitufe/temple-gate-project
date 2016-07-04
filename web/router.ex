@@ -26,6 +26,8 @@ defmodule PortalApi.Router do
       resources "term_sets", TermSetController, except: [:new, :edit]
       resources "terms", TermController, except: [:new, :edit]
       resources "states", StateController, except: [:new, :edit]
+      resources "local_government_areas", LocalGovernmentAreaController, except: [:new, :edit]
+      resources "programs", ProgramController, except: [:new, :edit]
     end
   end
 end
