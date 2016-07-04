@@ -33,7 +33,7 @@ defmodule PortalApi.Router do
       resources "faculties", FacultyController, except: [:new, :edit]
       resources "departments", DepartmentController, except: [:new, :edit]
       resources "program_departments", ProgramDepartmentController, except: [:new, :edit]
-
+      resources "job_titles", JobTitleController, except: [:new, :edit]
       resources "courses", CourseController, except: [:new, :edit]
 
       resources "staffs", StaffController, except: [:new, :edit]
