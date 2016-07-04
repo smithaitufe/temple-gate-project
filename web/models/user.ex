@@ -2,6 +2,8 @@ defmodule PortalApi.User do
   use PortalApi.Web, :model
 
   schema "users" do
+    field :last_name, :string
+    field :first_name, :string
     field :user_name, :string
     field :email, :string
     field :encrypted_password, :string

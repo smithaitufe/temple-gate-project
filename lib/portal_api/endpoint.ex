@@ -35,7 +35,7 @@ defmodule PortalApi.Endpoint do
     key: "_portal_api_key",
     signing_salt: "Sz9R2Gqt"
 
-  plug Corsica, [origins: "*", allow_headers: ["Accept","Content-Type","Access-Control-Allow-Origin","Authorization"], log: :debug]
-  
+  plug Corsica, [origins: "*", allow_headers: ["Accept","Content-Type","Access-Control-Allow-Origin","Authorization"]]
+
   plug PortalApi.Router
 end

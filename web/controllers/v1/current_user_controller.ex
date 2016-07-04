@@ -1,5 +1,5 @@
 defmodule PortalApi.V1.CurrentUserController do
-  use ComputerBasedTest.Web, :controller
+  use PortalApi.Web, :controller
 
   plug Guardian.Plug.EnsureAuthenticated, handler: PortalApi.V1.SessionController
 
