@@ -28,6 +28,12 @@ defmodule PortalApi.Router do
       resources "states", StateController, except: [:new, :edit]
       resources "local_government_areas", LocalGovernmentAreaController, except: [:new, :edit]
       resources "programs", ProgramController, except: [:new, :edit]
+      resources "levels", LevelController, except: [:new, :edit]
+      resources "faculties", FacultyController, except: [:new, :edit]
+      resources "departments", DepartmentController, except: [:new, :edit]
+      resources "program_departments", ProgramDepartmentController, except: [:new, :edit]
+
+      resources "courses", CourseController, except: [:new, :edit]
     end
   end
 end
