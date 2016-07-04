@@ -10,7 +10,7 @@ defmodule PortalApi.Department do
     timestamps
   end
 
-  @required_fields ~w(name code)
+  @required_fields ~w(name code department_type_id faculty_id)
   @optional_fields ~w()
 
   @doc """

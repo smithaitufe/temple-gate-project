@@ -3,12 +3,12 @@ defmodule PortalApi.Faculty do
 
   schema "faculties" do
     field :name, :string
-    belongs_to :faculty_type, PortalApi.FacultyType
+    belongs_to :faculty_type, PortalApi.Term
 
     timestamps
   end
 
-  @required_fields ~w(name)
+  @required_fields ~w(name faculty_type_id)
   @optional_fields ~w()
 
   @doc """

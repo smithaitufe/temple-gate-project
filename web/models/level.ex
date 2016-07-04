@@ -8,7 +8,7 @@ defmodule PortalApi.Level do
     timestamps
   end
 
-  @required_fields ~w(description)
+  @required_fields ~w(description program_id)
   @optional_fields ~w()
 
   @doc """

@@ -8,7 +8,7 @@ defmodule PortalApi.LocalGovernmentArea do
     timestamps
   end
 
-  @required_fields ~w(name)
+  @required_fields ~w(name state_id)
   @optional_fields ~w()
 
   @doc """

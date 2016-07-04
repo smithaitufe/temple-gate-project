@@ -8,7 +8,7 @@ defmodule PortalApi.ProgramDepartment do
     timestamps
   end
 
-  @required_fields ~w()
+  @required_fields ~w(program_id department_id)
   @optional_fields ~w()
 
   @doc """

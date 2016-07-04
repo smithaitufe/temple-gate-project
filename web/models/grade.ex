@@ -5,11 +5,12 @@ defmodule PortalApi.Grade do
     field :maximum, :integer
     field :minimum, :integer
     field :point, :float
+    field :description, :string
 
     timestamps
   end
 
-  @required_fields ~w(maximum minimum point)
+  @required_fields ~w(maximum minimum point description)
   @optional_fields ~w()
 
   @doc """

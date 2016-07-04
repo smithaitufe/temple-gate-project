@@ -10,8 +10,8 @@ defmodule PortalApi.Program do
     timestamps
   end
 
-  @required_fields ~w(name description text duration)
-  @optional_fields ~w()
+  @required_fields ~w(name description duration)
+  @optional_fields ~w(text)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

@@ -3,12 +3,12 @@ defmodule PortalApi.State do
 
   schema "states" do
     field :name, :string
-    belongs_to :country, PortalApi.Country
+    belongs_to :country, PortalApi.Term
 
     timestamps
   end
 
-  @required_fields ~w(name)
+  @required_fields ~w(name country_id)
   @optional_fields ~w()
 
   @doc """

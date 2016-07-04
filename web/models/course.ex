@@ -15,8 +15,8 @@ defmodule PortalApi.Course do
     timestamps
   end
 
-  @required_fields ~w(code title units hours core description)
-  @optional_fields ~w()
+  @required_fields ~w(code title units hours core department_id level_id semester_id)
+  @optional_fields ~w(description)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

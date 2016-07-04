@@ -8,7 +8,7 @@ defmodule PortalApi.Term do
     timestamps
   end
 
-  @required_fields ~w(description)
+  @required_fields ~w(description term_set_id)
   @optional_fields ~w()
 
   @doc """
