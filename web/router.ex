@@ -36,6 +36,7 @@ defmodule PortalApi.Router do
       resources "job_titles", JobTitleController, except: [:new, :edit]
       resources "courses", CourseController, except: [:new, :edit]
 
+      resources "salary_grade_levels", SalaryGradeLevelController, except: [:new, :edit]
       resources "staffs", StaffController, except: [:new, :edit]
 
     end
