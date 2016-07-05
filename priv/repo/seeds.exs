@@ -10,7 +10,7 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias PortalApi.{Repo, TermSet, Term, Program, Level, Faculty, Department, ProgramDepartment, Course, State, LocalGovernmentArea}
+alias PortalApi.{Repo, TermSet, Term, Program, Level, Faculty, Department, ProgramDepartment, Grade, Course, State, LocalGovernmentArea}
 
 commit = fn(term_set, terms) ->
   for term <- terms do
@@ -2154,15 +2154,15 @@ end
 
 
 grades = [
-  %{ maximum: 74, minimum: 70, point: 3.5F, description: "A"},
-   %{ maximum: 100, minimum: 75, point: 4.0F, description: "AA"},
-   %{ maximum: 69, minimum: 65, point =3.25F, description: "AB"},
-   %{ maximum: 64, minimum: 60, point =3.0F, description: "B"},
-   %{ maximum: 59, minimum: 55, point =2.75F, description: "BC"},
-   %{ maximum: 54, minimum: 50, point =2.5F, description: "C"},
-   %{ maximum: 49, minimum: 45, point =2.25F, description: "CD"},
-   %{ maximum: 44, minimum: 40, point =2.0F, description: "D"},
-   %{ maximum: 39, minimum: 0, point =0.0F, description: "F"}
+  %{ maximum: 74, minimum: 70, point: 3.5, description: "A"},
+   %{ maximum: 100, minimum: 75, point: 4.0, description: "AA"},
+   %{ maximum: 69, minimum: 65, point: 3.25, description: "AB"},
+   %{ maximum: 64, minimum: 60, point: 3.0, description: "B"},
+   %{ maximum: 59, minimum: 55, point: 2.75, description: "BC"},
+   %{ maximum: 54, minimum: 50, point: 2.5, description: "C"},
+   %{ maximum: 49, minimum: 45, point: 2.25, description: "CD"},
+   %{ maximum: 44, minimum: 40, point: 2.0, description: "D"},
+   %{ maximum: 39, minimum: 0, point: 0.0, description: "F"}
 ]
 
 for grade <- grades do
