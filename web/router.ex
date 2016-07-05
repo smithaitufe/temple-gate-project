@@ -43,6 +43,8 @@ defmodule PortalApi.Router do
       resources "staffs", StaffController, except: [:new, :edit]
 
       resources "students", StudentController, except: [:new, :edit]
+      resources "course_enrollments", CourseEnrollmentController, except: [:new, :edit]
+      
 
     end
   end
