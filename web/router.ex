@@ -50,6 +50,8 @@ defmodule PortalApi.Router do
       resources "salary_grade_levels", SalaryGradeLevelController, except: [:new, :edit]
       resources "salary_grade_steps", SalaryGradeStepController, except: [:new, :edit]
       resources "fees", FeeController, except: [:new, :edit]
+      resources "payments", PaymentController, except: [:new, :edit]
+      resources "payment_items", PaymentItemController, except: [:new, :edit]
 
       # Student Module
       resources "students", StudentController, except: [:new, :edit]
@@ -60,6 +62,7 @@ defmodule PortalApi.Router do
       resources "student_results", StudentResultController, except: [:new, :edit]
       resources "student_result_grades", StudentResultGradeController, except: [:new, :edit]
       resources "student_assignments", StudentAssignmentController, except: [:new, :edit]
+      resources "student_payments", StudentPaymentController, except: [:new, :edit]
 
     end
   end
