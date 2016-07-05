@@ -1,7 +1,7 @@
 defmodule PortalApi.V1.StudentContinuousAssessmentController do
   use PortalApi.Web, :controller
 
-  alias PortalApi.V1.StudentContinuousAssessment
+  alias PortalApi.StudentContinuousAssessment
 
   plug :scrub_params, "student_continuous_assessment" when action in [:create, :update]
 
@@ -17,7 +17,7 @@ defmodule PortalApi.V1.StudentContinuousAssessmentController do
       {:ok, student_continuous_assessment} ->
         conn
         |> put_status(:created)
-        |> put_resp_header("location", student_continuous_assessment_path(conn, :show, student_continuous_assessment))
+        |> put_resp_header("location", v1_student_continuous_assessment_path(conn, :show, student_continuous_assessment))
         |> render("show.json", student_continuous_assessment: student_continuous_assessment)
       {:error, changeset} ->
         conn
