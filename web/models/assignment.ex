@@ -1,16 +1,18 @@
-defmodule PortalApi.StudentResultGrade do
+defmodule PortalApi.Assignment do
   use PortalApi.Web, :model
 
-  schema "student_result_grades" do
-    field :score, :float    
-    belongs_to :student_result, PortalApi.StudentResult
+  schema "assignments" do
+    field :question, :string
+    field :note, :string
+    field :closing_date, Ecto.Date
+    field :closing_time, Ecto.Time
+    belongs_to :staff, PortalApi.Staff
     belongs_to :course, PortalApi.Course
-    belongs_to :grade, PortalApi.Grade
 
     timestamps
   end
 
-  @required_fields ~w(student_result_id course_id grade_id score)
+  @required_fields ~w(question note closing_date closing_time)
   @optional_fields ~w()
 
   @doc """

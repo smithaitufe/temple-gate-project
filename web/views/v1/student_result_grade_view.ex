@@ -14,7 +14,7 @@ defmodule PortalApi.V1.StudentResultGradeView do
       student_result_id: student_result_grade.student_result_id,
       course_id: student_result_grade.course_id,
       score: student_result_grade.score,
-      grade_id: student_result_grade.grade_id,
-      grade: student_result_grade.grade}
+      grade_id: student_result_grade.grade_id
+      }
   end
 end

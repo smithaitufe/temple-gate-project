@@ -3,8 +3,7 @@ defmodule PortalApi.Repo.Migrations.CreateStudentResultGrade do
 
   def change do
     create table(:student_result_grades) do
-      add :score, :float
-      add :grade, :string
+      add :score, :float      
       add :student_result_id, references(:student_results)
       add :course_id, references(:courses)
       add :grade_id, references(:grades)
