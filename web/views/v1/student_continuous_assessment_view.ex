@@ -10,10 +10,13 @@ defmodule PortalApi.V1.StudentContinuousAssessmentView do
   end
 
   def render("student_continuous_assessment.json", %{student_continuous_assessment: student_continuous_assessment}) do
-    %{id: student_continuous_assessment.id,
+    %{
+      id: student_continuous_assessment.id,
       course_id: student_continuous_assessment.course_id,
       staff_id: student_continuous_assessment.staff_id,
       student_id: student_continuous_assessment.student_id,
-      score: student_continuous_assessment.score}
+      continuous_assessment_type_id: student_continuous_assessment.continuous_assessment_type_id,
+      score: student_continuous_assessment.score
+    }
   end
 end
