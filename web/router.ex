@@ -23,6 +23,7 @@ defmodule PortalApi.Router do
   scope "/api", PortalApi do
     pipe_through :api
     scope "/v1", V1, as: :v1 do
+
       resources "term_sets", TermSetController, except: [:new, :edit]
       resources "terms", TermController, except: [:new, :edit]
       resources "states", StateController, except: [:new, :edit]
@@ -48,9 +49,7 @@ defmodule PortalApi.Router do
       # Accounts/Bursary
       resources "salary_grade_levels", SalaryGradeLevelController, except: [:new, :edit]
       resources "salary_grade_steps", SalaryGradeStepController, except: [:new, :edit]
-
-
-
+      resources "fees", FeeController, except: [:new, :edit]
 
       # Student Module
       resources "students", StudentController, except: [:new, :edit]
@@ -60,7 +59,7 @@ defmodule PortalApi.Router do
       resources "student_continuous_assessments", StudentContinuousAssessmentController, except: [:new, :edit]
       resources "student_results", StudentResultController, except: [:new, :edit]
       resources "student_result_grades", StudentResultGradeController, except: [:new, :edit]
-
+      resources "student_assignments", StudentAssignmentController, except: [:new, :edit]
 
     end
   end
