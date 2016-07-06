@@ -7,6 +7,9 @@ defmodule PortalApi.Program do
     field :text, :string
     field :duration, :integer
 
+
+    has_many :levels, PortalApi.Level
+
     timestamps
   end
 
@@ -23,4 +26,10 @@ defmodule PortalApi.Program do
     model
     |> cast(params, @required_fields, @optional_fields)
   end
+
+  def load_levels(query) do
+    from q in query, join: l in assoc(q, :levels), preload: [levels: l]
+  end
+
+  
 end

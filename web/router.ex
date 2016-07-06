@@ -27,7 +27,7 @@ defmodule PortalApi.Router do
       resources "term_sets", TermSetController, except: [:new, :edit]
       resources "terms", TermController, except: [:new, :edit]
       get "term_sets/:name/terms", TermController, :get_terms_by_term_set_name
-      
+
 
       resources "states", StateController, except: [:new, :edit]
       resources "local_government_areas", LocalGovernmentAreaController, except: [:new, :edit]
@@ -38,7 +38,9 @@ defmodule PortalApi.Router do
       resources "faculties", FacultyController, except: [:new, :edit]
       resources "departments", DepartmentController, except: [:new, :edit]
       resources "program_departments", ProgramDepartmentController, except: [:new, :edit]
+      resources "academic_sessions", AcademicSessionController, except: [:new, :edit]
       resources "assignments", AssignmentController, except: [:new, :edit]
+
 
       # Human Resources Module
       resources "job_titles", JobTitleController, except: [:new, :edit]

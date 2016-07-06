@@ -15,5 +15,17 @@ defmodule PortalApi.V1.ProgramView do
       description: program.description,
       text: program.text,
       duration: program.duration}
+
+    |> render_levels(%{levels: program.levels})
   end
+
+
+  def render_levels(json, %{levels: levels}) when is_list(levels) do
+    Map.put(json, :levels, render_many(levels, PortalApi.V1.LevelView, "level.json"))
+  end
+  def render_levels(json, _) do
+    json
+  end
+
+
 end

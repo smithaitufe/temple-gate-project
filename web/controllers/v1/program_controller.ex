@@ -6,7 +6,11 @@ defmodule PortalApi.V1.ProgramController do
   plug :scrub_params, "program" when action in [:create, :update]
 
   def index(conn, _params) do
-    programs = Repo.all(Program)
+    programs = Program
+    |> Program.load_levels
+    |> Repo.all
+
+    
     render(conn, "index.json", programs: programs)
   end
 
