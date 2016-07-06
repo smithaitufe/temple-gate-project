@@ -6,7 +6,10 @@ defmodule PortalApi.V1.CourseController do
   plug :scrub_params, "course" when action in [:create, :update]
 
   def index(conn, _params) do
-    courses = Repo.all(Course)
+    courses = Course
+    |> Course.load_associations
+    |> Repo.all
+    
     render(conn, "index.json", courses: courses)
   end
 

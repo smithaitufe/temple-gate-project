@@ -5,6 +5,7 @@ defmodule PortalApi.V1.TermSetController do
 
   plug :scrub_params, "term_set" when action in [:create, :update]
 
+  
   def index(conn, _params) do
     term_sets = Repo.all(TermSet)
     render(conn, "index.json", term_sets: term_sets)
