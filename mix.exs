@@ -39,7 +39,10 @@ defmodule PortalApi.Mixfile do
      {:cowboy, "~> 1.0"},
      {:corsica, "~> 0.4"},
      {:comeonin, "~> 2.1"},
-     {:guardian, "~> 0.10.0"}
+     {:guardian, "~> 0.10.0"},
+     {:timex, "~> 2.1.4"},
+     {:timex_ecto, "~> 1.0.4"}
+
    ]
   end
 

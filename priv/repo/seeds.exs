@@ -10,7 +10,7 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias PortalApi.{Repo, TermSet, Term, Program, Level, Faculty, Department, ProgramDepartment, Grade, Course, State, LocalGovernmentArea}
+alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty, Department, ProgramDepartment, Grade, Course, State, LocalGovernmentArea}
 
 commit = fn(term_set, terms) ->
   for term <- terms do
@@ -2170,4 +2170,19 @@ for grade <- grades do
     changeset = Grade.changeset(%Grade{}, grade)
     Repo.insert!(changeset)
   end
+end
+
+{_, opening_date} = Ecto.Date.cast("2016-05-01")
+{_, closing_date} = Ecto.Date.cast("2016-12-20")
+academic_session_params = %{description: "2016/2017", opening_date: opening_date, closing_date: closing_date, active: true}
+if Repo.get_by(AcademicSession, [description: "2016/2017"]) == nil do
+  changeset = AcademicSession.changeset(%AcademicSession{},academic_session_params)
+  IO.inspect changeset
+  if changeset.valid?, do: Repo.insert!(changeset)
+end
+academic_session_params = %{description: "2017/2018", opening_date: "2016-08-10", closing_date: closing_date, active: false}
+if Repo.get_by(AcademicSession, [description: "2017/2018"]) == nil do
+  changeset = AcademicSession.changeset(%AcademicSession{},academic_session_params)
+  IO.inspect changeset
+  if changeset.valid?, do: Repo.insert!(changeset)
 end

@@ -10,10 +10,12 @@ defmodule PortalApi.V1.AcademicSessionView do
   end
 
   def render("academic_session.json", %{academic_session: academic_session}) do
-    %{id: academic_session.id,
+    %{
+      id: academic_session.id,
       opening_date: academic_session.opening_date,
       closing_date: academic_session.closing_date,
       description: academic_session.description,
-      is_current: academic_session.is_current}
+      active: academic_session.active
+    }
   end
 end
