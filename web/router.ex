@@ -25,6 +25,8 @@ defmodule PortalApi.Router do
     scope "/v1", V1, as: :v1 do
 
       resources "users", UserController, except: [:new, :edit]
+      resources "user_roles", UserRoleController, except: [:new, :edit]
+      resources "sessions", SessionController, only: [:create, :delete]
       resources "term_sets", TermSetController, except: [:new, :edit]
       resources "terms", TermController, except: [:new, :edit]
       get "term_sets/:name/terms", TermController, :get_terms_by_term_set_name

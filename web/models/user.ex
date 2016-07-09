@@ -2,18 +2,19 @@ defmodule PortalApi.User do
   use PortalApi.Web, :model
 
   schema "users" do
-    # field :last_name, :string
-    # field :first_name, :string
+
     field :user_name, :string
     field :email, :string
     field :encrypted_password, :string
-    belongs_to :user_category, PortalApi.Term
-
     field :password, :string, virtual: true
 
 
+    belongs_to :user_category, PortalApi.Term
     has_one :student, PortalApi.Student, foreign_key: :user_id
-    
+
+    has_many :user_roles, PortalApi.UserRole
+    has_many :roles, through: [:user_roles, :role]
+
     timestamps
   end
 
@@ -31,6 +32,12 @@ defmodule PortalApi.User do
     |> cast(params, @required_fields, @optional_fields)
     |> encrypt_password
   end
+  def load_user_category_and_roles(query) do
+    from q in query,
+    join: uc in assoc(q, :user_category),
+    left_join: r in assoc(q, :roles),
+    preload: [user_category: uc, roles: r]
+  end
 
   defp encrypt_password(current_changeset) do
     case current_changeset do
@@ -38,4 +45,6 @@ defmodule PortalApi.User do
       _ -> current_changeset
     end
   end
+
+
 end

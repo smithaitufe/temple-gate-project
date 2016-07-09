@@ -2200,7 +2200,7 @@ query = from t in Term, join: ts in assoc(t, :term_set), where: t.description ==
 user_category = Repo.one query
 
 registration_no = "DS151690003478"
-user = %{user_name: registration_no, email: "jane.brown@dspg.edu.ng", password: "password", user_category_id: user_category.id}
+user = %{user_name: String.downcase(registration_no), email: "jane.brown@dspg.edu.ng", password: "password", user_category_id: user_category.id}
 
 if Repo.get_by(User, [user_name: user.user_name]) == nil do
   changeset = User.changeset(%User{}, user)

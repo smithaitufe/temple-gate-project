@@ -17,6 +17,7 @@ defmodule PortalApi.V1.UserView do
       email: user.email,
       user_category_id: user.user_category_id
     }
+    |> render_user_category(user_category: user.user_category)
   end
 
   def render("error.json", %{changeset: changeset}) do
@@ -38,5 +39,13 @@ defmodule PortalApi.V1.UserView do
 
   defp render_detail(message) do
     message
+  end
+
+
+  defp render_user_category(json, %{user_category: user_category}) when is_map(user_category) do
+    Map.put(json, :user_category, render_one(user_category, PortalApi.V1.TermView, "term.json"))
+  end
+  defp render_user_category(json, _) do
+    json
   end
 end

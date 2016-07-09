@@ -1,23 +1,28 @@
 defmodule PortalApi.V1.SessionController do
   use PortalApi.Web, :controller
-  alias PortalApi.{Session}
+  alias PortalApi.{Session, User}
   plug :scrub_params, "session" when action in [:create]
 
   def create(conn, %{"session" => session_params}) do
-
+    IO.inspect session_params
     case PortalApi.Helper.Session.authenticate(session_params) do
       {:ok, user} ->
+        # user = user
+        # |> User.load_user_category
+        # |> Repo.one
+
+
         {:ok, jwt, _full_claims} = user |> Guardian.encode_and_sign(:token)
 
         conn
         |> put_status(:created)
         |> render("show.json", jwt: jwt, user: user)
 
-      :error ->
+      {:error, _} ->
         conn
         |> put_status(:unprocessable_entity)
         |> render("error.json")
-        
+
     end
   end
 
