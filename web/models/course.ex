@@ -13,6 +13,8 @@ defmodule PortalApi.Course do
     belongs_to :semester, PortalApi.Term
 
     timestamps
+
+    has_many :enrollments, PortalApi.CourseEnrollment
   end
 
   @required_fields ~w(code title units hours core department_id level_id semester_id)

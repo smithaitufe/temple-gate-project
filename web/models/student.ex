@@ -2,6 +2,8 @@ defmodule PortalApi.Student do
   use PortalApi.Web, :model
 
   schema "students" do
+
+
     field :first_name, :string
     field :last_name, :string
     field :middle_name, :string
@@ -16,12 +18,13 @@ defmodule PortalApi.Student do
     belongs_to :department, PortalApi.Department
     belongs_to :program, PortalApi.Program
     belongs_to :level, PortalApi.Level
+    belongs_to :user, PortalApi.User
 
     timestamps
   end
 
-  @required_fields ~w(first_name last_name middle_name birth_date phone_number email registration_no matriculation_no)
-  @optional_fields ~w()
+  @required_fields ~w(first_name last_name email registration_no program_id department_id user_id)
+  @optional_fields ~w(middle_name birth_date phone_number matriculation_no level_id)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

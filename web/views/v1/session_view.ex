@@ -4,11 +4,10 @@ defmodule PortalApi.V1.SessionView do
     %{data:
       %{
         user: %{
-        id: user.id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        active: user.active
+          id: user.id,
+          user_name: user.user_name,
+          email: user.email,
+          user_category_id: user.user_category_id
         },
         jwt: jwt
       }
@@ -19,11 +18,10 @@ defmodule PortalApi.V1.SessionView do
     %{data:
       %{
         user: %{
-        id: user.id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        active: user.active
+          id: user.id,
+          user_name: user.user_name,
+          email: user.email,
+          user_category_id: user.user_category_id
         },
         jwt: jwt
       }

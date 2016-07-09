@@ -1,7 +1,7 @@
 defmodule PortalApi.V1.CourseController do
   use PortalApi.Web, :controller
 
-  alias PortalApi.Course
+  alias PortalApi.{Course, Department}
 
   plug :scrub_params, "course" when action in [:create, :update]
 
@@ -9,7 +9,7 @@ defmodule PortalApi.V1.CourseController do
     courses = Course
     |> Course.load_associations
     |> Repo.all
-    
+
     render(conn, "index.json", courses: courses)
   end
 
@@ -56,5 +56,15 @@ defmodule PortalApi.V1.CourseController do
     Repo.delete!(course)
 
     send_resp(conn, :no_content, "")
+  end
+
+
+  def get_courses_by_department_and_level(conn, %{"department_id" => department_id, "level_id" => level_id}) do
+    query = from c in Course,
+            where: c.department_id == ^department_id and c.level_id == ^level_id
+
+    courses = query |> Course.load_associations |> Repo.all
+
+    render(conn, "index.json", courses: courses)
   end
 end

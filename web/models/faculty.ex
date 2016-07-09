@@ -4,6 +4,7 @@ defmodule PortalApi.Faculty do
   schema "faculties" do
     field :name, :string
     belongs_to :faculty_type, PortalApi.Term
+    has_many :departments, PortalApi.Department
 
     timestamps
   end
@@ -20,5 +21,12 @@ defmodule PortalApi.Faculty do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+  end
+
+
+  def load_associations(query \\ %PortalApi.Faculty{}) do
+    from q in query,
+    join: d in assoc(q, :departments),
+    preload: [departments: d]
   end
 end

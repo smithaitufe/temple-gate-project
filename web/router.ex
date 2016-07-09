@@ -24,6 +24,7 @@ defmodule PortalApi.Router do
     pipe_through :api
     scope "/v1", V1, as: :v1 do
 
+      resources "users", UserController, except: [:new, :edit]
       resources "term_sets", TermSetController, except: [:new, :edit]
       resources "terms", TermController, except: [:new, :edit]
       get "term_sets/:name/terms", TermController, :get_terms_by_term_set_name
@@ -51,6 +52,9 @@ defmodule PortalApi.Router do
       # Courses Module
       resources "grades", GradeController, except: [:new, :edit]
       resources "courses", CourseController, except: [:new, :edit]
+      get "departments/:department_id/levels/:level_id/courses", CourseController, :get_courses_by_department_and_level
+
+      get "students/:student_id/levels/:level_id/courses", CourseController, :get_courses_by_student_and_level
 
       # Accounts/Bursary
       resources "salary_grade_levels", SalaryGradeLevelController, except: [:new, :edit]

@@ -11,6 +11,7 @@ defmodule PortalApi.V1.StudentView do
 
   def render("student.json", %{student: student}) do
     %{id: student.id,
+      user_id: student.user_id,
       first_name: student.first_name,
       last_name: student.last_name,
       middle_name: student.middle_name,
