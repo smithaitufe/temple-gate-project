@@ -1,25 +1,7 @@
 defmodule PortalApi.V1.SessionView do
   use PortalApi.Web, :view
-  def render("show.json", %{jwt: jwt, user: user, roles: roles}) do
 
-    user = %{
-      id: user.id,
-      user_name: user.user_name,
-      email: user.email,
-      user_category_id: user.user_category_id
-    }
-    |> render_user_category(user_category: user.user_category)
-    |> render_roles(%{roles: roles})
-
-    %{data:
-      %{
-        user: user,
-        jwt: jwt
-      }
-    }
-  end
-  def render("show.json", %{jwt: jwt, user: user}) do
-
+  def render("show.json", %{user: user, token: token}) do
     user = %{
       id: user.id,
       user_name: user.user_name,
@@ -32,7 +14,7 @@ defmodule PortalApi.V1.SessionView do
     %{data:
       %{
         user: user,
-        jwt: jwt
+        token: token
       }
     }
   end

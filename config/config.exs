@@ -21,10 +21,8 @@ config :logger, :console,
 
 # Configures Guardian to tailor JWT generation behaviour
 config :guardian, Guardian,
-  allowed_algos: ["HS512"], # optional
-  verify_module: Guardian.JWT,  # optional
   issuer: "PortalApi",
-  ttl: { 1, :days },
+  ttl: { 3, :days },
   verify_issuer: true, # optional
   secret_key: "EDL8FGl7O6Xy-oIjdvcl4TRrx9EqKEkU_vKTi2qV3S95vfh1RB9gqiBJ6Uys-NuhSWCOn3FO84JFdpXy",
   serializer: PortalApi.GuardianSerializer

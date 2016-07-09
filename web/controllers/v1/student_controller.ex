@@ -54,4 +54,12 @@ defmodule PortalApi.V1.StudentController do
 
     send_resp(conn, :no_content, "")
   end
+
+
+  def get_student_by_user_id(conn, %{"user_id" => user_id}) do
+      student = Student
+      |> Repo.get_by(user_id: user_id)
+
+      render(conn, "show.json", student: student)
+  end
 end

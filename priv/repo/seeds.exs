@@ -10,7 +10,7 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty, Department, ProgramDepartment, Grade, Course, State, LocalGovernmentArea, Student, User}
+alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty, Department, ProgramDepartment, Grade, Course, State, LocalGovernmentArea, Student, User, StudentCourse}
 
 commit = fn(term_set, terms) ->
   for term <- terms do
@@ -2196,6 +2196,7 @@ if Repo.get_by(AcademicSession, [description: "2017/2018"]) == nil do
   if changeset.valid?, do: Repo.insert!(changeset)
 end
 
+#-------------------------------------------------------
 query = from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Applicant" and ts.name == ^"user_category"
 user_category = Repo.one query
 
@@ -2212,5 +2213,39 @@ if Repo.get_by(User, [user_name: user.user_name]) == nil do
     student = %{first_name: "Jane", last_name: "Brown", email: "jane.brown@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, user_id: user.id}
     changeset = Student.changeset(%Student{}, student)
     if changeset.valid?, do: Repo.insert!(changeset)
+  end
+end
+#-------------------------------------------------------
+query = from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"user_category"
+user_category = Repo.one query
+
+registration_no = "DS151690003477"
+user = %{user_name: String.downcase(registration_no), email: "brown.fish@dspg.edu.ng", password: "password", user_category_id: user_category.id}
+
+if Repo.get_by(User, [user_name: user.user_name]) == nil do
+  changeset = User.changeset(%User{}, user)
+  if changeset.valid? do
+    {:ok, user} = Repo.insert(changeset)
+    program = Repo.get_by(Program, name: "ND")
+    department = Repo.get_by(Department, [name: "Computer Science"])
+
+    student = %{first_name: "Brown", last_name: "Fish", email: "brown.fish@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, user_id: user.id}
+    changeset = Student.changeset(%Student{}, student)
+    if changeset.valid? do
+      {:ok, student} = Repo.insert(changeset)
+      level = Repo.get_by(Level, description: "ND I")
+
+      query = from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"1st" and ts.name == ^"semester"
+      semester = Repo.one query
+      academic_session = Repo.get_by(AcademicSession, [description: "2016/2017", active: true])
+      courses = Repo.get_by(Course, level: level.id)
+      for course <- courses do
+        changeset = StudentCourse.changeset(%StudentCourse{}, %{course_id: course.id, student_id: student.id, academic_session_id: academic_session.id})
+        if changeset.valid? do
+          Repo.insert!(changeset)
+        end
+      end
+
+    end
   end
 end

@@ -11,6 +11,8 @@ defmodule PortalApi.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug Guardian.Plug.VerifyHeader
+    plug Guardian.Plug.LoadResource
   end
 
   scope "/", PortalApi do
@@ -22,11 +24,13 @@ defmodule PortalApi.Router do
   # Other scopes may use custom stacks.
   scope "/api", PortalApi do
     pipe_through :api
+
     scope "/v1", V1, as: :v1 do
 
       resources "users", UserController, except: [:new, :edit]
       resources "user_roles", UserRoleController, except: [:new, :edit]
       resources "sessions", SessionController, only: [:create, :delete]
+      get "current_user", CurrentUserController, :show
       resources "term_sets", TermSetController, except: [:new, :edit]
       resources "terms", TermController, except: [:new, :edit]
       get "term_sets/:name/terms", TermController, :get_terms_by_term_set_name
@@ -40,6 +44,7 @@ defmodule PortalApi.Router do
       resources "levels", LevelController, except: [:new, :edit]
       resources "faculties", FacultyController, except: [:new, :edit]
       resources "departments", DepartmentController, except: [:new, :edit]
+
       resources "program_departments", ProgramDepartmentController, except: [:new, :edit]
       resources "academic_sessions", AcademicSessionController, except: [:new, :edit]
       resources "assignments", AssignmentController, except: [:new, :edit]
@@ -56,6 +61,8 @@ defmodule PortalApi.Router do
       resources "courses", CourseController, except: [:new, :edit]
       get "departments/:department_id/levels/:level_id/courses", CourseController, :get_courses_by_department_and_level
 
+
+
       get "students/:student_id/levels/:level_id/courses", CourseController, :get_courses_by_student_and_level
 
       # Accounts/Bursary
@@ -67,7 +74,11 @@ defmodule PortalApi.Router do
 
       # Student Module
       resources "students", StudentController, except: [:new, :edit]
+      get "students/:user_id/record", StudentController, :get_student_by_user_id
+
       resources "course_enrollments", CourseEnrollmentController, except: [:new, :edit]
+      get "students/:student_id/level/:level_id/courses", CourseEnrollmentController, :get_student_course_enrollment_by_level
+
       resources "project_topics", ProjectTopicController, except: [:new, :edit]
       resources "student_project_supervisors", StudentProjectSupervisorController, except: [:new, :edit]
       resources "student_continuous_assessments", StudentContinuousAssessmentController, except: [:new, :edit]
