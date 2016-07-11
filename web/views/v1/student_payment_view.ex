@@ -13,7 +13,6 @@ defmodule PortalApi.V1.StudentPaymentView do
     %{id: student_payment.id,
       student_id: student_payment.student_id,
       payment_id: student_payment.payment_id,
-      academic_session_id: student_payment.academic_session_id,
-      level_id: student_payment.level_id}
+    }
   end
 end

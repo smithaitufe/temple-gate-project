@@ -4,13 +4,12 @@ defmodule PortalApi.StudentPayment do
   schema "student_payments" do
     belongs_to :student, PortalApi.Student
     belongs_to :payment, PortalApi.Payment
-    belongs_to :academic_session, PortalApi.AcademicSession
-    belongs_to :level, PortalApi.Level
+    
 
     timestamps
   end
 
-  @required_fields ~w()
+  @required_fields ~w(student_id payment_id)
   @optional_fields ~w()
 
   @doc """
