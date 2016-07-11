@@ -6,6 +6,7 @@ defmodule PortalApi.StudentCourse do
     belongs_to :student, PortalApi.Student
     belongs_to :academic_session, PortalApi.AcademicSession
 
+    
     timestamps
   end
 

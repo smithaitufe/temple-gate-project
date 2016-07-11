@@ -20,11 +20,17 @@ defmodule PortalApi.Student do
     belongs_to :level, PortalApi.Level
     belongs_to :user, PortalApi.User
 
+
+    has_many :student_payments, PortalApi.StudentPayment
+    has_many :student_courses, PortalApi.StudentCourse
+
+    has_many :payments, through: [:student_payments, :payment]
+    has_many :courses, through: [:student_courses, :course]
     timestamps
   end
 
-  @required_fields ~w(first_name last_name email registration_no program_id department_id user_id)
-  @optional_fields ~w(middle_name birth_date phone_number matriculation_no level_id)
+  @required_fields ~w(first_name last_name email registration_no program_id department_id)
+  @optional_fields ~w(user_id middle_name birth_date phone_number matriculation_no level_id)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
