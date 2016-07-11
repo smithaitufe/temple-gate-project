@@ -5,16 +5,16 @@ defmodule PortalApi.Fee do
     field :code, :string
     field :description, :string
     field :amount, :decimal
+    field :service_charge, :decimal
     field :is_catchment_area, :boolean, default: false
     belongs_to :program, PortalApi.Program
     belongs_to :level, PortalApi.Level
-    belongs_to :service_charge_type, PortalApi.Term
-    belongs_to :payer_category, PortalApi.Term
+    belongs_to :fee_category, PortalApi.Term
 
     timestamps
   end
 
-  @required_fields ~w(program_id service_charge_type_id payer_category_id code description amount is_catchment_area)
+  @required_fields ~w(program_id fee_category_id code description amount service_charge is_catchment_area)
   @optional_fields ~w(level_id)
 
   @doc """
@@ -26,5 +26,16 @@ defmodule PortalApi.Fee do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+  end
+
+  def load_associations(query) do
+    # from q in query,
+    # join: p in assoc(q, :program),
+    # join: l in assoc(q, :level),
+    # join: fc in assoc(q, :fee_category),
+    # preload: [program: p, level: l, fee_category: fc]
+
+    from q in query,    
+    preload: [:program, :level, :fee_category]
   end
 end

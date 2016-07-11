@@ -25,19 +25,15 @@ defmodule PortalApi.StudentCourse do
 
 
   def load_associations(query) do
+    course_query = from c in PortalApi.Course, preload: [:department, :semester, :level]
     from q in query,
     join: c in assoc(q, :course),
     join: s in assoc(q, :student),
     join: a in assoc(q, :academic_session),
-    preload: [course: c, student: s, academic_session: a]
+    preload: [course: ^course_query, student: s, academic_session: a]
   end
 
-  def get_by_student_and_level(query, student_id, level_id) do
-    from [q, c, s, a] in query,
-    where: q.student_id == ^student_id and c.level_id == ^level_id
-  end
-
-  def get_student_course_enrollment_by_level(query, student_id, level_id) do
+  def get_student_courses_by_level(query, student_id, level_id) do
     from [q, c, s, a] in query,
     where: q.student_id == ^student_id and c.level_id == ^level_id
   end

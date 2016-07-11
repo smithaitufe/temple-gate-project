@@ -6,7 +6,10 @@ defmodule PortalApi.V1.StudentCourseController do
   plug :scrub_params, "student_course" when action in [:create, :update]
 
   def index(conn, _params) do
-    student_courses = Repo.all(StudentCourse)
+    student_courses = StudentCourse
+    |> StudentCourse.load_associations
+    |> Repo.all
+
     render(conn, "index.json", student_courses: student_courses)
   end
 
@@ -55,10 +58,10 @@ defmodule PortalApi.V1.StudentCourseController do
     send_resp(conn, :no_content, "")
   end
 
-  def get_student_course_by_level(conn, %{"student_id" => student_id, "level_id" => level_id}) do
+  def get_student_courses_by_level(conn, %{"student_id" => student_id, "level_id" => level_id}) do
     student_courses = StudentCourse
     |> StudentCourse.load_associations
-    |> StudentCourse.get_student_course_by_level(student_id, level_id)
+    |> StudentCourse.get_student_courses_by_level(student_id, level_id)
     |> Repo.all
 
     render(conn, "index.json", student_courses: student_courses)

@@ -6,7 +6,10 @@ defmodule PortalApi.V1.FeeController do
   plug :scrub_params, "fee" when action in [:create, :update]
 
   def index(conn, _params) do
-    fees = Repo.all(Fee)
+    fees = Fee
+    |> Fee.load_associations
+    |> Repo.all
+
     render(conn, "index.json", fees: fees)
   end
 
@@ -15,6 +18,11 @@ defmodule PortalApi.V1.FeeController do
 
     case Repo.insert(changeset) do
       {:ok, fee} ->
+
+        fee = Fee
+        |> Fee.load_associations
+        |> Repo.get!(fee.id)
+
         conn
         |> put_status(:created)
         |> put_resp_header("location", v1_fee_path(conn, :show, fee))
@@ -27,7 +35,10 @@ defmodule PortalApi.V1.FeeController do
   end
 
   def show(conn, %{"id" => id}) do
-    fee = Repo.get!(Fee, id)
+    fee =  Fee
+    |> Fee.load_associations
+    |> Repo.get!(id)
+
     render(conn, "show.json", fee: fee)
   end
 

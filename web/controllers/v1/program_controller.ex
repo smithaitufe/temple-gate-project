@@ -10,7 +10,7 @@ defmodule PortalApi.V1.ProgramController do
     |> Program.load_levels
     |> Repo.all
 
-    
+
     render(conn, "index.json", programs: programs)
   end
 
@@ -31,7 +31,10 @@ defmodule PortalApi.V1.ProgramController do
   end
 
   def show(conn, %{"id" => id}) do
-    program = Repo.get!(Program, id)
+    program = Program
+    |> Program.load_levels
+    |> Repo.get!(id)
+    
     render(conn, "show.json", program: program)
   end
 

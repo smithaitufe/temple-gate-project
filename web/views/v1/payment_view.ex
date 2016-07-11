@@ -12,8 +12,13 @@ defmodule PortalApi.V1.PaymentView do
   def render("payment.json", %{payment: payment}) do
     %{id: payment.id,
       transaction_no: payment.transaction_no,
-      sub_total: payment.sub_total,
+      fee_id: payment.fee_id,
+      amount: payment.amount,
       service_charge: payment.service_charge,
-      payment_status_id: payment.payment_status_id}
+      payment_status_id: payment.payment_status_id,
+      payment_method_id: payment.payment_method_id,      
+      transaction_response_id: payment.transaction_response_id,
+      inserted_at: payment.inserted_at
+    }
   end
 end

@@ -63,7 +63,7 @@ defmodule PortalApi.Router do
 
 
 
-      get "students/:student_id/levels/:level_id/courses", CourseController, :get_courses_by_student_and_level
+      get "students/:student_id/levels/:level_id/courses", StudentCourseController, :get_student_courses_by_level
 
       # Accounts/Bursary
       resources "salary_grade_levels", SalaryGradeLevelController, except: [:new, :edit]
@@ -76,7 +76,7 @@ defmodule PortalApi.Router do
       resources "students", StudentController, except: [:new, :edit]
       get "students/:user_id/record", StudentController, :get_student_by_user_id
 
-      resources "course_enrollments", CourseEnrollmentController, except: [:new, :edit]
+      resources "student_courses", StudentCourseController, except: [:new, :edit]
       get "students/:student_id/level/:level_id/courses", CourseEnrollmentController, :get_student_course_enrollment_by_level
 
       resources "project_topics", ProjectTopicController, except: [:new, :edit]

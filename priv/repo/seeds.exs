@@ -10,7 +10,7 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty, Department, ProgramDepartment, Grade, Course, State, LocalGovernmentArea, Student, User, StudentCourse}
+alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty, Department, ProgramDepartment, Grade, Course, State, LocalGovernmentArea, Student, User, StudentCourse, Fee}
 
 commit = fn(term_set, terms) ->
   for term <- terms do
@@ -47,7 +47,8 @@ term_sets = [
   %{ name: "payment_status", display_name: "Payment Status" },
   %{ name: "allowance", display_name: "Allowance" },
   %{ name: "score_type", display_name: "Score Type" },
-  %{ name: "user_category", display_name: "User Category" }
+  %{ name: "user_category", display_name: "User Category" },
+  %{ name: "fee_category", display_name: "Fee Category" }
 ]
 for term_set <- term_sets do
   t = TermSet |> Repo.get_by(name: term_set.name)
@@ -228,6 +229,13 @@ terms =[
   %{description: "Applicant"},
   %{description: "Student"},
   %{description: "Staff"}
+]
+commit.(term_set, terms)
+
+term_set = TermSet |> Repo.get_by(name: "fee_category")
+terms =[
+  %{description: "Applicant"},
+  %{description: "Student"}
 ]
 commit.(term_set, terms)
 
@@ -2238,7 +2246,7 @@ if Repo.get_by(User, [user_name: user.user_name]) == nil do
       query = from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"1st" and ts.name == ^"semester"
       semester = Repo.one query
       academic_session = Repo.get_by(AcademicSession, [description: "2016/2017", active: true])
-      courses = Repo.get_by(Course, level: level.id)
+      courses =Repo.all( from c in Course, where: c.level_id == ^level.id and c.department_id == ^department.id )
       for course <- courses do
         changeset = StudentCourse.changeset(%StudentCourse{}, %{course_id: course.id, student_id: student.id, academic_session_id: academic_session.id})
         if changeset.valid? do
@@ -2247,5 +2255,34 @@ if Repo.get_by(User, [user_name: user.user_name]) == nil do
       end
 
     end
+  end
+end
+
+fees = [
+  %{code: "200", description: "ND Application Fee", amount: 2000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "ND"]).id, is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Applicant" and ts.name == ^"fee_category").id },
+  %{code: "201", description: "HND Application Fee", amount: 8000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "HND"]).id, is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Applicant" and ts.name == ^"fee_category").id },
+  %{code: "202", description: "ND Acceptance Fee", amount: 10000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "ND"]).id, is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "203", description: "HND Acceptance Fee", amount: 14000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "HND"]).id, is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "204", description: "ND I School Fee", amount: 24000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "205", description: "ND I School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "206", description: "ND II School Fee", amount: 23000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "207", description: "ND II School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "208", description: "HND I School Fee", amount: 29000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "209", description: "HND I School Fee", amount: 32000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "210", description: "HND II School Fee", amount: 34500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "211", description: "HND II School Fee", amount: 37500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "212", description: "ND I School Fee", amount: 24000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "213", description: "ND II School Fee", amount: 23000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "214", description: "HND I School Fee", amount: 29000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "216", description: "HND II School Fee", amount: 34500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "219", description: "ND I School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "220", description: "ND II School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "221", description: "HND I School Fee", amount: 32000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
+  %{code: "222", description: "HND II School Fee", amount: 37500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id }
+]
+for fee <- fees do
+  if Repo.get_by(Fee, code: fee.code) == nil do
+    changeset = Fee.changeset(%Fee{}, fee)
+    if changeset.valid?, do: Repo.insert!(changeset)
   end
 end
