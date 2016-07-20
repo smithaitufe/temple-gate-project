@@ -7,6 +7,8 @@ defmodule PortalApi.Repo.Migrations.CreateDepartment do
       add :code, :string
       add :faculty_id, references(:faculties)
       add :department_type_id, references(:terms)
+      
+
 
       timestamps
     end

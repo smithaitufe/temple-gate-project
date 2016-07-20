@@ -1,12 +1,16 @@
 defmodule PortalApi.V1.StudentPaymentController do
   use PortalApi.Web, :controller
 
-  alias PortalApi.StudentPayment
+  alias PortalApi.{Payment, StudentPayment}
 
   plug :scrub_params, "student_payment" when action in [:create, :update]
 
-  def index(conn, _params) do
-    student_payments = Repo.all(StudentPayment)
+  def index(conn, params) do
+    student_payments = StudentPayment
+    |> build_student_payment_query(Map.to_list(params))
+    |> Repo.all
+    |> preload_models
+
     render(conn, "index.json", student_payments: student_payments)
   end
 
@@ -54,4 +58,37 @@ defmodule PortalApi.V1.StudentPaymentController do
 
     send_resp(conn, :no_content, "")
   end
+
+  defp build_student_payment_query(query, [{"student_id", student_id} | tail]) do
+    query
+    |> Ecto.Query.where([sp], sp.student_id == ^student_id)
+    |> build_student_payment_query(tail)
+  end
+  defp build_student_payment_query(query, [{"level_id", level_id} | tail]) do
+    query
+    |> Ecto.Query.where([sp], sp.level_id == ^level_id)
+    |> build_student_payment_query(tail)
+  end
+  defp build_student_payment_query(query, [{"fee_id", fee_id} | tail]) do
+    query
+    |> Ecto.Query.join(:left, [sp], p in assoc(sp, :payment))
+    |> Ecto.Query.where([_, p], p.fee_id == ^fee_id)
+    |> build_student_payment_query(tail)
+  end
+  defp build_student_payment_query(query, [{attr, value} | tail]), do: query
+  defp build_student_payment_query(query, []), do: query
+  # defp build_student_payment_query(query, [{attr, value} | tail]) do
+  #   query
+  #   |> Ecto.Query.where([sp], field(sp, ^String.to_existing_atom(attr)) == ^value)
+  #   |> build_student_payment_query(tail)
+  # end
+
+  defp preload_models(model) do
+    Repo.preload(model, [
+      {:student, [:program, :department, :marital_status, :gender]},
+      {:payment, [:transaction_response, :academic_session, {:fee, [:level, :program] }, :payment_method, :payment_status]}
+      ])
+  end
+
+
 end

@@ -9,6 +9,8 @@ defmodule PortalApi.Program do
 
 
     has_many :levels, PortalApi.Level
+    has_many :program_departments, PortalApi.ProgramDepartment
+    has_many :departments, through: [:program_departments, :department]
 
     timestamps
   end
@@ -31,5 +33,5 @@ defmodule PortalApi.Program do
     from q in query, join: l in assoc(q, :levels), preload: [levels: l]
   end
 
-  
+
 end

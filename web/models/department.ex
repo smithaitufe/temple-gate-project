@@ -5,13 +5,17 @@ defmodule PortalApi.Department do
     field :name, :string
     field :code, :string
     belongs_to :faculty, PortalApi.Faculty
-    belongs_to :department_type, PortalApi.DepartmentType
+    belongs_to :department_type, PortalApi.Term
+
+
+
+    has_many :program_departments, PortalApi.ProgramDepartment
 
     timestamps
   end
 
-  @required_fields ~w(name code department_type_id faculty_id)
-  @optional_fields ~w()
+  @required_fields ~w(name department_type_id faculty_id)
+  @optional_fields ~w(code)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -23,4 +27,5 @@ defmodule PortalApi.Department do
     model
     |> cast(params, @required_fields, @optional_fields)
   end
+
 end

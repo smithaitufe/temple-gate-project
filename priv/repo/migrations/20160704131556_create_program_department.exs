@@ -5,6 +5,8 @@ defmodule PortalApi.Repo.Migrations.CreateProgramDepartment do
     create table(:program_departments) do
       add :program_id, references(:programs)
       add :department_id, references(:departments)
+      add :admit, :boolean, default: false
+
 
       timestamps
     end

@@ -1,16 +1,4 @@
-# Script for populating the database. You can run it as:
-#
-#     mix run priv/repo/seeds.exs
-#
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     PortalApi.Repo.insert!(%SomeModel{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
-
-alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty, Department, ProgramDepartment, Grade, Course, State, LocalGovernmentArea, Student, User, StudentCourse, Fee}
+alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty, Department, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Student, User, StudentCourse, Fee, Payment, StudentPayment, TransactionResponse}
 
 commit = fn(term_set, terms) ->
   for term <- terms do
@@ -48,7 +36,9 @@ term_sets = [
   %{ name: "allowance", display_name: "Allowance" },
   %{ name: "score_type", display_name: "Score Type" },
   %{ name: "user_category", display_name: "User Category" },
-  %{ name: "fee_category", display_name: "Fee Category" }
+  %{ name: "fee_category", display_name: "Fee Category" },
+  %{ name: "payment_method", display_name: "Payment Method" },
+
 ]
 for term_set <- term_sets do
   t = TermSet |> Repo.get_by(name: term_set.name)
@@ -152,6 +142,15 @@ terms = [
   %{description: "Unsuccessful"}
 ]
 commit.(term_set, terms)
+
+term_set = TermSet |> Repo.get_by(name: "payment_method")
+terms = [
+  %{description: "Web Pay"},
+  %{description: "Bank Branch"}
+]
+commit.(term_set, terms)
+
+
 
 term_set = TermSet |> Repo.get_by(name: "semester")
 terms = [
@@ -1189,8 +1188,6 @@ department_list =[
 term_set = Repo.get_by(TermSet, [name: "department_type"])
 department_type = Repo.get_by(Term, [description: "Academic", term_set_id: term_set.id])
 
-
-
 for dept <- department_list do
   if Repo.get_by(Department, name: dept[:name]) == nil do
     faculty = Repo.get_by(Faculty, name: dept[:school])
@@ -1204,7 +1201,6 @@ for dept <- department_list do
         3 ->  ["HND"]
         2 ->  ["ND"]
       end
-
       for p <- programs do
         program = Repo.get_by(Program, name: p)
         program_department = %{program_id: program.id, department_id: department.id}
@@ -1213,9 +1209,7 @@ for dept <- department_list do
           Repo.insert!(changeset)
         end
       end
-
     end
-
   end
 end
 
@@ -2208,17 +2202,19 @@ end
 query = from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Applicant" and ts.name == ^"user_category"
 user_category = Repo.one query
 
+program = Repo.get_by(Program, name: "ND")
+department = Repo.get_by(Department, [name: "Computer Science"])
+level = Repo.get_by(Level, description: "ND I")
+gender = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Male" and ts.name == ^"gender")
+marital_status = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Single" and ts.name == ^"marital_status")
+
 registration_no = "DS151690003478"
 user = %{user_name: String.downcase(registration_no), email: "jane.brown@dspg.edu.ng", password: "password", user_category_id: user_category.id}
-
 if Repo.get_by(User, [user_name: user.user_name]) == nil do
   changeset = User.changeset(%User{}, user)
   if changeset.valid? do
     {:ok, user} = Repo.insert(changeset)
-    program = Repo.get_by(Program, name: "ND")
-    department = Repo.get_by(Department, [name: "Computer Science"])
-
-    student = %{first_name: "Jane", last_name: "Brown", email: "jane.brown@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, user_id: user.id}
+    student = %{first_name: "Jane", last_name: "Brown", email: "jane.brown@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, id: user.id}
     changeset = Student.changeset(%Student{}, student)
     if changeset.valid?, do: Repo.insert!(changeset)
   end
@@ -2226,7 +2222,6 @@ end
 #-------------------------------------------------------
 query = from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"user_category"
 user_category = Repo.one query
-
 registration_no = "DS151690003477"
 user = %{user_name: String.downcase(registration_no), email: "brown.fish@dspg.edu.ng", password: "password", user_category_id: user_category.id}
 
@@ -2234,10 +2229,7 @@ if Repo.get_by(User, [user_name: user.user_name]) == nil do
   changeset = User.changeset(%User{}, user)
   if changeset.valid? do
     {:ok, user} = Repo.insert(changeset)
-    program = Repo.get_by(Program, name: "ND")
-    department = Repo.get_by(Department, [name: "Computer Science"])
-
-    student = %{first_name: "Brown", last_name: "Fish", email: "brown.fish@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, user_id: user.id}
+    student = %{first_name: "Brown", last_name: "Fish", email: "brown.fish@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, id: user.id, level_id: level.id, gender_id: gender.id, marital_status_id: marital_status.id}
     changeset = Student.changeset(%Student{}, student)
     if changeset.valid? do
       {:ok, student} = Repo.insert(changeset)
@@ -2284,5 +2276,64 @@ for fee <- fees do
   if Repo.get_by(Fee, code: fee.code) == nil do
     changeset = Fee.changeset(%Fee{}, fee)
     if changeset.valid?, do: Repo.insert!(changeset)
+  end
+end
+transaction_responses = [
+  %{code: "Z4", description: "Interface Integration Error"},
+  %{code: "51", description: "Insufficient Funds"},
+  %{code: "41", description: "Lost(Card, Pick - Up)"},
+  %{code: "Z6", description: "Incomplete(Transaction)"},
+  %{code: "Z1", description: "Incorrect PIN"},
+  %{code: "59", description: "Suspected Fraud"},
+  %{code: "54", description: "Expired Card"},
+  %{code: "00", description: "Approved Successful"},
+  %{code: "91", description: "Issuer or Switch Inoperative"},
+  %{code: "59", description: "Unable to process CVV2"},
+  %{code: "Z5", description: "Duplicate Reference Error"},
+  %{code: "00", description: "Approved Successfuf"},
+  %{code: "57", description: "Transaction not permitted to Cardholder"},
+  %{code: "Z6", description: "Customer cancellation"},
+  %{code: "04", description: "Pick-up card"},
+  %{code: "43", description: "Stolen Card, Pick-Up"},
+  %{code: "Z2", description: "Bank account error"},
+  %{code: "61", description: "Exceeds Withdrawal Limit"},
+  %{code: "Z0", description: "Transaction Status Unconfirmed"}
+]
+
+for transaction_response <- transaction_responses do
+  if Repo.get_by(TransactionResponse, code: transaction_response.code) == nil do
+    changeset = TransactionResponse.changeset(%TransactionResponse{}, transaction_response)
+    Repo.insert!(changeset)
+  end
+end
+
+registration_no = "DS151690003477"
+
+student = Repo.get_by(Student, registration_no: registration_no)
+fee = Repo.get_by(Fee, code: "212")
+payment_method = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Web Pay" and ts.name == ^"payment_method")
+payment_status = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Successful" and ts.name == ^"payment_status")
+academic_session = Repo.get_by(AcademicSession, active: true)
+
+transaction_response = Repo.get_by(TransactionResponse, code: "00")
+
+payment = %{fee_id: fee.id, amount: fee.amount, service_charge: fee.service_charge, payment_method_id: payment_method.id, payment_status_id: payment_status.id, transaction_response_id: transaction_response.id, academic_session_id: academic_session.id }
+
+changeset = Payment.changeset(%Payment{}, payment)
+if changeset.valid? do
+  {:ok, payment} = Repo.insert(changeset)
+  changeset = StudentPayment.changeset(%StudentPayment{}, %{student_id: student.id, payment_id: payment.id})
+  Repo.insert(changeset)
+end
+
+
+academic_session = Repo.get_by(AcademicSession, active: true)
+program = Repo.get_by(Program, name: "ND")
+
+course_registration_setting = %{academic_session_id: academic_session.id, program_id: program.id, opening_date: "2016-07-13", closing_date: "2016-08-13"}
+if Repo.get_by(CourseRegistrationSetting, [academic_session_id: academic_session.id, program_id: program.id]) == nil do
+  changeset = CourseRegistrationSetting.changeset(%CourseRegistrationSetting{}, course_registration_setting)
+  if changeset.valid? do
+    Repo.insert!(changeset)
   end
 end

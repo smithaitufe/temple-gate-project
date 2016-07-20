@@ -10,6 +10,7 @@ defmodule PortalApi.Repo.Migrations.CreatePayment do
       add :payment_status_id, references(:terms)
       add :payment_method_id, references(:terms)
       add :transaction_response_id, references(:transaction_responses)
+      add :academic_session_id, references(:academic_sessions)
 
       timestamps
     end
@@ -17,6 +18,7 @@ defmodule PortalApi.Repo.Migrations.CreatePayment do
     create index(:payments, [:payment_status_id])
     create index(:payments, [:payment_method_id])
     create index(:payments, [:transaction_response_id])
+    create index(:payments, [:academic_session_id])
 
 
   end

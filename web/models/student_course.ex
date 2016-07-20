@@ -6,7 +6,7 @@ defmodule PortalApi.StudentCourse do
     belongs_to :student, PortalApi.Student
     belongs_to :academic_session, PortalApi.AcademicSession
 
-    
+
     timestamps
   end
 
@@ -27,15 +27,23 @@ defmodule PortalApi.StudentCourse do
 
   def load_associations(query) do
     course_query = from c in PortalApi.Course, preload: [:department, :semester, :level]
+
     from q in query,
     join: c in assoc(q, :course),
     join: s in assoc(q, :student),
     join: a in assoc(q, :academic_session),
     preload: [course: ^course_query, student: s, academic_session: a]
+
+
+    
+  end
+  def filter_by(query, {"student", value}) do
+    from [q, c, s, a] in query,
+    where: q.student_id == ^value
+  end
+  def filter_by(query, {"level", value}) do
+    from [q, c, s, a] in query,
+    where: c.level_id == ^value
   end
 
-  def get_student_courses_by_level(query, student_id, level_id) do
-    from [q, c, s, a] in query,
-    where: q.student_id == ^student_id and c.level_id == ^level_id
-  end
 end

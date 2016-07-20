@@ -5,10 +5,17 @@ defmodule PortalApi.V1.PaymentController do
 
   plug :scrub_params, "payment" when action in [:create, :update]
 
-  def index(conn, _params) do
-    payments = Repo.all(Payment)
-    render(conn, "index.json", payments: payments)
+  def index(conn, %{ "type" => "student", "params" => params } = all) do
+    send_resp(conn, :content, params)
   end
+
+  # def index(conn, _params) do
+  #   payments = Payment
+  #   |> Payment.load_associations
+  #   |> Repo.all
+  #
+  #   render(conn, "index.json", payments: payments)
+  # end
 
   def create(conn, %{"payment" => payment_params}) do
     changeset = Payment.changeset(%Payment{}, payment_params)
@@ -53,5 +60,14 @@ defmodule PortalApi.V1.PaymentController do
     Repo.delete!(payment)
 
     send_resp(conn, :no_content, "")
+  end
+
+  def get_payments_by_category(conn, %{"fee_category_id" => fee_category_id}) do
+    payments = Payment
+    |> Payment.load_associations
+    |> Payment.get_by_category(fee_category_id)
+    |> Repo.all
+
+    render(conn, "index.json", payments: payments)
   end
 end

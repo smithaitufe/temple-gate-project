@@ -14,4 +14,10 @@ defmodule PortalApi.V1.FacultyView do
       name: faculty.name,
       faculty_type_id: faculty.faculty_type_id}
   end
+
+  def render_faculty(json, %{faculty: faculty}) when is_map(faculty) do
+    Map.put(json, :faculty, render("faculty.json", faculty: faculty))
+  end
+
+  def render_faculty(json, _), do: Map.put(json, :faculty, %{})
 end

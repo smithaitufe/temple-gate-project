@@ -5,8 +5,12 @@ defmodule PortalApi.V1.FacultyController do
 
   plug :scrub_params, "faculty" when action in [:create, :update]
 
-  def index(conn, _params) do
-    faculties = Repo.all(Faculty)
+  def index(conn, params) do
+
+    faculties = Faculty
+    |> build_faculty_query(Map.to_list(params))
+    |> Repo.all
+
     render(conn, "index.json", faculties: faculties)
   end
 
@@ -54,4 +58,18 @@ defmodule PortalApi.V1.FacultyController do
 
     send_resp(conn, :no_content, "")
   end
+  defp build_faculty_query(query, []) do
+    query
+  end
+  defp build_faculty_query(query, [{"faculty_type_id", value} | tail]) do
+    query
+    |> Ecto.Query.where([f], f.faculty_type_id == ^value)
+    |> build_faculty_query(tail)
+  end
+  defp build_faculty_query(query, [{attr, value} | tail]) do
+    query
+    |> Ecto.Query.where([f], fragment("? == ?",^attr, ^value ))
+    |> build_faculty_query(tail)
+  end
+
 end

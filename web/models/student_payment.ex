@@ -4,7 +4,15 @@ defmodule PortalApi.StudentPayment do
   schema "student_payments" do
     belongs_to :student, PortalApi.Student
     belongs_to :payment, PortalApi.Payment
-    
+
+    # Virtual fields
+    field :transaction_no, :string, virtual: true
+    field :amount, :decimal, virtual: true
+    field :service_charge, :decimal, virtual: true
+    field :fee_id, :integer, virtual: true
+    field :payment_status_id, :integer, virtual: true
+    field :payment_method_id, :integer, virtual: true
+    field :transaction_response_id, :integer, virtual: true
 
     timestamps
   end

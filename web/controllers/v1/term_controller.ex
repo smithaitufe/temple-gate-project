@@ -6,6 +6,11 @@ defmodule PortalApi.V1.TermController do
   plug :scrub_params, "term" when action in [:create, :update]
 
 
+  def index(conn, %{"name" => name}) do
+    query = from t in Term, join: ts in assoc(t, :term_set), where: ts.name == ^name
+    terms = Repo.all query
+    render(conn, "index.json", terms: terms)
+  end
   def index(conn, _params) do
     terms = Repo.all(Term)
     render(conn, "index.json", terms: terms)
@@ -56,12 +61,4 @@ defmodule PortalApi.V1.TermController do
     send_resp(conn, :no_content, "")
   end
 
-
-  def get_terms_by_term_set_name(conn, %{"name" => name}) do
-    query = from t in Term, join: ts in assoc(t, :term_set), where: ts.name == ^name
-    terms = Repo.all query
-    render(conn, "index.json", terms: terms)
-  end
-
-  
 end

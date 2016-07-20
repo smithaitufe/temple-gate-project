@@ -10,7 +10,7 @@ defmodule PortalApi.User do
 
 
     belongs_to :user_category, PortalApi.Term
-    has_one :student, PortalApi.Student, foreign_key: :user_id
+    has_one :student, PortalApi.Student, foreign_key: :id
 
     has_many :user_roles, PortalApi.UserRole
     has_many :roles, through: [:user_roles, :role]

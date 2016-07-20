@@ -1,31 +1,31 @@
 defmodule PortalApi.V1.ProgramView do
   use PortalApi.Web, :view
+  alias PortalApi.V1.{ProgramView, LevelView}
 
   def render("index.json", %{programs: programs}) do
-    %{data: render_many(programs, PortalApi.V1.ProgramView, "program.json")}
+    %{data: render_many(programs, ProgramView, "program.json")}
   end
 
   def render("show.json", %{program: program}) do
-    %{data: render_one(program, PortalApi.V1.ProgramView, "program.json")}
+    %{data: render_one(program, ProgramView, "program.json")}
   end
 
   def render("program.json", %{program: program}) do
-    %{id: program.id,
+    %{
+      id: program.id,
       name: program.name,
       description: program.description,
       text: program.text,
-      duration: program.duration}
-
-    |> render_levels(%{levels: program.levels})
+      duration: program.duration
+    }
+    # |> LevelView.render_level(%{levels: program.levels})
   end
 
-
-  def render_levels(json, %{levels: levels}) when is_list(levels) do
-    Map.put(json, :levels, render_many(levels, PortalApi.V1.LevelView, "level.json"))
+  def render_program(json, %{program: program}) when is_map(program) do
+    Map.put(json, :program, render_one(program, ProgramView, "program.json"))
   end
-  def render_levels(json, _) do
+  def render_program(json, _) do
     json
   end
-
 
 end

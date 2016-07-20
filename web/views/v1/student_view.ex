@@ -1,17 +1,17 @@
 defmodule PortalApi.V1.StudentView do
   use PortalApi.Web, :view
+  alias PortalApi.V1.{StudentView, ProgramView, LevelView, DepartmentView, TermView}
 
   def render("index.json", %{students: students}) do
-    %{data: render_many(students, PortalApi.V1.StudentView, "student.json")}
+    %{data: render_many(students, StudentView, "student.json")}
   end
 
   def render("show.json", %{student: student}) do
-    %{data: render_one(student, PortalApi.V1.StudentView, "student.json")}
+    %{data: render_one(student, StudentView, "student.json")}
   end
 
   def render("student.json", %{student: student}) do
     %{id: student.id,
-      user_id: student.user_id,
       first_name: student.first_name,
       last_name: student.last_name,
       middle_name: student.middle_name,
@@ -26,5 +26,21 @@ defmodule PortalApi.V1.StudentView do
       department_id: student.department_id,
       program_id: student.program_id,
       level_id: student.level_id}
+      |> ProgramView.render_program(%{program: student.program})
+      |> LevelView.render_level(%{level: student.level})
+      |> DepartmentView.render_department(%{department: student.department})
+      |> TermView.render_term("marital_status", %{term: student.marital_status})
+      |> TermView.render_term("gender", %{term: student.gender})
+
   end
+
+
+
+  def render_student(json, %{student: student}) when is_map(student) do
+    Map.put(json, :student, render_one(student, PortalApi.V1.StudentView, "student.json"))
+  end
+  def render_student(json, _) do
+    json
+  end
+
 end

@@ -1,12 +1,13 @@
 defmodule PortalApi.V1.LevelView do
   use PortalApi.Web, :view
+  alias PortalApi.V1.LevelView
 
   def render("index.json", %{levels: levels}) do
-    %{data: render_many(levels, PortalApi.V1.LevelView, "level.json")}
+    %{data: render_many(levels, LevelView, "level.json")}
   end
 
   def render("show.json", %{level: level}) do
-    %{data: render_one(level, PortalApi.V1.LevelView, "level.json")}
+    %{data: render_one(level, LevelView, "level.json")}
   end
 
   def render("level.json", %{level: level}) do
@@ -14,4 +15,13 @@ defmodule PortalApi.V1.LevelView do
       description: level.description,
       program_id: level.program_id}
   end
+
+  def render_level(json, %{level: level}) when is_map(level) do
+    Map.put(json, :level, render_one(level, LevelView, "level.json"))
+  end
+  def render_level(json, _) do
+    json
+  end
+
+
 end

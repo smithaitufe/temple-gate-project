@@ -33,51 +33,47 @@ defmodule PortalApi.Router do
       get "current_user", CurrentUserController, :show
       resources "term_sets", TermSetController, except: [:new, :edit]
       resources "terms", TermController, except: [:new, :edit]
-      get "term_sets/:name/terms", TermController, :get_terms_by_term_set_name
-
-
+      resources "transaction_responses", TransactionResponseController, except: [:new, :edit]
       resources "states", StateController, except: [:new, :edit]
       resources "local_government_areas", LocalGovernmentAreaController, except: [:new, :edit]
-
+      resources "course_registration_settings", CourseRegistrationSettingController, except: [:new, :edit]
       # Faculty Module
       resources "programs", ProgramController, except: [:new, :edit]
+      resources "program_adverts", ProgramAdvertController, except: [:new, :edit]
       resources "levels", LevelController, except: [:new, :edit]
       resources "faculties", FacultyController, except: [:new, :edit]
       resources "departments", DepartmentController, except: [:new, :edit]
-
       resources "program_departments", ProgramDepartmentController, except: [:new, :edit]
       resources "academic_sessions", AcademicSessionController, except: [:new, :edit]
       resources "assignments", AssignmentController, except: [:new, :edit]
-
-
       # Human Resources Module
       resources "job_titles", JobTitleController, except: [:new, :edit]
       resources "staffs", StaffController, except: [:new, :edit]
       resources "staff_postings", StaffPostingController, except: [:new, :edit]
       resources "staff_academic_qualifications", StaffAcademicQualificationController, except: [:new, :edit]
-
       # Courses Module
       resources "grades", GradeController, except: [:new, :edit]
       resources "courses", CourseController, except: [:new, :edit]
-      get "departments/:department_id/levels/:level_id/courses", CourseController, :get_courses_by_department_and_level
-
-
-
-      get "students/:student_id/levels/:level_id/courses", StudentCourseController, :get_student_courses_by_level
-
       # Accounts/Bursary
       resources "salary_grade_levels", SalaryGradeLevelController, except: [:new, :edit]
       resources "salary_grade_steps", SalaryGradeStepController, except: [:new, :edit]
       resources "fees", FeeController, except: [:new, :edit]
       resources "payments", PaymentController, except: [:new, :edit]
       resources "payment_items", PaymentItemController, except: [:new, :edit]
-
       # Student Module
       resources "students", StudentController, except: [:new, :edit]
+      resources "student_courses", StudentCourseController, except: [:new, :edit]
+      resources "student_payments", StudentPaymentController, only: [:index, :create]
+      resources "student_jamb_records", StudentJambRecordController, except: [:new, :edit]
+      resources "student_diploma_qualifications", StudentDiplomaQualificationController, except: [:new, :edit]
+      resources "student_certificates", StudentCertificateController, except: [:new, :edit]
+      resources "student_certificate_subject_grades", StudentCertificateSubjectGradeController, except: [:new, :edit]
+
+
+
       get "students/:user_id/record", StudentController, :get_student_by_user_id
 
-      resources "student_courses", StudentCourseController, except: [:new, :edit]
-      get "students/:student_id/level/:level_id/courses", CourseEnrollmentController, :get_student_course_enrollment_by_level
+
 
       resources "project_topics", ProjectTopicController, except: [:new, :edit]
       resources "student_project_supervisors", StudentProjectSupervisorController, except: [:new, :edit]
@@ -85,7 +81,7 @@ defmodule PortalApi.Router do
       resources "student_results", StudentResultController, except: [:new, :edit]
       resources "student_result_grades", StudentResultGradeController, except: [:new, :edit]
       resources "student_assignments", StudentAssignmentController, except: [:new, :edit]
-      resources "student_payments", StudentPaymentController, except: [:new, :edit]
+
 
     end
   end

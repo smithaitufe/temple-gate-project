@@ -1,13 +1,15 @@
 defmodule PortalApi.V1.CourseView do
   use PortalApi.Web, :view
+  alias PortalApi.V1.{CourseView, TermView, DepartmentView, LevelView}
 
   def render("index.json", %{courses: courses}) do
-    %{data: render_many(courses, PortalApi.V1.CourseView, "course.json")}
+
+    %{data: render_many(courses, CourseView, "course.json")}
+  end
+  def render("show.json", %{course: course}) do
+    %{data: render_one(course, CourseView, "course.json")}
   end
 
-  def render("show.json", %{course: course}) do
-    %{data: render_one(course, PortalApi.V1.CourseView, "course.json")}
-  end
 
   def render("course.json", %{course: course}) do
     %{id: course.id,
@@ -21,29 +23,16 @@ defmodule PortalApi.V1.CourseView do
       core: course.core,
       description: course.description
     }
-    |> render_department(%{department: course.department})
-    |> render_level(%{level: course.level})
-    |> render_semester(%{semester: course.semester})
+    |> DepartmentView.render_department(%{department: course.department})
+    |> LevelView.render_level(%{level: course.level})
+    |> TermView.render_term("semester", %{term: course.semester})
   end
 
-  def render_department(json, %{department: department}) when is_map(department) do
-    Map.put(json, :department, render_one(department, PortalApi.V1.DepartmentView, "department.json"))
+  def render_course(json, %{course: course}) when is_map(course) do
+    Map.put(json, :course, render_one(course, CourseView, "course.json"))
   end
-  def render_department(json, _) do
-    json
-  end
-  def render_level(json, %{level: level}) when is_map(level) do
-    Map.put(json, :level, render_one(level, PortalApi.V1.LevelView, "level.json"))
-  end
-  def render_level(json, _) do
-    json
-  end
-  def render_semester(json, %{semester: semester}) when is_map(semester) do
-    Map.put(json, :semester, render_one(semester, PortalApi.V1.TermView, "term.json"))
-  end
-  def render_semester(json, _) do
-    json
+  def render_course(json, _) do
+    Map.put(json, :course, %{})
   end
 
-  
 end

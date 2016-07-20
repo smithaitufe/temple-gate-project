@@ -5,8 +5,11 @@ defmodule PortalApi.V1.LevelController do
 
   plug :scrub_params, "level" when action in [:create, :update]
 
-  def index(conn, _params) do
-    levels = Repo.all(Level)
+  def index(conn, params) do
+    levels = Level
+    |> build_level_query(Map.to_list(params))
+    |> Repo.all
+
     render(conn, "index.json", levels: levels)
   end
 
@@ -54,4 +57,11 @@ defmodule PortalApi.V1.LevelController do
 
     send_resp(conn, :no_content, "")
   end
+
+  defp build_level_query(query, [{"program_id", program_id} | tail]) do
+    query
+    |> Ecto.Query.where([l], l.program_id == ^program_id)
+    |> build_level_query(tail)
+  end
+  defp build_level_query(query, []), do: query
 end

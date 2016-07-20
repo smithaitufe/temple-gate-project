@@ -5,10 +5,11 @@ defmodule PortalApi.V1.CourseController do
 
   plug :scrub_params, "course" when action in [:create, :update]
 
-  def index(conn, _params) do
+  def index(conn, params) do
     courses = Course
-    |> Course.load_associations
+    |> build_course_query(Map.to_list(params))
     |> Repo.all
+    |> Repo.preload([:semester, :level, :department])
 
     render(conn, "index.json", courses: courses)
   end
@@ -18,6 +19,8 @@ defmodule PortalApi.V1.CourseController do
 
     case Repo.insert(changeset) do
       {:ok, course} ->
+        course = Repo.preload(course, [:semester, :level, :department])
+
         conn
         |> put_status(:created)
         |> put_resp_header("location", v1_course_path(conn, :show, course))
@@ -31,15 +34,17 @@ defmodule PortalApi.V1.CourseController do
 
   def show(conn, %{"id" => id}) do
     course = Repo.get!(Course, id)
+    |> Repo.preload([:semester, :level, :department])
+
     render(conn, "show.json", course: course)
   end
 
   def update(conn, %{"id" => id, "course" => course_params}) do
     course = Repo.get!(Course, id)
     changeset = Course.changeset(course, course_params)
-
     case Repo.update(changeset) do
       {:ok, course} ->
+        course = Repo.preload(course, [:semester, :level, :department])
         render(conn, "show.json", course: course)
       {:error, changeset} ->
         conn
@@ -50,11 +55,7 @@ defmodule PortalApi.V1.CourseController do
 
   def delete(conn, %{"id" => id}) do
     course = Repo.get!(Course, id)
-
-    # Here we use delete! (with a bang) because we expect
-    # it to always work (and if it does not, it will raise).
     Repo.delete!(course)
-
     send_resp(conn, :no_content, "")
   end
 
@@ -63,8 +64,39 @@ defmodule PortalApi.V1.CourseController do
     query = from c in Course,
             where: c.department_id == ^department_id and c.level_id == ^level_id
 
-    courses = query |> Course.load_associations |> Repo.all
+    courses = query
+    |> Course.load_associations
+    |> Repo.all
 
     render(conn, "index.json", courses: courses)
   end
+
+  defp build_course_query(query, []),  do: query
+  defp build_course_query(query, [{"department_id", value} | tail]) do
+    query
+    |> Ecto.Query.where([c], c.department_id == ^value)
+    |> build_course_query(tail)
+  end
+  defp build_course_query(query, [{"level_id", value} | tail])  do
+    query
+    |> Ecto.Query.where([c], c.level_id == ^value)
+    |> build_course_query(tail)
+  end
+  defp build_course_query(query, [{"semester_id", value} | tail])  do
+    query
+    |> Ecto.Query.where([c], c.semester_id == ^value)
+    |> build_course_query(tail)
+  end
+  # defp build_course_query(query, [{attr, value} | tail]) do
+  #   query
+  #   |> Ecto.Query.where([c], field(c, ^String.to_existing_atom(attr)) == ^value)
+  #   |> build_course_query(tail)
+  # end
+  defp build_course_query(query, [{"order_by", field} | tail]) do
+    query
+    |> Ecto.Query.order_by([asc: ^String.to_existing_atom(field)])
+    |> build_course_query(tail)
+  end
+
+
 end

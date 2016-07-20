@@ -5,8 +5,11 @@ defmodule PortalApi.V1.AcademicSessionController do
 
   plug :scrub_params, "academic_session" when action in [:create, :update]
 
-  def index(conn, _params) do
-    academic_sessions = Repo.all(AcademicSession)
+  def index(conn, params) do
+    academic_sessions = AcademicSession
+    |> build_academic_session_query(Map.to_list(params) )
+    |> Repo.all
+
     render(conn, "index.json", academic_sessions: academic_sessions)
   end
 
@@ -54,4 +57,25 @@ defmodule PortalApi.V1.AcademicSessionController do
 
     send_resp(conn, :no_content, "")
   end
+
+
+  defp build_academic_session_query(query, [{"active", active} | tail]) do
+    query
+    |> Ecto.Query.where([a], a.active == ^active)
+    |> build_academic_session_query(tail)
+  end
+  defp build_academic_session_query(query, [{"order_by", field} | tail]) do
+    query
+    |> Ecto.Query.order_by([asc: ^String.to_existing_atom(field)])
+    |> build_academic_session_query(tail)
+  end
+  defp build_academic_session_query(query, [{"order_by_desc", field} | tail]) do
+    query
+    |> Ecto.Query.order_by([desc: ^String.to_existing_atom(field)])
+    |> build_academic_session_query(tail)
+  end
+
+  defp build_academic_session_query(query, []), do: query
+  defp build_academic_session_query(query, [_ | tail]), do: query
+
 end

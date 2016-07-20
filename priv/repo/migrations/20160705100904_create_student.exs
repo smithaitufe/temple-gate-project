@@ -2,8 +2,8 @@ defmodule PortalApi.Repo.Migrations.CreateStudent do
   use Ecto.Migration
 
   def change do
-    create table(:students) do      
-
+    create table(:students, primary_key: false) do
+      add :id, references(:users), primary_key: true
       add :first_name, :string, limit: 50, null: false
       add :last_name, :string, limit: 50, null: false
       add :middle_name, :string, limit: 50
@@ -18,7 +18,7 @@ defmodule PortalApi.Repo.Migrations.CreateStudent do
       add :department_id, references(:departments)
       add :program_id, references(:programs)
       add :level_id, references(:levels)
-      add :user_id, references(:users)
+
 
       timestamps
     end
