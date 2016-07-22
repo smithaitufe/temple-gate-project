@@ -54,4 +54,11 @@ defmodule PortalApi.V1.StudentCertificateController do
 
     send_resp(conn, :no_content, "")
   end
+
+  defp build_student_certificate_query(query, [{attr, value} | tail]) do
+    query
+    |> Ecto.Query.where([sc], field(sc, ^String.to_existing_atom(attr)) == ^value)
+    |> build_student_certificate_query(tail)
+  end
+  defp build_student_certificate_query(query, []), do: query
 end

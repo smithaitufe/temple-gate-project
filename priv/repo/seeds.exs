@@ -38,6 +38,7 @@ term_sets = [
   %{ name: "user_category", display_name: "User Category" },
   %{ name: "fee_category", display_name: "Fee Category" },
   %{ name: "payment_method", display_name: "Payment Method" },
+  %{ name: "entry_mode", display_name: "Entry Mode" },
 
 ]
 for term_set <- term_sets do
@@ -253,6 +254,15 @@ terms = [
   %{description: "Overtime"}
 ]
 commit.(term_set, terms)
+
+term_set = TermSet |> Repo.get_by(name: "entry_mode")
+terms = [
+  %{description: "Direct Entry"},
+  %{description: "Post UTME"}
+]
+commit.(term_set, terms)
+
+
 
 programs = [
   %{name: "ND", description: "National Diploma", duration: 2 }, %{name: "HND", description: "Higher National Diploma", duration: 2 }

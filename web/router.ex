@@ -37,6 +37,7 @@ defmodule PortalApi.Router do
       resources "states", StateController, except: [:new, :edit]
       resources "local_government_areas", LocalGovernmentAreaController, except: [:new, :edit]
       resources "course_registration_settings", CourseRegistrationSettingController, except: [:new, :edit]
+      resources "newrooms", NewsroomController, except: [:new, :edit]
       # Faculty Module
       resources "programs", ProgramController, except: [:new, :edit]
       resources "program_adverts", ProgramAdvertController, except: [:new, :edit]

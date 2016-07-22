@@ -7,6 +7,8 @@ defmodule PortalApi.StudentCertificate do
     belongs_to :student, PortalApi.Student
     belongs_to :examination_body, PortalApi.ExaminationBody
 
+    has_many :student_certificate_subject_grades, PortalApi.StudentCertificateSubjectGrade
+
     timestamps
   end
 

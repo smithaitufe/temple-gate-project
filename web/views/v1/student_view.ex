@@ -25,7 +25,9 @@ defmodule PortalApi.V1.StudentView do
       academic_session_id: student.academic_session_id,
       department_id: student.department_id,
       program_id: student.program_id,
-      level_id: student.level_id}
+      level_id: student.level_id,
+      entry_mode_id: student.entry_mode_id
+    }
       |> ProgramView.render_program(%{program: student.program})
       |> LevelView.render_level(%{level: student.level})
       |> DepartmentView.render_department(%{department: student.department})

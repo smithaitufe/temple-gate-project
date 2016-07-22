@@ -20,6 +20,7 @@ defmodule PortalApi.Student do
     belongs_to :program, PortalApi.Program
     belongs_to :level, PortalApi.Level
     belongs_to :user, PortalApi.User, define_field: false
+    belongs_to :entry_mode, PortalApi.Term
 
 
     has_many :student_payments, PortalApi.StudentPayment
@@ -28,11 +29,15 @@ defmodule PortalApi.Student do
     has_many :student_courses, PortalApi.StudentCourse
     has_many :courses, through: [:student_courses, :course]
 
+    has_many :student_certificates, PortalApi.StudentCertificate
+    has_one :student_jamb_record, PortalApi.StudentJambRecord
+    has_one :student_diploma_qualification, PortalApi.StudentDiplomaQualification
+
 
     timestamps
   end
 
-  @required_fields ~w(id first_name last_name email registration_no program_id department_id)
+  @required_fields ~w(id first_name last_name email registration_no program_id department_id entry_mode_id)
   @optional_fields ~w(middle_name marital_status_id gender_id birth_date phone_number matriculation_no level_id)
 
   @doc """
