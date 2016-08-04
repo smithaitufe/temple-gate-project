@@ -21,5 +21,17 @@ defmodule PortalApi.Role do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> generate_slug()
+  end
+
+  defp generate_slug(changeset) do
+    if description = get_change(changeset, :description) do
+      slug = description
+      |> String.downcase
+      |> String.replace(~r/[^\w-]+/, "-")
+      put_change(changeset, :slug, slug)
+    else
+      changeset
+    end
   end
 end
