@@ -74,6 +74,6 @@ defmodule PortalApi.V1.StudentCourseController do
     |> build_student_course_query(tail)
   end
   defp preload_models(model) do
-     Repo.preload(model, [:student, :academic_session, {:course, [:department, :level, :semester]}])
+     Repo.preload(model, [{:student,[:gender, :marital_status, :program, :level, {:department, [:faculty, :department_type]}]}, :academic_session, {:course, [{:department, [:faculty, :department_type]}, :level, :semester]}])
   end
 end

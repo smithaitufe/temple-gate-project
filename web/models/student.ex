@@ -1,44 +1,48 @@
 defmodule PortalApi.Student do
   use PortalApi.Web, :model
 
-  @primary_key {:id, :integer, autogenerate: false}
+  # @primary_key {:id, :integer, autogenerate: false}
   schema "students" do
 
 
-    field :first_name, :string
-    field :last_name, :string
-    field :middle_name, :string
+    field :first_name, :string, limit: 50, null: false
+    field :last_name, :string, limit: 50, null: false
+    field :middle_name, :string, limit: 50
     field :birth_date, Ecto.Date
     field :phone_number, :string
     field :email, :string
     field :registration_no, :string
     field :matriculation_no, :string
+    field :admitted, :boolean, default: false
+
     belongs_to :gender, PortalApi.Term
     belongs_to :marital_status, PortalApi.Term
     belongs_to :academic_session, PortalApi.AcademicSession
     belongs_to :department, PortalApi.Department
     belongs_to :program, PortalApi.Program
     belongs_to :level, PortalApi.Level
-    belongs_to :user, PortalApi.User, define_field: false
+    belongs_to :user, PortalApi.User
     belongs_to :entry_mode, PortalApi.Term
 
+    has_one :student_program, PortalApi.StudentProgram
+    has_many :student_courses, PortalApi.StudentCourse
+    has_many :courses, through: [:student_courses, :course]
+    has_many :student_certificates, PortalApi.StudentCertificate
+    has_one :student_jamb_record, PortalApi.StudentJambRecord
+    has_one :student_diploma_qualification, PortalApi.StudentDiplomaQualification
 
     has_many :student_payments, PortalApi.StudentPayment
     has_many :payments, through: [:student_payments, :payment]
 
-    has_many :student_courses, PortalApi.StudentCourse
-    has_many :courses, through: [:student_courses, :course]
 
-    has_many :student_certificates, PortalApi.StudentCertificate
-    has_one :student_jamb_record, PortalApi.StudentJambRecord
-    has_one :student_diploma_qualification, PortalApi.StudentDiplomaQualification
+    # field :password, :string, virtual: true
 
 
     timestamps
   end
 
-  @required_fields ~w(id first_name last_name email registration_no program_id department_id entry_mode_id)
-  @optional_fields ~w(middle_name marital_status_id gender_id birth_date phone_number matriculation_no level_id)
+  @required_fields ~w(first_name last_name email program_id department_id academic_session_id entry_mode_id)
+  @optional_fields ~w(middle_name marital_status_id gender_id birth_date phone_number registration_no matriculation_no level_id admitted user_id)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -49,6 +53,7 @@ defmodule PortalApi.Student do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    
   end
 
 end

@@ -2,15 +2,26 @@ defmodule PortalApi.V1.PaymentView do
   use PortalApi.Web, :view
 
   def render("index.json", %{payments: payments}) do
-    %{data: render_many(payments, PortalApi.V1.PaymentView, "payment.json")}
+    render_many(payments, PortalApi.V1.PaymentView, "payment.json")
   end
 
   def render("show.json", %{payment: payment}) do
-    %{data: render_one(payment, PortalApi.V1.PaymentView, "payment.json")}
+    render_one(payment, PortalApi.V1.PaymentView, "payment.json")
   end
 
   def render("payment.json", %{payment: payment}) do
-    %{id: payment.id,
+    render("payment_lite.json", payment: payment)
+    |> render_fee(%{fee: payment.fee})
+    |> render_payment_method(%{payment_method: payment.payment_method})
+    |> render_payment_status(%{payment_status: payment.payment_status})
+    |> render_transaction_response(%{transaction_response: payment.transaction_response})
+    |> render_academic_session(%{academic_session: payment.academic_session})
+
+  end
+
+  def render("payment_lite.json", %{payment: payment}) do
+    %{
+      id: payment.id,
       transaction_no: payment.transaction_no,
       fee_id: payment.fee_id,
       amount: payment.amount,
@@ -21,13 +32,9 @@ defmodule PortalApi.V1.PaymentView do
       academic_session_id: payment.academic_session_id,
       inserted_at: payment.inserted_at
     }
-    |> render_fee(%{fee: payment.fee})
-    |> render_payment_method(%{payment_method: payment.payment_method})
-    |> render_payment_status(%{payment_status: payment.payment_status})
-    |> render_transaction_response(%{transaction_response: payment.transaction_response})
-    |> render_academic_session(%{academic_session: payment.academic_session})
-
   end
+
+
 
 
   defp render_fee(json, %{fee: fee}) when is_map(fee) do

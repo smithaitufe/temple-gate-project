@@ -5,7 +5,7 @@ defmodule PortalApi.Repo.Migrations.CreateUserRole do
     create table(:user_roles) do
       add :default, :boolean, default: false
       add :user_id, references(:users)
-      add :role_id, references(:terms)
+      add :role_id, references(:roles)
 
       timestamps
     end

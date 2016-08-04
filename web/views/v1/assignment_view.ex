@@ -1,12 +1,13 @@
 defmodule PortalApi.V1.AssignmentView do
   use PortalApi.Web, :view
+  alias PortalApi.V1.AssignmentView
 
   def render("index.json", %{assignments: assignments}) do
-    %{data: render_many(assignments, PortalApi.V1.AssignmentView, "assignment.json")}
+    render_many(assignments, AssignmentView, "assignment.json")
   end
 
   def render("show.json", %{assignment: assignment}) do
-    %{data: render_one(assignment, PortalApi.V1.AssignmentView, "assignment.json")}
+    render_one(assignment, AssignmentView, "assignment.json")
   end
 
   def render("assignment.json", %{assignment: assignment}) do

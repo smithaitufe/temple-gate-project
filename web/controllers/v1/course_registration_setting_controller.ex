@@ -32,7 +32,7 @@ defmodule PortalApi.V1.CourseRegistrationSettingController do
   end
 
   def show(conn, %{"id" => id}) do
-    course_registration_setting = Repo.get!(CourseRegistrationSetting, id)
+    course_registration_setting = Repo.get(CourseRegistrationSetting, id)
     |> preload_models
 
     render(conn, "show.json", course_registration_setting: course_registration_setting)

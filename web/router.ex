@@ -27,6 +27,8 @@ defmodule PortalApi.Router do
 
     scope "/v1", V1, as: :v1 do
 
+      post "remitas", RemitaController, :create
+      resources "roles", RoleController, except: [:new, :edit]
       resources "users", UserController, except: [:new, :edit]
       resources "user_roles", UserRoleController, except: [:new, :edit]
       resources "sessions", SessionController, only: [:create, :delete]
@@ -37,7 +39,7 @@ defmodule PortalApi.Router do
       resources "states", StateController, except: [:new, :edit]
       resources "local_government_areas", LocalGovernmentAreaController, except: [:new, :edit]
       resources "course_registration_settings", CourseRegistrationSettingController, except: [:new, :edit]
-      resources "newrooms", NewsroomController, except: [:new, :edit]
+      resources "newsrooms", NewsroomController, except: [:new, :edit]
       # Faculty Module
       resources "programs", ProgramController, except: [:new, :edit]
       resources "program_adverts", ProgramAdvertController, except: [:new, :edit]
@@ -48,7 +50,10 @@ defmodule PortalApi.Router do
       resources "academic_sessions", AcademicSessionController, except: [:new, :edit]
       resources "assignments", AssignmentController, except: [:new, :edit]
       # Human Resources Module
+      resources "jobs", JobController, except: [:new, :edit]
+      resources "job_postings", JobPostingController, except: [:new, :edit]
       resources "job_titles", JobTitleController, except: [:new, :edit]
+
       resources "staffs", StaffController, except: [:new, :edit]
       resources "staff_postings", StaffPostingController, except: [:new, :edit]
       resources "staff_academic_qualifications", StaffAcademicQualificationController, except: [:new, :edit]
@@ -63,6 +68,7 @@ defmodule PortalApi.Router do
       resources "payment_items", PaymentItemController, except: [:new, :edit]
       # Student Module
       resources "students", StudentController, except: [:new, :edit]
+      resources "student_programs", StudentProgramController, except: [:new, :edit]
       resources "student_courses", StudentCourseController, except: [:new, :edit]
       resources "student_payments", StudentPaymentController, only: [:index, :create]
       resources "student_jamb_records", StudentJambRecordController, except: [:new, :edit]

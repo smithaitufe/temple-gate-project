@@ -3,7 +3,7 @@ defmodule PortalApi.V1.EnrollmentView do
   alias PortalApi.V1.EnrollmentView
 
   def render("index.json", %{"enrollments" => enrollments}) do
-    %{data: render_many(enrollments, EnrollmentView, "enrollment.json" )}
+    render_many(enrollments, EnrollmentView, "enrollment.json" )
   end
 
 

@@ -2,11 +2,11 @@ defmodule PortalApi.V1.StudentJambRecordView do
   use PortalApi.Web, :view
 
   def render("index.json", %{student_jamb_records: student_jamb_records}) do
-    %{data: render_many(student_jamb_records, PortalApi.V1.StudentJambRecordView, "student_jamb_record.json")}
+    render_many(student_jamb_records, PortalApi.V1.StudentJambRecordView, "student_jamb_record.json")
   end
 
   def render("show.json", %{student_jamb_record: student_jamb_record}) do
-    %{data: render_one(student_jamb_record, PortalApi.V1.StudentJambRecordView, "student_jamb_record.json")}
+    render_one(student_jamb_record, PortalApi.V1.StudentJambRecordView, "student_jamb_record.json")
   end
 
   def render("student_jamb_record.json", %{student_jamb_record: student_jamb_record}) do

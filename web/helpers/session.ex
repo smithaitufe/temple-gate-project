@@ -4,8 +4,9 @@ defmodule PortalApi.Helper.Session do
 
   def authenticate(%{"user_name" => user_name, "password" => password}) do
     user = User
-    |> User.load_user_category_and_roles
     |> Repo.get_by(user_name: String.downcase(user_name))
+    |> Repo.preload([:user_category, :roles])
+    
     case check_password(user, password) do
       true -> {:ok, user}
       _ -> {:error, :unsuccessful}

@@ -5,7 +5,7 @@ defmodule PortalApi.V1.CurrentUserController do
 
   def show(conn, _) do
     user = Guardian.Plug.current_resource(conn)
-
+    user = user |> Repo.preload([:user_category, :roles])
     conn
     |> put_status(:ok)
     |> render("show.json", user: user)

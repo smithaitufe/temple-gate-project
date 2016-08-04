@@ -85,6 +85,14 @@ defmodule PortalApi.V1.DepartmentController do
     |> build_department_query(tail)
   end
 
+  # defp build_department_query(query, [{"available_department", value} | tail]) do
+  #   query
+  #   |> Ecto.Query.join(:inner, [d], pd in assoc(d, :program_departments))
+  #   |> Ecto.Query.join(:inner, [d, pd], p in assoc(pd, :program))
+  #   |> Ecto.Query.where([d, pd, p], p.id == ^program_id)
+  #   |> build_department_query(tail)
+  # end
+
   defp preload_models(query) do
     Repo.preload(query, [:faculty, :department_type])
   end

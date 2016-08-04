@@ -3,11 +3,10 @@ defmodule PortalApi.V1.CourseView do
   alias PortalApi.V1.{CourseView, TermView, DepartmentView, LevelView}
 
   def render("index.json", %{courses: courses}) do
-
-    %{data: render_many(courses, CourseView, "course.json")}
+    render_many(courses, CourseView, "course.json")
   end
   def render("show.json", %{course: course}) do
-    %{data: render_one(course, CourseView, "course.json")}
+    render_one(course, CourseView, "course.json")
   end
 
 

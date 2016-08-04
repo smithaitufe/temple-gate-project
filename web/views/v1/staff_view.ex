@@ -1,12 +1,13 @@
 defmodule PortalApi.V1.StaffView do
   use PortalApi.Web, :view
+  alias PortalApi.V1.StaffView
 
   def render("index.json", %{staffs: staffs}) do
-    %{data: render_many(staffs, PortalApi.V1.StaffView, "staff.json")}
+    render_many(staffs, StaffView, "staff.json")
   end
 
   def render("show.json", %{staff: staff}) do
-    %{data: render_one(staff, PortalApi.V1.StaffView, "staff.json")}
+    render_one(staff, StaffView, "staff.json")
   end
 
   def render("staff.json", %{staff: staff}) do

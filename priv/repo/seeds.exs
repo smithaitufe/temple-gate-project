@@ -1,4 +1,4 @@
-alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty, Department, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Student, User, StudentCourse, Fee, Payment, StudentPayment, TransactionResponse}
+alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty, Department, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Student, User, UserRole, StudentCourse, Fee, Payment, StudentPayment, TransactionResponse, Newsroom, ProgramAdvert, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Staff, StaffPosting}
 
 commit = fn(term_set, terms) ->
   for term <- terms do
@@ -39,7 +39,7 @@ term_sets = [
   %{ name: "fee_category", display_name: "Fee Category" },
   %{ name: "payment_method", display_name: "Payment Method" },
   %{ name: "entry_mode", display_name: "Entry Mode" },
-
+  %{ name: "role", display_name: "Role"}
 ]
 for term_set <- term_sets do
   t = TermSet |> Repo.get_by(name: term_set.name)
@@ -212,15 +212,8 @@ commit.(term_set, terms)
 
 term_set = TermSet |> Repo.get_by(name: "salary_structure_type")
 terms =[
-  %{description: "CONPSS"},
   %{description: "CONPCASS"},
-  %{description: "CONTEDISS"},
-  %{description: "CONHESS"},
-  %{description: "CONMESS"},
-  %{description: "HAPSS"},
-  %{description: "HATISS"},
-  %{description: "CONPSSS"},
-  %{description: "CONTISS"}
+  %{description: "CONTEDISS"}
 ]
 commit.(term_set, terms)
 
@@ -231,6 +224,18 @@ terms =[
   %{description: "Staff"}
 ]
 commit.(term_set, terms)
+
+term_set = TermSet |> Repo.get_by(name: "role")
+terms =[
+  %{description: "Admin"},
+  %{description: "HeadDepartment"},
+  %{description: "Lecturer"},
+  %{description: "Bursar"},
+  %{description: "Account"}
+]
+commit.(term_set, terms)
+
+
 
 term_set = TermSet |> Repo.get_by(name: "fee_category")
 terms =[
@@ -1150,29 +1155,7 @@ for faculty <- faculties do
 end
 
 
-department_list =[
-  # %{name: "Fashion Design and Clothing Technology", code: "FAS", school: "School of Art and Design"},
-  # %{name: "Fine and Applied Art", code: "FAA", school: "School of Art and Design"},
-  # %{name: "Accountancy", code: "ACC", school: "School of Business Studies"},
-  # %{name: "Business Administration", code: "BAM", school: "School of Business Studies"},
-  # %{name: "Office Technology and Management", code: "OTM", school: "School of Business Studies"},
-  # %{name: "Mass Communication", code: "MCM", school: "School of Business Studies"},
-  # %{name: "Mechanical Engineering", code: "MEC", school: "School of Engineering"},
-  # %{name: "Welding and Fabrication", code: "WED", school: "School of Engineering"},
-  # %{name: "Hospitality", code: "HTM", school: "School of Applied Sciences"},
-  # %{name: "Computer Science", code: "COM", school: "School of Applied Sciences"},
-  # %{name: "Mathematics and Statistics", code: "STA", school: "School of Applied Sciences"},
-  # %{name: "Electrical/Electronics Engineering", code: "EEE", school: "School of Engineering"},
-  # %{name: "Foundry Engineering", code: "FDT", school: "School of Engineering"},
-  # %{name: "Computer Engineering", code: "CET", school: "School of Engineering"},
-  # %{name: "Metallurgical Engineering", code: "MET", school: "School of Engineering"},
-  # %{name: "Human Resources Management", code: "HRM", school: "School of Business Studies"},
-  # %{name: "Production Operations Management", code: "POM", school: "School of Business Studies"},
-  # %{name: "Banking and Finance", code: "BNF", school: "School of Business Studies"},
-  # %{name: "Marketing", code: "MKT", school: "School of Business Studies"},
-  # %{name: "Agricultural & Bio-Environmental Engineering Technology", code: "ABE", school: "School of Engineering"},
-  # %{name: "Civil Engineering Technology", code: "CEC", school: "School of Engineering"},
-
+department_list = [
   %{name: "Fashion Design and Clothing Technology", abbreviation: "FAS", school: "School of Art and Design", program: "NDHND"},
   %{name: "Fine and Applied Art", abbreviation: "FAA", school: "School of Art and Design", program: "NDHND"},
   %{name: "Accountancy", abbreviation: "ACC", school: "School of Business Studies", program: "NDHND"},
@@ -2217,6 +2200,8 @@ department = Repo.get_by(Department, [name: "Computer Science"])
 level = Repo.get_by(Level, description: "ND I")
 gender = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Male" and ts.name == ^"gender")
 marital_status = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Single" and ts.name == ^"marital_status")
+entry_mode = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Post UTME" and ts.name == ^"entry_mode")
+academic_session = Repo.get_by(AcademicSession, [description: "2016/2017", active: true])
 
 registration_no = "DS151690003478"
 user = %{user_name: String.downcase(registration_no), email: "jane.brown@dspg.edu.ng", password: "password", user_category_id: user_category.id}
@@ -2224,12 +2209,13 @@ if Repo.get_by(User, [user_name: user.user_name]) == nil do
   changeset = User.changeset(%User{}, user)
   if changeset.valid? do
     {:ok, user} = Repo.insert(changeset)
-    student = %{first_name: "Jane", last_name: "Brown", email: "jane.brown@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, id: user.id}
+    student = %{first_name: "Jane", last_name: "Brown", email: "jane.brown@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, entry_mode_id: entry_mode.id, user_id: user.id, academic_session_id: academic_session.id}
     changeset = Student.changeset(%Student{}, student)
+
     if changeset.valid?, do: Repo.insert!(changeset)
   end
 end
-#-------------------------------------------------------
+
 query = from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"user_category"
 user_category = Repo.one query
 registration_no = "DS151690003477"
@@ -2239,8 +2225,9 @@ if Repo.get_by(User, [user_name: user.user_name]) == nil do
   changeset = User.changeset(%User{}, user)
   if changeset.valid? do
     {:ok, user} = Repo.insert(changeset)
-    student = %{first_name: "Brown", last_name: "Fish", email: "brown.fish@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, id: user.id, level_id: level.id, gender_id: gender.id, marital_status_id: marital_status.id}
+    student = %{first_name: "Brown", last_name: "Fish", email: "brown.fish@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, user_id: user.id, level_id: level.id, gender_id: gender.id, marital_status_id: marital_status.id, entry_mode_id: entry_mode.id, academic_session_id: academic_session.id}
     changeset = Student.changeset(%Student{}, student)
+
     if changeset.valid? do
       {:ok, student} = Repo.insert(changeset)
       level = Repo.get_by(Level, description: "ND I")
@@ -2259,6 +2246,163 @@ if Repo.get_by(User, [user_name: user.user_name]) == nil do
     end
   end
 end
+
+user_category = Repo.all(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Staff" and ts.name == ^"user_category") |> List.first
+
+users = [
+  %{user_name: String.downcase("WLD/STF/000301"), email: "evragab@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{user_name: String.downcase("WLD/STF/000300"), email: "smithaitufe@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{user_name: String.downcase("WLD/STF/000302"), email: "jun.gospel@walden.edu.ng", password: "password", user_category_id: user_category.id}
+]
+Enum.each(users, fn user ->
+%User{}
+|> User.changeset(user)
+|> Repo.insert()
+end)
+
+department_type = Repo.one(Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> Ecto.Query.where([t, ts], ts.name == ^"department_type" and t.description == ^"Non Academic"))
+[
+  %{title: "Bursar", description: "The Bursar is responsible to the Rector on all financial matters in the Polytechnic. He is the custodian of the Polytechnic’s financial records and plans organize and coordinate the operation of the financial system of the Polytechnic", department_type_id: department_type.id},
+  %{title: "The Polytechnic Librarian", description: "The Polytechnic Librarian is responsible to the Rector for the administration and smooth operation of the Library services of the Polytechnic. He shall possess those personal qualities like drive, innovation, resourcefulness and ability to initiate and supervise research", department_type_id: department_type.id},
+  %{title: "Director of Medical Services", description: "The Director Medical Services Is responsible for the administration of medical services in the polytechnic. He shall be in charge of all the Clinics and All matters that relates to medical care.", department_type_id: department_type.id},
+  %{title: "Director of Works and Maintenance Services", description: "The Director of Works and Maintenance shall be the overall controller of the Works and Estate Department", department_type_id: department_type.id}
+]
+|> Enum.each(fn job ->
+  %Job{}
+  |> Job.changeset(job)
+  |> Repo.insert()
+end)
+
+types = ["CONPCASS","CONTEDISS"]
+for st <- types do
+  salary_structure_type = Term
+  |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set))
+  |> Ecto.Query.where([t,ts], t.description == ^st and ts.name == ^"salary_structure_type")
+  |> Repo.all
+  |> List.first
+  start = 0
+  stop  = 0
+  case st do
+    "CONPCASS" ->
+      start = 7
+      stop = 15
+    "CONTEDISS" ->
+      start = 1
+      stop = 15
+  end
+
+  for i <- start..stop do
+    description = i |> Integer.to_string |> String.rjust(2, ?0)
+    if st == "CONPCASS" && i != 11 do
+      grade_level = %{description: description, salary_structure_type_id: salary_structure_type.id}
+      changeset = SalaryGradeLevel.changeset(%SalaryGradeLevel{}, grade_level)
+      if changeset.valid? do
+        {:ok, salary_grade_level} = Repo.insert(changeset)
+        cond do
+          i <= 9 -> steps = 1..15
+          i >= 10 && i < 12 -> steps = 1..11
+          true -> steps = 1..9
+        end
+        for s <- steps do
+          gs = s |> Integer.to_string |> String.rjust(2, ?0)
+          grade_step = %{description: gs, salary_grade_level_id: salary_grade_level.id}
+          changeset = SalaryGradeStep.changeset(%SalaryGradeStep{}, grade_step)
+          if changeset.valid? do
+            {:ok, grade_step} = Repo.insert(changeset)
+          end
+        end
+      end
+    else if st == "CONTEDISS" && i != 10  do
+      grade_level = %{description: description, salary_structure_type_id: salary_structure_type.id}
+      changeset = SalaryGradeLevel.changeset(%SalaryGradeLevel{}, grade_level)
+        if changeset.valid? do
+          {:ok, salary_grade_level} = Repo.insert(changeset)
+          cond do
+            i <= 9 -> steps = 1..15
+            i >= 11 && i <= 12 -> steps = 1..11
+            i >= 13 && i <= 15 -> steps = 1..9
+
+          end
+          for s <- steps do
+            gs = s |> Integer.to_string |> String.rjust(2, ?0)
+            grade_step = %{description: gs, salary_grade_level_id: salary_grade_level.id}
+            changeset = SalaryGradeStep.changeset(%SalaryGradeStep{}, grade_step)
+            if changeset.valid? do
+              {:ok, grade_step} = Repo.insert(changeset)
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
+
+staff_1_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000300")])
+staff_2_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000302")])
+staffs =[ %{first_name: "Clinton", last_name: "John", email: "john.clinton@walden.edu.ng", registration_no: "WLD/STF/000300", user_id: staff_1_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
+ %{first_name: "Gospel", last_name: "Junior", email: "jun.gospel@walden.edu.ng", registration_no: "WLD/STF/000302", user_id: staff_2_user.id, gender_id: gender.id, marital_status_id: marital_status.id}]
+
+Enum.each(staffs, &(
+%Staff{}
+|> Staff.changeset(&1)
+|> Repo.insert!()
+))
+
+staff = Repo.get_by(Staff, user_id: staff_1_user.id)
+job = Repo.get_by(Job, title: "Bursar")
+department = Repo.get_by(Department, name: "Computer Science")
+salary_grade_step = SalaryGradeStep
+|> Ecto.Query.join(:inner, [sgs], sgl in assoc(sgs, :salary_grade_level))
+|> Ecto.Query.join(:inner, [sgs, sgl], sst in assoc(sgl, :salary_structure_type))
+|> Ecto.Query.join(:inner, [sgs, sgl, sst], ts in assoc(sst, :term_set))
+|> Ecto.Query.where([sgs, sgl, sst, ts], sgl.description == ^"09" and sgs.description == ^"09" and sst.description == ^"CONPCASS" and ts.name == ^"salary_structure_type")
+|> Repo.all
+|> List.first
+
+staff_posting = %{staff_id: staff.id, department_id: department.id, salary_grade_step_id: salary_grade_step.id, job_id: job.id, active: true}
+
+%StaffPosting{}
+|> StaffPosting.changeset(staff_posting)
+|> Repo.insert()
+
+
+
+
+admin_role = Term
+|> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set))
+|> Ecto.Query.where([t, ts], t.description == "Admin" and ts.name == ^"role")
+|> Repo.all
+|> List.first
+
+head_department_role = Term
+|> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set))
+|> Ecto.Query.where([t, ts], t.description == "HeadDepartment" and ts.name == ^"role")
+|> Repo.all
+|> List.first
+
+lecturer_role = Term
+|> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set))
+|> Ecto.Query.where([t, ts], t.description == "Lecturer" and ts.name == ^"role")
+|> Repo.all
+|> List.first
+
+
+%UserRole{}
+|> UserRole.changeset(%{user_id: user.id, role_id: admin_role.id, default: true})
+|> Repo.insert()
+
+user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000302")])
+%UserRole{}
+|> UserRole.changeset(%{user_id: user.id, role_id: head_department_role.id, default: false})
+|> Repo.insert()
+
+%UserRole{}
+|> UserRole.changeset(%{user_id: user.id, role_id: lecturer_role.id, default: true})
+|> Repo.insert()
+
+
+
 
 fees = [
   %{code: "200", description: "ND Application Fee", amount: 2000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "ND"]).id, is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Applicant" and ts.name == ^"fee_category").id },
@@ -2318,7 +2462,6 @@ for transaction_response <- transaction_responses do
 end
 
 registration_no = "DS151690003477"
-
 student = Repo.get_by(Student, registration_no: registration_no)
 fee = Repo.get_by(Fee, code: "212")
 payment_method = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Web Pay" and ts.name == ^"payment_method")
@@ -2332,6 +2475,7 @@ payment = %{fee_id: fee.id, amount: fee.amount, service_charge: fee.service_char
 changeset = Payment.changeset(%Payment{}, payment)
 if changeset.valid? do
   {:ok, payment} = Repo.insert(changeset)
+
   changeset = StudentPayment.changeset(%StudentPayment{}, %{student_id: student.id, payment_id: payment.id})
   Repo.insert(changeset)
 end
@@ -2347,3 +2491,35 @@ if Repo.get_by(CourseRegistrationSetting, [academic_session_id: academic_session
     Repo.insert!(changeset)
   end
 end
+
+news = [
+  %{heading: "Admission into 2016/2017 academic session has begun", lead: "Admission into 2016/2017 academic session has begun.", release_at: "2017-07-23", duration: 5, body: "Admission into 2016/2017 academic session is currently going on. Those who applied to study a course in our prestigious learning centre are to go online to apply as soon as possible. Successful applicants will be invited for screening"},
+  %{heading: "Excursion", lead: "HND II mechanical engineering students will be embarking on a trip to Dubai for a tour ...", release_at: "2017-07-23", duration: 10, body: "In a bid to enhance the quality of education students of this polytechnic, the management of the Mechanical engineering department has organized a tour to Dubai car manufacturing company"}
+]
+
+Enum.each(news, fn n ->
+  changeset = Newsroom.changeset(%Newsroom{}, n)
+  if changeset.valid?, do: Repo.insert!(changeset)
+end)
+
+academic_session_id = AcademicSession
+|> Ecto.Query.select([ac], ac.id)
+|> Repo.get_by(description: "2017/2018")
+
+program_id = Program
+|> Ecto.Query.select([p], p.id)
+|> Repo.get_by(name: "ND")
+
+%ProgramAdvert{}
+|> ProgramAdvert.changeset(%{academic_session_id: academic_session_id, program_id: program_id, closing_date: "2016-07-25", opening_date: "2016-07-20", active: true })
+|> Repo.insert()
+
+
+
+%JobPosting{}
+|> JobPosting.changeset(%{opening_date: "2016-05-21", closing_date: "2016-08-21", active: true, application_method: "<p>Interested applicants should forward their applications together with fifteen (15) copies of detailed curriculum vitae stating among others, qualification, work experience, present employment, rank, Local Government of origin, extracurricular activities and names of three (3) referees.</p><p>All applications, which should be in sealed envelopes labeled <b>APPLICATION FOR THE POST OF WALDEN POLYTECHNIC, ABUJA</b>, are to be forwarded to:</p><p><b>The Registrar,<br>
+Walden Polytechnic,<br>
+Main Campus, Wuntin Dada,<br>
+P.M.B. 094, Abuja,<br>
+Bauchi State.</b></p>", posted_by_user_id: 3})
+|> Repo.insert()

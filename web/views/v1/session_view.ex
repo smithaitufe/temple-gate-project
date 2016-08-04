@@ -1,22 +1,18 @@
 defmodule PortalApi.V1.SessionView do
   use PortalApi.Web, :view
-
+  alias PortalApi.V1.{UserRoleView, TermView}
   def render("show.json", %{user: user, token: token}) do
     user = %{
-      id: user.id,
-      user_name: user.user_name,
-      email: user.email,
-      user_category_id: user.user_category_id
+    id: user.id,
+    user_name: user.user_name,
+    email: user.email,
+    user_category_id: user.user_category_id
     }
-    |> render_user_category(%{user_category: user.user_category})
-    |> render_roles(%{roles: user.roles})
+    |> Map.put(:roles, render_many(user.roles, TermView, "term.json"))
+    |> Map.put(:user_category, render_one(user.user_category, TermView, "term.json"))
 
-    %{data:
-      %{
-        user: user,
-        token: token
-      }
-    }
+    %{ user: user, token: token }
+
   end
 
   def render("error.json", _) do
@@ -32,16 +28,11 @@ defmodule PortalApi.V1.SessionView do
   end
 
 
-  defp render_roles(json, %{roles: roles}) do
-    Map.put(json, :roles, render_many(roles, PortalApi.V1.TermView, "term.json"))
-  end
-  defp render_roles(json, _) do
-    json
-  end
-  defp render_user_category(json, %{user_category: user_category}) when is_map(user_category) do
-    Map.put(json, :user_category, render_one(user_category, PortalApi.V1.TermView, "term.json"))
-  end
-  defp render_user_category(json, _) do
-    json
-  end
+  # defp render_roles(json, %{roles: roles}) do
+  #   Map.put(json, :roles, render_many(roles, PortalApi.V1.TermView, "term.json"))
+  # end
+  # defp render_roles(json, _) do
+  #   json
+  # end
+
 end

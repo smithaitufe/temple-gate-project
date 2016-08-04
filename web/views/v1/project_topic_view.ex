@@ -1,12 +1,13 @@
 defmodule PortalApi.V1.ProjectTopicView do
   use PortalApi.Web, :view
+  alias PortalApi.V1.ProjectTopicView
 
   def render("index.json", %{project_topics: project_topics}) do
-    %{data: render_many(project_topics, PortalApi.V1.ProjectTopicView, "project_topic.json")}
+    render_many(project_topics, ProjectTopicView, "project_topic.json")
   end
 
   def render("show.json", %{project_topic: project_topic}) do
-    %{data: render_one(project_topic, PortalApi.V1.ProjectTopicView, "project_topic.json")}
+    render_one(project_topic, ProjectTopicView, "project_topic.json")
   end
 
   def render("project_topic.json", %{project_topic: project_topic}) do

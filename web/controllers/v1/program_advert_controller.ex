@@ -74,6 +74,12 @@ defmodule PortalApi.V1.ProgramAdvertController do
     |> Ecto.Query.where([pa], pa.academic_session_id == ^academic_session_id)
     |> build_program_advert_query(tail)
   end
+  defp build_program_advert_query(query, [{"active", active} | tail]) do
+    query
+    |> Ecto.Query.where([pa], pa.active == ^active)
+    |> build_program_advert_query(tail)
+  end
+
   defp build_program_advert_query(query, []), do: query
 
   defp preload_models(query) do

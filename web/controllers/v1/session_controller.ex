@@ -3,35 +3,9 @@ defmodule PortalApi.V1.SessionController do
   alias PortalApi.{Session, User}
   plug :scrub_params, "session" when action in [:create]
 
-  # def create(conn, %{"session" => session_params}) do
-  #   IO.inspect session_params
-  #   case PortalApi.Helper.Session.authenticate(session_params) do
-  #     {:ok, user} ->
-  #       {:ok, jwt, _full_claims} = user |> Guardian.encode_and_sign(:token)
-  #
-  #       IO.inspect "========================================="
-  #       IO.inspect Guardian.Plug.current_resource(conn)
-  #       IO.inspect "========================================="
-  #
-  #
-  #       conn
-  #       |> put_status(:created)
-  #       |> render("show.json", jwt: jwt, user: user)
-  #
-  #     {:error, _} ->
-  #       conn
-  #       |> put_status(:unprocessable_entity)
-  #       |> render("error.json")
-  #
-  #   end
-  # end
 
-  def create(conn, %{"session" => session_params}) do
-    IO.inspect session_params
-
-    %{"user_name" => user_name, "password" => password} = session_params
+  def create(conn, %{"session" => %{"user_name" => user_name, "password" => password}}) do
     query = User
-    |> User.load_user_category_and_roles
     |> Repo.get_by(user_name: String.downcase(user_name))
 
     case query do
@@ -41,6 +15,7 @@ defmodule PortalApi.V1.SessionController do
       user ->
         if Comeonin.Bcrypt.checkpw(password, user.encrypted_password) do
           {:ok, token, _} = Guardian.encode_and_sign(user, :api)
+          user = user |> Repo.preload([:user_category, :roles])
           render(conn, "show.json", user: user, token: token)
         else
           login_failed(conn)

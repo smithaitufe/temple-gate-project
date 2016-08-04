@@ -2,7 +2,7 @@ defmodule PortalApi.V1.StudentResultGradeView do
   use PortalApi.Web, :view
 
   def render("index.json", %{student_result_grades: student_result_grades}) do
-    %{data: render_many(student_result_grades, PortalApi.V1.StudentResultGradeView, "student_result_grade.json")}
+    render_many(student_result_grades, PortalApi.V1.StudentResultGradeView, "student_result_grade.json")
   end
 
   def render("show.json", %{student_result_grade: student_result_grade}) do

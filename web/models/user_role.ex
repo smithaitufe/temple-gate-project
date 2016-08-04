@@ -4,13 +4,13 @@ defmodule PortalApi.UserRole do
   schema "user_roles" do
     field :default, :boolean, default: false
     belongs_to :user, PortalApi.User
-    belongs_to :role, PortalApi.Term
+    belongs_to :role, PortalApi.Role
 
     timestamps
   end
 
-  @required_fields ~w(user_id role_id default)
-  @optional_fields ~w()
+  @required_fields ~w(user_id role_id)
+  @optional_fields ~w(default)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

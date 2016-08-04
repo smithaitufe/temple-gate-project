@@ -14,7 +14,9 @@ defmodule PortalApi.Course do
 
     timestamps
 
-    has_many :enrollments, PortalApi.CourseEnrollment
+    has_many :student_courses, PortalApi.StudentCourse
+
+
   end
 
   @required_fields ~w(code title units hours core department_id level_id semester_id)

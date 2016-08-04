@@ -3,11 +3,11 @@ defmodule PortalApi.V1.LevelView do
   alias PortalApi.V1.LevelView
 
   def render("index.json", %{levels: levels}) do
-    %{data: render_many(levels, LevelView, "level.json")}
+    render_many(levels, LevelView, "level.json")
   end
 
   def render("show.json", %{level: level}) do
-    %{data: render_one(level, LevelView, "level.json")}
+    render_one(level, LevelView, "level.json")
   end
 
   def render("level.json", %{level: level}) do

@@ -5,8 +5,11 @@ defmodule PortalApi.V1.LocalGovernmentAreaController do
 
   plug :scrub_params, "local_government_area" when action in [:create, :update]
 
-  def index(conn, _params) do
-    local_government_areas = Repo.all(LocalGovernmentArea)
+  def index(conn, params) do
+    local_government_areas = LocalGovernmentArea
+    |> build_local_government_area_query(Map.to_list(params))
+    |> Repo.all
+    
     render(conn, "index.json", local_government_areas: local_government_areas)
   end
 
@@ -53,5 +56,12 @@ defmodule PortalApi.V1.LocalGovernmentAreaController do
     Repo.delete!(local_government_area)
 
     send_resp(conn, :no_content, "")
+  end
+
+  defp build_local_government_area_query(query, []), do: query
+  defp build_local_government_area_query(query, [{"state_id", state_id} | tail ]) do
+    query
+    |> Ecto.Query.where([l], l.state_id == ^state_id)
+    |> build_local_government_area_query(tail)
   end
 end

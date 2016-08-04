@@ -11,12 +11,15 @@ defmodule PortalApi.Repo.Migrations.CreateStaff do
       add :marital_status_id, references(:terms)
       add :gender_id, references(:terms)
       add :local_government_area_id, references(:local_government_areas)
+      add :user_id, references(:users)
+      
 
       timestamps
     end
     create index(:staffs, [:marital_status_id])
     create index(:staffs, [:gender_id])
     create index(:staffs, [:local_government_area_id])
+    create index(:staffs, [:user_id])
 
   end
 end

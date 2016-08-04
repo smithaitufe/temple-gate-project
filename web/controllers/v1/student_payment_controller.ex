@@ -85,7 +85,7 @@ defmodule PortalApi.V1.StudentPaymentController do
 
   defp preload_models(model) do
     Repo.preload(model, [
-      {:student, [:program, :department, :marital_status, :gender]},
+      {:student, [:program, {:department, [:faculty, :department_type]}, :level, :marital_status, :gender]},
       {:payment, [:transaction_response, :academic_session, {:fee, [:level, :program] }, :payment_method, :payment_status]}
       ])
   end

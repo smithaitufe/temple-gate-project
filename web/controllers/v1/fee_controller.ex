@@ -5,10 +5,11 @@ defmodule PortalApi.V1.FeeController do
 
   plug :scrub_params, "fee" when action in [:create, :update]
 
-  def index(conn, _params) do
+  def index(conn, params) do
     fees = Fee
-    |> Fee.load_associations
+    |> build_fee_query(Map.to_list(params))
     |> Repo.all
+    |> load_related_models
 
     render(conn, "index.json", fees: fees)
   end
@@ -65,4 +66,24 @@ defmodule PortalApi.V1.FeeController do
 
     send_resp(conn, :no_content, "")
   end
+
+  defp load_related_models(query) do
+    Repo.preload(query, [:program, :level, :fee_category])
+  end
+
+
+  defp build_fee_query(query, [{"program_id", program_id} |  tail]) do
+    query
+    |> Ecto.Query.where([f], f.program_id == ^program_id)
+    |> build_fee_query(tail)
+  end
+  defp build_fee_query(query, [{"fee_category_id", fee_category_id} |  tail]) do
+    query
+    |> Ecto.Query.where([f], f.fee_category_id == ^fee_category_id)
+    |> build_fee_query(tail)
+  end
+  defp build_fee_query(query, []), do: query
+
+
+
 end

@@ -4,7 +4,10 @@ defmodule PortalApi.V1.UserController do
   alias PortalApi.{Repo, User, UserRole, Term}
 
   def index(conn, _) do
-    users = Repo.all(User)
+    users = User
+    |> Repo.all
+    |> preload_models
+
     render(conn, "index.json", users: users)
   end
 
@@ -15,14 +18,16 @@ defmodule PortalApi.V1.UserController do
 
 
   def create(conn, %{"user" => user_params}) do
+
     changeset = User.changeset(%User{}, user_params)
+
     case Repo.insert(changeset) do
       {:ok, user} ->
-        {:ok, jwt, _full_claims} = Guardian.encode_and_sign(user, :token)
+        {:ok, token, _full_claims} = Guardian.encode_and_sign(user, :token)
 
         conn
         |> put_status(:created)
-        |> render(PortalApi.V1.SessionView, "show.json", jwt: jwt, user: user)
+        |> render(PortalApi.V1.SessionView, "show.json", user: user, token: token)
 
       {:error, changeset} ->
         conn
@@ -30,6 +35,11 @@ defmodule PortalApi.V1.UserController do
         |> render("error.json", changeset: changeset)
     end
   end
+
+
+
+
+
 
   def update(conn, %{"id" => id, "user" => user_params}) do
     user = Repo.get!(User, id)
@@ -43,6 +53,11 @@ defmodule PortalApi.V1.UserController do
         |> put_status(:unprocessable_entity)
         |> render(PortalApi.ChangesetView, "error.json", changeset: changeset)
     end
+  end
+
+  defp preload_models(query) do
+    query
+    |> Repo.preload([:user_category])
   end
 
 

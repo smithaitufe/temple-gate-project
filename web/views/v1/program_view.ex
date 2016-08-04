@@ -3,11 +3,11 @@ defmodule PortalApi.V1.ProgramView do
   alias PortalApi.V1.{ProgramView, LevelView}
 
   def render("index.json", %{programs: programs}) do
-    %{data: render_many(programs, ProgramView, "program.json")}
+    render_many(programs, ProgramView, "program.json")
   end
 
   def render("show.json", %{program: program}) do
-    %{data: render_one(program, ProgramView, "program.json")}
+    render_one(program, ProgramView, "program.json")
   end
 
   def render("program.json", %{program: program}) do

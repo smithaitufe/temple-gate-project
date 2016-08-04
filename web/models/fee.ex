@@ -27,15 +27,6 @@ defmodule PortalApi.Fee do
     model
     |> cast(params, @required_fields, @optional_fields)
   end
-
-  def load_associations(query) do
-    # from q in query,
-    # join: p in assoc(q, :program),
-    # join: l in assoc(q, :level),
-    # join: fc in assoc(q, :fee_category),
-    # preload: [program: p, level: l, fee_category: fc]
-
-    from q in query,    
-    preload: [:program, :level, :fee_category]
-  end
+   
+  
 end

@@ -15,7 +15,7 @@ defmodule PortalApi.V1.ProgramDepartmentController do
   end
 
   def create(conn, %{"program_department" => program_department_params}) do
-    changeset = ProgramDepartment.changeset(%ProgramDepartment{}, program_department_params)
+    changeset = ProgramDepartment.changeset(%ProgramDepartment{}, program_department_params)    
 
     case Repo.insert(changeset) do
       {:ok, program_department} ->
@@ -66,25 +66,21 @@ defmodule PortalApi.V1.ProgramDepartmentController do
 
   defp build_program_department_query(query, [{"program_id", program_id} | tail]) do
     query
-    # |> Ecto.Query.join(:left, [pd], d in assoc(pd, :department))
-    # |> Ecto.Query.join(:left, [pd, _], p in assoc(pd, :program))
-    # |> Ecto.Query.where([_, _, p], p.id == ^program_id)
     |> Ecto.Query.where([pd], pd.program_id == ^program_id)
+    |> build_program_department_query(tail)
+  end
+  defp build_program_department_query(query, [{"department_id", department_id} | tail]) do
+    query
+    |> Ecto.Query.where([pd], pd.department_id == ^department_id)
     |> build_program_department_query(tail)
   end
   defp build_program_department_query(query, [{"admit", admit} | tail]) do
     query
-    # |> Ecto.Query.join(:left, [pd], d in assoc(pd, :department))
-    # |> Ecto.Query.join(:left, [pd, _], p in assoc(pd, :program))
-    # |> Ecto.Query.where([_, _, p], p.id == ^program_id)
     |> Ecto.Query.where([pd], pd.admit == ^admit)
     |> build_program_department_query(tail)
   end
   defp build_program_department_query(query, []), do: query
   defp preload_models(query) do
-    # from q in query,
-    # preload: [{:department, [:faculty, :department_type]}, :program]
-
     Repo.preload(query, [{:department, [:faculty, :department_type]}, :program])
   end
 

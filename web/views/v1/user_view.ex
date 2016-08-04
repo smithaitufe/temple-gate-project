@@ -2,11 +2,11 @@ defmodule PortalApi.V1.UserView do
   use PortalApi.Web, :view
 
   def render("index.json", %{users: users}) do
-    %{data: render_many(users, PortalApi.V1.UserView, "user.json", as: :user)}
+    render_many(users, PortalApi.V1.UserView, "user.json")
   end
 
   def render("show.json", %{user: user}) do
-    %{data: render_one(user, PortalApi.V1.UserView, "user.json", as: :user)}
+    render_one(user, PortalApi.V1.UserView, "user.json")
   end
 
 
@@ -17,7 +17,9 @@ defmodule PortalApi.V1.UserView do
       email: user.email,
       user_category_id: user.user_category_id
     }
-    |> render_user_category(user_category: user.user_category)
+
+
+    |> PortalApi.V1.TermView.render_term("user_category", %{term: user.user_category})
   end
 
   def render("error.json", %{changeset: changeset}) do

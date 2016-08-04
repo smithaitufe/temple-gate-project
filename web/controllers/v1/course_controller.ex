@@ -9,7 +9,7 @@ defmodule PortalApi.V1.CourseController do
     courses = Course
     |> build_course_query(Map.to_list(params))
     |> Repo.all
-    |> Repo.preload([:semester, :level, :department])
+    |> Repo.preload([:semester, :level, {:department, [:faculty, :department_type]}])
 
     render(conn, "index.json", courses: courses)
   end
@@ -87,14 +87,21 @@ defmodule PortalApi.V1.CourseController do
     |> Ecto.Query.where([c], c.semester_id == ^value)
     |> build_course_query(tail)
   end
-  # defp build_course_query(query, [{attr, value} | tail]) do
-  #   query
-  #   |> Ecto.Query.where([c], field(c, ^String.to_existing_atom(attr)) == ^value)
-  #   |> build_course_query(tail)
-  # end
+  defp build_course_query(query, [{"student_id", student_id} | tail]) do
+    query
+    |> Ecto.Query.join(:inner, [c], sc in assoc(c, :student_courses))
+    |> Ecto.Query.join(:inner, [c, sc], s in assoc(sc, :student))
+    |> Ecto.Query.where([_, sc, _], sc.student_id == ^student_id)
+    |> build_course_query(tail)
+  end
   defp build_course_query(query, [{"order_by", field} | tail]) do
     query
     |> Ecto.Query.order_by([asc: ^String.to_existing_atom(field)])
+    |> build_course_query(tail)
+  end
+  defp build_course_query(query, [{"order_by_desc", field} | tail]) do
+    query
+    |> Ecto.Query.order_by([desc: ^String.to_existing_atom(field)])
     |> build_course_query(tail)
   end
 

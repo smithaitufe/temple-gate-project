@@ -7,15 +7,19 @@ defmodule PortalApi.Staff do
     field :middle_name, :string
     field :first_name, :string
     field :birth_date, Ecto.Date
-    belongs_to :marital_status, PortalApi.MaritalStatus
-    belongs_to :gender, PortalApi.Gender
+    belongs_to :marital_status, PortalApi.Term
+    belongs_to :gender, PortalApi.Term
     belongs_to :local_government_area, PortalApi.LocalGovernmentArea
+    belongs_to :user, PortalApi.User
 
     timestamps
+
+
+    has_many :staff_postings, PortalApi.StaffPosting
   end
 
-  @required_fields ~w(registration_no last_name middle_name first_name birth_date)
-  @optional_fields ~w()
+  @required_fields ~w(last_name first_name)
+  @optional_fields ~w(user_id registration_no middle_name birth_date marital_status_id gender_id local_government_area_id)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

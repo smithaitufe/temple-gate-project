@@ -1,12 +1,13 @@
 defmodule PortalApi.V1.FeeView do
   use PortalApi.Web, :view
+  alias PortalApi.V1.{FeeView, ProgramView, LevelView}
 
   def render("index.json", %{fees: fees}) do
-    %{data: render_many(fees, PortalApi.V1.FeeView, "fee.json")}
+    render_many(fees, FeeView, "fee.json")
   end
 
   def render("show.json", %{fee: fee}) do
-    %{data: render_one(fee, PortalApi.V1.FeeView, "fee.json")}
+    render_one(fee, FeeView, "fee.json")
   end
 
   def render("fee.json", %{fee: fee}) do
@@ -21,23 +22,25 @@ defmodule PortalApi.V1.FeeView do
       level_id: fee.level_id,
       fee_category_id: fee.fee_category_id
     }
-    |> render_program(%{program: fee.program})
-    |> render_level(%{level: fee.level})
+    # |> ProgramView.render_program(%{program: fee.program})
+    # |> LevelView.render_level(%{level: fee.level})
+    |> Map.put(:program, ProgramView.render("show.json", program: fee.program))
+    |> Map.put(:level, LevelView.render("show.json", level: fee.level))
   end
-
-  defp render_level(json, %{level: level}) when is_map(level) do
-    Map.put(json, :level, render_one(level, PortalApi.V1.LevelView, "level.json"))
-  end
-  defp render_level(json, _) do
-    json
-  end
-
-  defp render_program(json, %{program: program}) when is_map(program) do
-    Map.put(json, :program, render_one(program, PortalApi.V1.ProgramView, "program.json"))
-  end
-  defp render_program(json, _) do
-    json
-  end
+  #
+  # defp render_level(json, %{level: level}) when is_map(level) do
+  #   Map.put(json, :level, render_one(level, PortalApi.V1.LevelView, "level.json"))
+  # end
+  # defp render_level(json, _) do
+  #   json
+  # end
+  #
+  # defp render_program(json, %{program: program}) when is_map(program) do
+  #   Map.put(json, :program, render_one(program, PortalApi.V1.ProgramView, "program.json"))
+  # end
+  # defp render_program(json, _) do
+  #   json
+  # end
 
 
 

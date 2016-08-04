@@ -2,11 +2,11 @@ defmodule PortalApi.V1.StudentCertificateView do
   use PortalApi.Web, :view
 
   def render("index.json", %{student_certificates: student_certificates}) do
-    %{data: render_many(student_certificates, PortalApi.V1.StudentCertificateView, "student_certificate.json")}
+    render_many(student_certificates, PortalApi.V1.StudentCertificateView, "student_certificate.json")
   end
 
   def render("show.json", %{student_certificate: student_certificate}) do
-    %{data: render_one(student_certificate, PortalApi.V1.StudentCertificateView, "student_certificate.json")}
+    render_one(student_certificate, PortalApi.V1.StudentCertificateView, "student_certificate.json")
   end
 
   def render("student_certificate.json", %{student_certificate: student_certificate}) do

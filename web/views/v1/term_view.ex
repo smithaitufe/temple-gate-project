@@ -3,10 +3,10 @@ defmodule PortalApi.V1.TermView do
   alias PortalApi.V1.TermView
 
   def render("index.json", %{terms: terms}) do
-    %{data: render_many(terms, TermView, "term.json")}
+    render_many(terms, TermView, "term.json")
   end
   def render("show.json", %{term: term}) do
-    %{data: render_one(term, TermView, "term.json")}
+    render_one(term, TermView, "term.json")
   end
   def render("term.json", %{term: term}) do
     %{id: term.id,

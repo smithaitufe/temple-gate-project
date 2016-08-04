@@ -3,8 +3,9 @@ defmodule PortalApi.SalaryGradeLevel do
 
   schema "salary_grade_levels" do
     field :description, :string
-    belongs_to :salary_structure_type, PortalApi.SalaryStructureType
+    belongs_to :salary_structure_type, PortalApi.Term
 
+    has_many :salary_grade_steps, PortalApi.V1.SalaryGradeStep
     timestamps
   end
 

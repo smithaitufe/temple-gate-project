@@ -3,11 +3,13 @@ defmodule PortalApi.Repo.Migrations.CreateNewsroom do
 
   def change do
     create table(:newsrooms) do
+      add :heading, :text
       add :lead, :text
       add :body, :text
       add :release_at, :date
       add :active, :boolean, default: false
       add :duration, :integer
+      
 
       timestamps
     end

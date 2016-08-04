@@ -3,11 +3,11 @@ defmodule PortalApi.V1.StudentView do
   alias PortalApi.V1.{StudentView, ProgramView, LevelView, DepartmentView, TermView}
 
   def render("index.json", %{students: students}) do
-    %{data: render_many(students, StudentView, "student.json")}
+    render_many(students, StudentView, "student.json")
   end
 
   def render("show.json", %{student: student}) do
-    %{data: render_one(student, StudentView, "student.json")}
+    render_one(student, StudentView, "student.json")
   end
 
   def render("student.json", %{student: student}) do
@@ -26,7 +26,8 @@ defmodule PortalApi.V1.StudentView do
       department_id: student.department_id,
       program_id: student.program_id,
       level_id: student.level_id,
-      entry_mode_id: student.entry_mode_id
+      entry_mode_id: student.entry_mode_id,
+      user_id: student.user_id
     }
       |> ProgramView.render_program(%{program: student.program})
       |> LevelView.render_level(%{level: student.level})

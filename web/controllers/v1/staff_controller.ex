@@ -5,8 +5,10 @@ defmodule PortalApi.V1.StaffController do
 
   plug :scrub_params, "staff" when action in [:create, :update]
 
-  def index(conn, _params) do
-    staffs = Repo.all(Staff)
+  def index(conn,params) do
+    staffs = Staff
+    |> build_staff_query(Map.to_list(params))
+    |> Repo.all
     render(conn, "index.json", staffs: staffs)
   end
 
@@ -54,4 +56,12 @@ defmodule PortalApi.V1.StaffController do
 
     send_resp(conn, :no_content, "")
   end
+
+  defp build_staff_query(query, [{"user_id", user_id} | tail ]) do
+    query
+    |> Ecto.Query.where([s], s.user_id == ^user_id)
+    |> build_staff_query(tail)
+  end
+  defp build_staff_query(query, []), do: query
+
 end

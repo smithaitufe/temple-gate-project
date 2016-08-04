@@ -1,17 +1,18 @@
 defmodule PortalApi.Newsroom do
   use PortalApi.Web, :model
 
-  schema "newsroom" do
+  schema "newsrooms" do
+    field :heading, :string
     field :lead, :string
     field :body, :string
     field :release_at, Ecto.Date
-    field :active, :boolean, default: false
+    field :active, :boolean, default: true
     field :duration, :integer
 
     timestamps
   end
 
-  @required_fields ~w(lead body release_at active duration)
+  @required_fields ~w(heading lead body release_at active duration)
   @optional_fields ~w()
 
   @doc """
