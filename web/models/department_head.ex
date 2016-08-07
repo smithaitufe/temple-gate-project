@@ -12,7 +12,7 @@ defmodule PortalApi.DepartmentHead do
     timestamps
   end
 
-  @required_fields ~w(department_id appointment_date effective_date end_date)
+  @required_fields ~w(staff_id department_id appointment_date effective_date end_date)
   @optional_fields ~w(active)
 
   @doc """

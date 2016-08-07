@@ -2,11 +2,11 @@ defmodule PortalApi.V1.DepartmentHeadView do
   use PortalApi.Web, :view
 
   def render("index.json", %{department_heads: department_heads}) do
-    %{data: render_many(department_heads, PortalApi.V1.DepartmentHeadView, "department_head.json")}
+    render_many(department_heads, PortalApi.V1.DepartmentHeadView, "department_head.json")
   end
 
   def render("show.json", %{department_head: department_head}) do
-    %{data: render_one(department_head, PortalApi.V1.DepartmentHeadView, "department_head.json")}
+    render_one(department_head, PortalApi.V1.DepartmentHeadView, "department_head.json")
   end
 
   def render("department_head.json", %{department_head: department_head}) do

@@ -15,7 +15,7 @@ defmodule PortalApi.V1.UserRoleView do
       role_id: user_role.role_id,
       default: user_role.default
     }
-    |> Map.put(:role, render_one(user_role.role, PortalApi.V1.TermView, "term.json"))
+    |> Map.put(:role, render_one(user_role.role, PortalApi.V1.RoleView, "role.json"))
   end
 
 

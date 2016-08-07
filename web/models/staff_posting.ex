@@ -7,12 +7,15 @@ defmodule PortalApi.StaffPosting do
     belongs_to :department, PortalApi.Department
     belongs_to :salary_grade_step, PortalApi.SalaryGradeStep
     belongs_to :job, PortalApi.Job
+    field :effective_date, Ecto.Date
+    field :resumption_date, Ecto.Date
+    field :posted_date, Ecto.Date
 
     timestamps
   end
 
-  @required_fields ~w(staff_id department_id salary_grade_step_id job_id)
-  @optional_fields ~w(active)
+  @required_fields ~w(staff_id department_id job_id salary_grade_step_id effective_date posted_date)
+  @optional_fields ~w(active resumption_date)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

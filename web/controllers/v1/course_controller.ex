@@ -7,7 +7,7 @@ defmodule PortalApi.V1.CourseController do
 
   def index(conn, params) do
     courses = Course
-    |> build_course_query(Map.to_list(params))
+    |> build_query(Map.to_list(params))
     |> Repo.all
     |> Repo.preload([:semester, :level, {:department, [:faculty, :department_type]}])
 
@@ -71,38 +71,44 @@ defmodule PortalApi.V1.CourseController do
     render(conn, "index.json", courses: courses)
   end
 
-  defp build_course_query(query, []),  do: query
-  defp build_course_query(query, [{"department_id", value} | tail]) do
+  defp build_query(query, []),  do: query
+  defp build_query(query, [{"department_id", value} | tail]) do
     query
     |> Ecto.Query.where([c], c.department_id == ^value)
-    |> build_course_query(tail)
+    |> build_query(tail)
   end
-  defp build_course_query(query, [{"level_id", value} | tail])  do
+  
+  defp build_query(query, [{"level_id", value} | tail])  do
     query
     |> Ecto.Query.where([c], c.level_id == ^value)
-    |> build_course_query(tail)
+    |> build_query(tail)
   end
-  defp build_course_query(query, [{"semester_id", value} | tail])  do
+  defp build_query(query, [{"semester_id", value} | tail])  do
     query
     |> Ecto.Query.where([c], c.semester_id == ^value)
-    |> build_course_query(tail)
+    |> build_query(tail)
   end
-  defp build_course_query(query, [{"student_id", student_id} | tail]) do
+  defp build_query(query, [{"student_id", student_id} | tail]) do
     query
     |> Ecto.Query.join(:inner, [c], sc in assoc(c, :student_courses))
     |> Ecto.Query.join(:inner, [c, sc], s in assoc(sc, :student))
     |> Ecto.Query.where([_, sc, _], sc.student_id == ^student_id)
-    |> build_course_query(tail)
+    |> build_query(tail)
   end
-  defp build_course_query(query, [{"order_by", field} | tail]) do
+  defp build_query(query, [{"core", core} | tail]) do
+    query
+    |> Ecto.Query.where([c], c.core == ^core)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"order_by", field} | tail]) do
     query
     |> Ecto.Query.order_by([asc: ^String.to_existing_atom(field)])
-    |> build_course_query(tail)
+    |> build_query(tail)
   end
-  defp build_course_query(query, [{"order_by_desc", field} | tail]) do
+  defp build_query(query, [{"order_by_desc", field} | tail]) do
     query
     |> Ecto.Query.order_by([desc: ^String.to_existing_atom(field)])
-    |> build_course_query(tail)
+    |> build_query(tail)
   end
 
 

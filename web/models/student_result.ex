@@ -2,21 +2,18 @@ defmodule PortalApi.StudentResult do
   use PortalApi.Web, :model
 
   schema "student_results" do
-    field :total_units, :integer
-    field :total_score, :float
-    field :total_point_average, :float
-    field :number_passed, :integer
-    field :number_failed, :integer
-    field :promoted, :boolean, default: false
     belongs_to :academic_session, PortalApi.AcademicSession
     belongs_to :student, PortalApi.Student
     belongs_to :level, PortalApi.Level
     belongs_to :semester, PortalApi.Term
+    belongs_to :course, PortalApi.Course
+    belongs_to :grade, PortalApi.Grade
+    field :score, :float, default: 0.0
 
     timestamps
   end
 
-  @required_fields ~w(academic_session_id student_id level_id semester_id total_units total_score total_point_average number_passed number_failed promoted)
+  @required_fields ~w(academic_session_id student_id level_id semester_id course_id grade_id score)
   @optional_fields ~w()
 
   @doc """

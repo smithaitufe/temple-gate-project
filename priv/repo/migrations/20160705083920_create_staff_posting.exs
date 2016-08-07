@@ -9,6 +9,10 @@ defmodule PortalApi.Repo.Migrations.CreateStaffPosting do
       add :salary_grade_step_id, references(:salary_grade_steps)
       add :job_id, references(:jobs)
 
+      add :effective_date, :date
+      add :resumption_date, :date
+      add :posted_date, :date
+
       timestamps
     end
     create index(:staff_postings, [:staff_id])

@@ -7,7 +7,7 @@ defmodule PortalApi.V1.DepartmentHeadController do
 
   def index(conn, params) do
     department_heads = DepartmentHead
-    |> build_query_params(Map.to_list(params))
+    |> build_query(Map.to_list(params))
     |> Repo.all
 
     render(conn, "index.json", department_heads: department_heads)
@@ -59,20 +59,20 @@ defmodule PortalApi.V1.DepartmentHeadController do
   end
 
 
-  defp build_query_params(query, []), do: query
-  defp build_query_params(query, [{"staff_id", staff_id} | tail ]) do
+  defp build_query(query, []), do: query
+  defp build_query(query, [{"staff_id", staff_id} | tail ]) do
     query
     |> Ecto.Query.where([d], d.staff_id == ^staff_id)
-    |> build_faculty_head_query(tail)
+    |> build_query(tail)
   end
-  defp build_query_params(query, [{"department_id", department_id} | tail ]) do
+  defp build_query(query, [{"department_id", department_id} | tail ]) do
     query
     |> Ecto.Query.where([d], d.department_id == ^department_id)
-    |> build_faculty_head_query(tail)
+    |> build_query(tail)
   end
-  defp build_query_params(query, [{"active", active} | tail ]) do
+  defp build_query(query, [{"active", active} | tail ]) do
     query
     |> Ecto.Query.where([d], d.active == ^active)
-    |> build_faculty_head_query(tail)
+    |> build_query(tail)
   end
 end

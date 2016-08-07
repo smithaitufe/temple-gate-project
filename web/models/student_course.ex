@@ -3,6 +3,7 @@ defmodule PortalApi.StudentCourse do
 
   schema "student_courses" do
     belongs_to :course, PortalApi.Course
+    belongs_to :level, PortalApi.Course
     belongs_to :student, PortalApi.Student
     belongs_to :academic_session, PortalApi.AcademicSession
 
@@ -10,7 +11,7 @@ defmodule PortalApi.StudentCourse do
     timestamps
   end
 
-  @required_fields ~w(student_id course_id academic_session_id)
+  @required_fields ~w(student_id course_id level_id academic_session_id)
   @optional_fields ~w()
 
   @doc """
@@ -35,7 +36,7 @@ defmodule PortalApi.StudentCourse do
     preload: [course: ^course_query, student: s, academic_session: a]
 
 
-    
+
   end
   def filter_by(query, {"student", value}) do
     from [q, c, s, a] in query,

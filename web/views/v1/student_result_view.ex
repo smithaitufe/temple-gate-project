@@ -15,11 +15,9 @@ defmodule PortalApi.V1.StudentResultView do
       student_id: student_result.student_id,
       level_id: student_result.level_id,
       semester_id: student_result.semester_id,
-      total_units: student_result.total_units,
-      total_score: student_result.total_score,
-      total_point_average: student_result.total_point_average,
-      number_passed: student_result.number_passed,
-      number_failed: student_result.number_failed,
-      promoted: student_result.promoted}
+      course_id: student_result_item.course_id,
+      score: student_result_item.score,
+      grade_id: student_result_item.grade_id
+      }
   end
 end

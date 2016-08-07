@@ -9,8 +9,8 @@ defmodule PortalApi.Role do
     timestamps
   end
 
-  @required_fields ~w(name description slug)
-  @optional_fields ~w()
+  @required_fields ~w(name description)
+  @optional_fields ~w(slug)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

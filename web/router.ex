@@ -62,6 +62,7 @@ defmodule PortalApi.Router do
       # Courses Module
       resources "grades", GradeController, except: [:new, :edit]
       resources "courses", CourseController, except: [:new, :edit]
+      resources "course_tutors", CourseTutorController, except: [:new, :edit]
       # Accounts/Bursary
       resources "salary_grade_levels", SalaryGradeLevelController, except: [:new, :edit]
       resources "salary_grade_steps", SalaryGradeStepController, except: [:new, :edit]

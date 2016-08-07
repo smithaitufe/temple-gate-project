@@ -1,19 +1,16 @@
-defmodule PortalApi.FacultyHead do
+defmodule PortalApi.CourseTutor do
   use PortalApi.Web, :model
 
-  schema "faculty_heads" do
-    field :active, :boolean, default: false
-    field :appointment_date, Ecto.Date
-    field :effective_date, Ecto.Date
-    field :end_date, :string
-    belongs_to :faculty, PortalApi.Faculty
+  schema "course_tutors" do
+    belongs_to :course, PortalApi.Course
     belongs_to :staff, PortalApi.Staff
+    belongs_to :academic_session, PortalApi.AcademicSession
 
     timestamps
   end
 
-  @required_fields ~w(staff_id faculty_id appointment_date effective_date end_date)
-  @optional_fields ~w(active)
+  @required_fields ~w(course_id staff_id academic_session_id)
+  @optional_fields ~w()
 
   @doc """
   Creates a changeset based on the `model` and `params`.
