@@ -9,7 +9,8 @@ defmodule PortalApi.V1.StudentCourseController do
     student_courses = StudentCourse
     |> build_query(Map.to_list(params))
     |> Repo.all
-    |> preload_models
+    |> Repo.preload(StudentCourse.associations)
+
     render(conn, "index.json", student_courses: student_courses)
   end
 
@@ -18,7 +19,7 @@ defmodule PortalApi.V1.StudentCourseController do
 
     case Repo.insert(changeset) do
       {:ok, student_course} ->
-        student_course = preload_models(student_course)
+        student_course = student_course |> Repo.preload(StudentCourse.associations)
         conn
         |> put_status(:created)
         |> put_resp_header("location", v1_student_course_path(conn, :show, student_course))
@@ -33,7 +34,7 @@ defmodule PortalApi.V1.StudentCourseController do
   end
 
   def show(conn, %{"id" => id}) do
-    student_course = Repo.get!(StudentCourse, id) |> preload_models
+    student_course = Repo.get!(StudentCourse, id) |> Repo.preload(StudentCourse.associations)
 
     render(conn, "show.json", student_course: student_course)
   end
@@ -43,7 +44,7 @@ defmodule PortalApi.V1.StudentCourseController do
     changeset = StudentCourse.changeset(student_course, student_course_params)
     case Repo.update(changeset) do
       {:ok, student_course} ->
-        student_course = preload_models(student_course)
+        student_course = student_course |> Repo.preload(StudentCourse.associations)
         render(conn, "show.json", student_course: student_course)
       {:error, changeset} ->
         conn
@@ -83,7 +84,5 @@ defmodule PortalApi.V1.StudentCourseController do
     |> Ecto.Query.where([sc], sc.student_id == ^student_id)
     |> build_query(tail)
   end
-  defp preload_models(model) do
-     Repo.preload(model, [{:student,[:gender, :marital_status, {:program, [:levels]}, :level, {:department, [:faculty, :department_type]}]}, :academic_session, {:course, [{:department, [:faculty, :department_type]}, :level, :semester]}, :course_grading])
-  end
+
 end

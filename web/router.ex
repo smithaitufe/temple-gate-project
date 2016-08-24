@@ -83,7 +83,7 @@ defmodule PortalApi.Router do
 
       resources "project_topics", ProjectTopicController, except: [:new, :edit]
       resources "student_project_supervisors", StudentProjectSupervisorController, except: [:new, :edit]
-      resources "student_continuous_assessments", StudentContinuousAssessmentController, except: [:new, :edit]
+      resources "student_assessments", StudentAssessmentController, except: [:new, :edit]
       resources "student_results", StudentResultController, except: [:new, :edit]
       resources "student_result_grades", StudentResultGradeController, except: [:new, :edit]
       resources "student_assignments", StudentAssignmentController, except: [:new, :edit]

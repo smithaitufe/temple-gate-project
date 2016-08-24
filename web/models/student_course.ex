@@ -8,7 +8,7 @@ defmodule PortalApi.StudentCourse do
     belongs_to :academic_session, PortalApi.AcademicSession
 
     has_one :course_grading, PortalApi.StudentCourseGrading
-    has_many :assessments, PortalApi.StudentAssessment
+    has_many :assessments, PortalApi.StudentCourseAssessment
 
 
     timestamps
@@ -41,6 +41,12 @@ defmodule PortalApi.StudentCourse do
 
 
   end
+
+  def associations do
+     [{:student,[:gender, :marital_status, {:program, [:levels]}, :level, {:department, [:faculty, :department_type]}]}, :academic_session, {:course, [{:department, [:faculty, :department_type]}, :level, :semester]}, :course_grading, :assessments]
+  end
+
+
   def filter_by(query, {"student", value}) do
     from [q, c, s, a] in query,
     where: q.student_id == ^value
