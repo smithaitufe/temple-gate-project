@@ -1,19 +1,17 @@
-defmodule PortalApi.Assignment do
+defmodule PortalApi.StudentAssessment do
   use PortalApi.Web, :model
 
-  schema "assignments" do
-    field :question, :string
-    field :note, :string
-    field :closing_date, Ecto.Date
-    field :closing_time, Ecto.Time
+  schema "student_assessments" do
+    field :score, :float
+    field :active, :boolean, default: true
+    belongs_to :student_course, PortalApi.Course
     belongs_to :staff, PortalApi.Staff
-    belongs_to :course, PortalApi.Course
-    belongs_to :academic_session, PortalApi.AcademicSession
+    belongs_to :assessment_type, PortalApi.Term
 
     timestamps
   end
 
-  @required_fields ~w(question note closing_date closing_time staff_id course_id academic_session_id)
+  @required_fields ~w(staff_id student_course_id continuous_assessment_type_id score)
   @optional_fields ~w()
 
   @doc """
@@ -26,6 +24,4 @@ defmodule PortalApi.Assignment do
     model
     |> cast(params, @required_fields, @optional_fields)
   end
-
-
 end

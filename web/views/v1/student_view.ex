@@ -11,6 +11,16 @@ defmodule PortalApi.V1.StudentView do
   end
 
   def render("student.json", %{student: student}) do
+      render("student_lite.json", student: student)
+      |> ProgramView.render_program(%{program: student.program})
+      |> LevelView.render_level(%{level: student.level})
+      |> DepartmentView.render_department(%{department: student.department})
+      |> TermView.render_term("marital_status", %{term: student.marital_status})
+      |> TermView.render_term("gender", %{term: student.gender})
+
+  end
+
+  def render("student_lite.json", %{student: student}) do
     %{id: student.id,
       first_name: student.first_name,
       last_name: student.last_name,
@@ -29,12 +39,6 @@ defmodule PortalApi.V1.StudentView do
       entry_mode_id: student.entry_mode_id,
       user_id: student.user_id
     }
-      |> ProgramView.render_program(%{program: student.program})
-      |> LevelView.render_level(%{level: student.level})
-      |> DepartmentView.render_department(%{department: student.department})
-      |> TermView.render_term("marital_status", %{term: student.marital_status})
-      |> TermView.render_term("gender", %{term: student.gender})
-
   end
 
 

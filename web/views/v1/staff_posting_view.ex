@@ -21,8 +21,10 @@ defmodule PortalApi.V1.StaffPostingView do
       resumption_date: staff_posting.resumption_date,
       effective_date: staff_posting.effective_date
     }
-    |> Map.put(:staff, render_one(staff_posting.staff, StaffView, "staff.json"))
+    # |> Map.put(:staff, render_one(staff_posting.staff, StaffView, "staff_lite.json"))
     |> Map.put(:department, render_one(staff_posting.department, DepartmentView, "department_lite.json"))
     |> Map.put(:job, render_one(staff_posting.job, JobView, "job.json"))
   end
+
+
 end

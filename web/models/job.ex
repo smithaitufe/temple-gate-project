@@ -6,7 +6,7 @@ defmodule PortalApi.Job do
     field :description, :string
     field :qualifications, :string
     field :responsibilities, :string
-    belongs_to :department_type, PortalApi.DepartmentType
+    belongs_to :department_type, PortalApi.Term
     field :open, :boolean, default: false
 
     timestamps

@@ -9,6 +9,7 @@ defmodule PortalApi.V1.DepartmentHeadController do
     department_heads = DepartmentHead
     |> build_query(Map.to_list(params))
     |> Repo.all
+    |> Repo.preload(DepartmentHead.associations)
 
     render(conn, "index.json", department_heads: department_heads)
   end

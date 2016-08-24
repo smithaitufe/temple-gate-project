@@ -17,6 +17,8 @@ defmodule PortalApi.V1.AssignmentView do
       question: assignment.question,
       note: assignment.note,
       closing_date: assignment.closing_date,
-      closing_time: assignment.closing_time}
+      closing_time: assignment.closing_time,
+      academic_session_id: assignment.academic_session_id
+    }
   end
 end

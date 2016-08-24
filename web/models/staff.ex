@@ -16,6 +16,8 @@ defmodule PortalApi.Staff do
 
 
     has_many :staff_postings, PortalApi.StaffPosting
+
+
   end
 
   @required_fields ~w(last_name first_name)
@@ -31,4 +33,5 @@ defmodule PortalApi.Staff do
     model
     |> cast(params, @required_fields, @optional_fields)
   end
+
 end

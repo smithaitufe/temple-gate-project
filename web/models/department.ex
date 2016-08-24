@@ -10,6 +10,9 @@ defmodule PortalApi.Department do
 
 
     has_many :program_departments, PortalApi.ProgramDepartment
+    has_many :courses, PortalApi.Course
+    has_many :staff_postings, PortalApi.StaffPosting, foreign_key: :department_id
+    has_many :staffs, through: [:staff_postings, :staff]
 
     timestamps
   end

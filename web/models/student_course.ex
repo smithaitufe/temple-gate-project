@@ -7,6 +7,9 @@ defmodule PortalApi.StudentCourse do
     belongs_to :student, PortalApi.Student
     belongs_to :academic_session, PortalApi.AcademicSession
 
+    has_one :course_grading, PortalApi.StudentCourseGrading
+    has_many :assessments, PortalApi.StudentAssessment
+
 
     timestamps
   end

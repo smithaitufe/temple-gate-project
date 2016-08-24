@@ -22,4 +22,9 @@ defmodule PortalApi.CourseTutor do
     model
     |> cast(params, @required_fields, @optional_fields)
   end
+
+  def preload_associations(query) do
+    from q in query,
+    preload: [:course, :staff]
+  end
 end

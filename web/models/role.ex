@@ -5,7 +5,6 @@ defmodule PortalApi.Role do
     field :name, :string
     field :description, :string
     field :slug, :string
-
     timestamps
   end
 

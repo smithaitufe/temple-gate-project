@@ -53,7 +53,12 @@ defmodule PortalApi.Student do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    
+
+  end
+
+
+  def associations do
+    [{:program, [:levels]}, {:department, [:faculty, :department_type]}, :level, :gender, :marital_status]
   end
 
 end

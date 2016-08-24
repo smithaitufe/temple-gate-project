@@ -25,4 +25,8 @@ defmodule PortalApi.DepartmentHead do
     model
     |> cast(params, @required_fields, @optional_fields)
   end
+
+  def associations do
+    [:department, :staff]
+  end
 end

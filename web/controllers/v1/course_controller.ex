@@ -9,7 +9,7 @@ defmodule PortalApi.V1.CourseController do
     courses = Course
     |> build_query(Map.to_list(params))
     |> Repo.all
-    |> Repo.preload([:semester, :level, {:department, [:faculty, :department_type]}])
+    |> Repo.preload(Course.associations)
 
     render(conn, "index.json", courses: courses)
   end
@@ -19,7 +19,7 @@ defmodule PortalApi.V1.CourseController do
 
     case Repo.insert(changeset) do
       {:ok, course} ->
-        course = Repo.preload(course, [:semester, :level, :department])
+        course = Repo.preload(course, Course.associations)
 
         conn
         |> put_status(:created)
@@ -34,7 +34,7 @@ defmodule PortalApi.V1.CourseController do
 
   def show(conn, %{"id" => id}) do
     course = Repo.get!(Course, id)
-    |> Repo.preload([:semester, :level, :department])
+    |> Repo.preload(Course.associations)
 
     render(conn, "show.json", course: course)
   end
@@ -77,7 +77,7 @@ defmodule PortalApi.V1.CourseController do
     |> Ecto.Query.where([c], c.department_id == ^value)
     |> build_query(tail)
   end
-  
+
   defp build_query(query, [{"level_id", value} | tail])  do
     query
     |> Ecto.Query.where([c], c.level_id == ^value)

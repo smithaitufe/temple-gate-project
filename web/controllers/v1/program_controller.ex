@@ -7,8 +7,8 @@ defmodule PortalApi.V1.ProgramController do
 
   def index(conn, _params) do
     programs = Program
-    |> Program.load_levels
     |> Repo.all
+    |> Repo.preload(associations)
 
 
     render(conn, "index.json", programs: programs)
@@ -32,9 +32,9 @@ defmodule PortalApi.V1.ProgramController do
 
   def show(conn, %{"id" => id}) do
     program = Program
-    |> Program.load_levels
     |> Repo.get!(id)
-    
+    |> Repo.preload(associations)
+
     render(conn, "show.json", program: program)
   end
 
@@ -44,6 +44,7 @@ defmodule PortalApi.V1.ProgramController do
 
     case Repo.update(changeset) do
       {:ok, program} ->
+        program = program |> Repo.preload(associations)
         render(conn, "show.json", program: program)
       {:error, changeset} ->
         conn
@@ -60,5 +61,9 @@ defmodule PortalApi.V1.ProgramController do
     Repo.delete!(program)
 
     send_resp(conn, :no_content, "")
+  end
+
+  def associations do
+    [:levels]
   end
 end

@@ -5,8 +5,17 @@ defmodule PortalApi.V1.CourseTutorController do
 
   plug :scrub_params, "course_tutor" when action in [:create, :update]
 
-  def index(conn, _params) do
-    course_tutors = Repo.all(CourseTutor)
+  def index(conn, params) do
+
+    IO.inspect params
+    course_tutors = CourseTutor
+    |> Ecto.Query.join(:inner, [ct], c in assoc(ct, :course))
+    |> Ecto.Query.join(:inner, [ct, c], a in assoc(ct, :academic_session))
+    |> Ecto.Query.join(:inner, [ct, c, a], s in assoc(ct, :staff))
+    |> build_query(Map.to_list(params))
+    |> Repo.all
+    |> Repo.preload(associations)
+
     render(conn, "index.json", course_tutors: course_tutors)
   end
 
@@ -15,6 +24,7 @@ defmodule PortalApi.V1.CourseTutorController do
 
     case Repo.insert(changeset) do
       {:ok, course_tutor} ->
+        course_tutor = Repo.preload(course_tutor, associations)
         conn
         |> put_status(:created)
         |> put_resp_header("location", v1_course_tutor_path(conn, :show, course_tutor))
@@ -28,6 +38,7 @@ defmodule PortalApi.V1.CourseTutorController do
 
   def show(conn, %{"id" => id}) do
     course_tutor = Repo.get!(CourseTutor, id)
+    |> Repo.preload(associations)
     render(conn, "show.json", course_tutor: course_tutor)
   end
 
@@ -37,6 +48,8 @@ defmodule PortalApi.V1.CourseTutorController do
 
     case Repo.update(changeset) do
       {:ok, course_tutor} ->
+
+        course_tutor = Repo.preload(course_tutor, associations)
         render(conn, "show.json", course_tutor: course_tutor)
       {:error, changeset} ->
         conn
@@ -54,4 +67,36 @@ defmodule PortalApi.V1.CourseTutorController do
 
     send_resp(conn, :no_content, "")
   end
+  defp build_query(query, []), do: query
+  defp build_query(query, [{"academic_session_id", academic_session_id} | tail]) do
+    query
+    |> Ecto.Query.where([ct, c, a, s], ct.academic_session_id == ^academic_session_id)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"department_id", department_id} | tail]) do
+    query
+    |> Ecto.Query.where([ct, c, a, s], c.department_id == ^department_id)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"staff_id", staff_id} | tail]) do
+    query
+    |> Ecto.Query.where([ct, c, a, s], ct.staff_id == ^staff_id)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"level_id", level_id} | tail]) do
+    query
+    |> Ecto.Query.where([ct, c, a, s], c.level_id == ^level_id)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"semester_id", semester_id} | tail]) do
+    query
+    |> Ecto.Query.where([ct, c, a, s], c.semester_id == ^semester_id)
+    |> build_query(tail)
+  end
+
+
+  defp associations do
+    [:course, :staff, :academic_session]
+  end
+
 end

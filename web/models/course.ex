@@ -43,4 +43,8 @@ defmodule PortalApi.Course do
     query
 
   end
+
+  def associations() do
+    [:semester, :level, {:department, [:faculty, :department_type]}]
+  end
 end

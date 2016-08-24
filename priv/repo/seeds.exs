@@ -1,6 +1,7 @@
 import Ecto.Query
-alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Student, Role, User, UserRole, StudentCourse, Fee, Payment, StudentPayment, TransactionResponse, Newsroom, ProgramAdvert, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Staff, StaffPosting, CourseTutor}
+alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Student, Role, User, UserRole, StudentCourse,StudentCourseGrading, Fee, Payment, StudentPayment, TransactionResponse, Newsroom, ProgramAdvert, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Staff, StaffPosting, CourseTutor}
 
+divider = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 commit = fn(term_set, terms) ->
   for term <- terms do
     result = Term |> Repo.get_by([term_set_id: term_set.id, description: term.description])
@@ -51,6 +52,22 @@ assign_office_head = fn %{type: type, user: user, name: name, appointment_date: 
       %DepartmentHead{} |> DepartmentHead.changeset(Map.put(params, :department_id, department.id)) |> Repo.insert!()
     end
 end
+register_courses = fn (student) ->
+  department = Repo.get_by(Department, [name: "Mechanical Engineering"])
+  level = Repo.get_by(Level, description: "ND I")
+  academic_session = Repo.get_by(AcademicSession, [description: "2016/2017", active: true])
+  courses = Repo.all(from c in Course, where: c.level_id == ^level.id and c.department_id == ^department.id)
+  for course <- courses do
+    changeset = StudentCourse.changeset(%StudentCourse{}, %{course_id: course.id, student_id: student.id, academic_session_id: academic_session.id, level_id: level.id})
+    if changeset.valid? do
+      Repo.insert!(changeset)
+    end
+  end
+end
+
+
+
+
 
 term_sets = [
   %{ name: "country", display_name: "Country" },
@@ -70,7 +87,7 @@ term_sets = [
   %{ name: "salary_structure_type", display_name: "Salary Structure Type" },
   %{ name: "payment_status", display_name: "Payment Status" },
   %{ name: "allowance", display_name: "Allowance" },
-  %{ name: "score_type", display_name: "Score Type" },
+  %{ name: "assessment_type", display_name: "Assessment Type" },
   %{ name: "user_category", display_name: "User Category" },
   %{ name: "fee_category", display_name: "Fee Category" },
   %{ name: "payment_method", display_name: "Payment Method" },
@@ -260,6 +277,17 @@ terms =[
   %{description: "Staff"}
 ]
 commit.(term_set, terms)
+
+term_set = TermSet |> Repo.get_by(name: "assessment_type")
+terms =[
+  %{description: "Assignment"},
+  %{description: "Class Work"},
+  %{description: "Practical"},
+  %{description: "Test"},
+  %{description: "Examination"}
+]
+commit.(term_set, terms)
+
 
 
 [
@@ -2237,17 +2265,20 @@ if Repo.get_by(AcademicSession, [description: "2017/2018"]) == nil do
   if changeset.valid?, do: Repo.insert!(changeset)
 end
 
-user_category = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Applicant" and ts.name == ^"user_category")
-
 
 program = Repo.get_by(Program, name: "ND")
-department = Repo.get_by(Department, [name: "Computer Science"])
+department = Repo.get_by(Department, [name: "Mechanical Engineering"])
 level = Repo.get_by(Level, description: "ND I")
 gender = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Male" and ts.name == ^"gender")
 marital_status = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Single" and ts.name == ^"marital_status")
 entry_mode = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Post UTME" and ts.name == ^"entry_mode")
 academic_session = Repo.get_by(AcademicSession, [description: "2016/2017", active: true])
+level = Repo.get_by(Level, description: "ND I")
+semester = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"1st" and ts.name == ^"semester")
 
+
+
+user_category = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Applicant" and ts.name == ^"user_category")
 registration_no = "DS151690003478"
 user = %{user_name: String.downcase(registration_no), email: "jane.brown@dspg.edu.ng", password: "password", user_category_id: user_category.id}
 if Repo.get_by(User, [user_name: user.user_name]) == nil do
@@ -2256,40 +2287,37 @@ if Repo.get_by(User, [user_name: user.user_name]) == nil do
     {:ok, user} = Repo.insert(changeset)
     student = %{first_name: "Jane", last_name: "Brown", email: "jane.brown@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, entry_mode_id: entry_mode.id, user_id: user.id, academic_session_id: academic_session.id}
     changeset = Student.changeset(%Student{}, student)
-
     if changeset.valid?, do: Repo.insert!(changeset)
   end
 end
 
-query = from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"user_category"
-user_category = Repo.one query
-registration_no = "DS151690003477"
-user = %{user_name: String.downcase(registration_no), email: "brown.fish@dspg.edu.ng", password: "password", user_category_id: user_category.id}
+registration_no = "DS151690003470"
+user_category = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"user_category")
+User.changeset(%User{}, %{user_name: String.downcase(registration_no), email: "ufuoma.brown@walden.edu.ng", password: "password", user_category_id: user_category.id})
+|> Repo.insert()
+|> case do
+    {:ok, user} ->
+      Student.changeset(%Student{}, %{first_name: "Ufuoma", last_name: "Brown", email: "ufuoma.brown@walden.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, user_id: user.id, level_id: level.id, gender_id: gender.id, marital_status_id: marital_status.id, entry_mode_id: entry_mode.id, academic_session_id: academic_session.id})
+      |> Repo.insert()
+      |> case do
+         {:ok, student} -> register_courses.(student)
+         _ -> IO.inspect "failed to create student #{registration_no}"
+      end
+    _ -> IO.inspect "failed to create user #{registration_no}"
+end
 
-if Repo.get_by(User, [user_name: user.user_name]) == nil do
-  changeset = User.changeset(%User{}, user)
+registration_no = "DS151690003477"
+if Repo.get_by(User, [user_name: String.downcase(registration_no)]) == nil do
+  changeset = User.changeset(%User{}, %{user_name: String.downcase(registration_no), email: "brown.fish@dspg.edu.ng", password: "password", user_category_id: user_category.id})
   if changeset.valid? do
     {:ok, user} = Repo.insert(changeset)
     student = %{first_name: "Brown", last_name: "Fish", email: "brown.fish@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, user_id: user.id, level_id: level.id, gender_id: gender.id, marital_status_id: marital_status.id, entry_mode_id: entry_mode.id, academic_session_id: academic_session.id}
     changeset = Student.changeset(%Student{}, student)
-
     if changeset.valid? do
       {:ok, student} = Repo.insert(changeset)
-      level = Repo.get_by(Level, description: "ND I")
-
-      query = from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"1st" and ts.name == ^"semester"
-      semester = Repo.one query
-      academic_session = Repo.get_by(AcademicSession, [description: "2016/2017", active: true])
-      courses =Repo.all( from c in Course, where: c.level_id == ^level.id and c.department_id == ^department.id )
-      for course <- courses do
-        changeset = StudentCourse.changeset(%StudentCourse{}, %{course_id: course.id, student_id: student.id, academic_session_id: academic_session.id, level_id: level.id})
-        if changeset.valid? do
-          Repo.insert!(changeset)
-        end
-      end
-
-
+      register_courses.(student)
     end
+
   end
 end
 
@@ -2568,15 +2596,27 @@ Bauchi State.</b></p>", posted_by_user_id: 3})
 academic_session = AcademicSession |> where([a], a.description == ^"2016/2017") |> Repo.one
 level = Level |> where([l], l.description == ^"ND I") |> Repo.one
 semester = Term |> join(:inner, [t], ts in assoc(t, :term_set)) |> where([t, ts], t.description == ^"1st" and ts.name == ^"semester") |> Repo.one
+department = Department |> where([d], d.name == ^"Mechanical Engineering") |> Repo.all |> List.first
+courses = Course |> where([c], c.department_id == ^department.id and c.level_id == ^level.id and c.semester_id == ^semester.id) |> Repo.all
+staff_postings = StaffPosting |> where([sp], sp.department_id == ^department.id and sp.active == ^true) |> Repo.all
+
+Enum.each(courses, fn course ->
+  %CourseTutor{}
+  |> CourseTutor.changeset(%{course_id: course.id, academic_session_id: academic_session.id, staff_id: Enum.random(staff_postings).staff_id})
+  |> Repo.insert()
+end)
+
 student = Student |> where([s], s.registration_no == ^"DS151690003477") |> Repo.one
-scores = [55, 40, 89, 50, 64, 78, 48]
-
-
-Course |> where([c], c.level_id == ^level.id and semester_id: semester.id)
-|> Repo.all
-|> Enum.each(fn course ->
-    score = Enum.at(scores, Stream.repeatedly(fn -> trunc(:random.uniform * Enum.count(scores))) |> Enum.take(1))
+student_courses = student |> Ecto.assoc(:student_courses) |> join(:inner, [sc], c in assoc(sc, :course)) |> where([sc,c], c.semester_id == ^semester.id and sc.level_id == ^level.id and sc.academic_session_id == ^academic_session.id) |> Repo.all |> Repo.preload([:course])
+staff = Repo.get_by(Staff, [user_id: staff_1_user.id])
+Enum.each(student_courses, fn student_course ->
+    scores = [13,12,7,15,14]
+    # score = 6 * (scores |> Enum.at(Stream.repeatedly(fn -> trunc(:random.uniform * Enum.count(scores)) end) |> Enum.take(1) |> Enum.join |> String.to_integer ))
+    score = 6 * Enum.random(scores)
     grade = Grade |> where([g], g.minimum <= ^score and g.maximum >= ^score) |> Repo.one
-    %StudentResult{}
-    |> StudentResult.changeset(%{student_id: student.id, academic_session_id: academic_session.id, level_id: level.id, semester_id: semester.id, course_id: course.id, score: score, grade_id: grade.id })
-    |> Repo.insert()
+
+    %StudentCourseGrading{}
+    |> StudentCourseGrading.changeset(%{student_course_id: student_course.id, exam: score, ca: 0, total: score, letter: grade.description, weight: grade.point, grade_point: grade.point * student_course.course.units, grade_id: grade.id, uploaded_by_staff_id: staff.id})
+    |> Repo.insert!()
+
+  end)

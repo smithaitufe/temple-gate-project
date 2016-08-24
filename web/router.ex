@@ -73,16 +73,12 @@ defmodule PortalApi.Router do
       resources "students", StudentController, except: [:new, :edit]
       resources "student_programs", StudentProgramController, except: [:new, :edit]
       resources "student_courses", StudentCourseController, except: [:new, :edit]
+      resources "student_course_gradings", StudentCourseGradingController, except: [:new, :edit]
       resources "student_payments", StudentPaymentController, only: [:index, :create]
       resources "student_jamb_records", StudentJambRecordController, except: [:new, :edit]
       resources "student_diploma_qualifications", StudentDiplomaQualificationController, except: [:new, :edit]
       resources "student_certificates", StudentCertificateController, except: [:new, :edit]
       resources "student_certificate_subject_grades", StudentCertificateSubjectGradeController, except: [:new, :edit]
-
-
-
-      get "students/:user_id/record", StudentController, :get_student_by_user_id
-
 
 
       resources "project_topics", ProjectTopicController, except: [:new, :edit]

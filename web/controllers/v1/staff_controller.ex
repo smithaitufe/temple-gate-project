@@ -7,8 +7,10 @@ defmodule PortalApi.V1.StaffController do
 
   def index(conn,params) do
     staffs = Staff
-    |> build_staff_query(Map.to_list(params))
+    |> build_query(Map.to_list(params))
     |> Repo.all
+    |> Repo.preload(associations)
+
     render(conn, "index.json", staffs: staffs)
   end
 
@@ -30,6 +32,7 @@ defmodule PortalApi.V1.StaffController do
 
   def show(conn, %{"id" => id}) do
     staff = Repo.get!(Staff, id)
+    |> Repo.preload(associations)
     render(conn, "show.json", staff: staff)
   end
 
@@ -57,11 +60,30 @@ defmodule PortalApi.V1.StaffController do
     send_resp(conn, :no_content, "")
   end
 
-  defp build_staff_query(query, [{"user_id", user_id} | tail ]) do
+  defp build_query(query, [{"user_id", user_id} | tail ]) do
     query
     |> Ecto.Query.where([s], s.user_id == ^user_id)
-    |> build_staff_query(tail)
+    |> build_query(tail)
   end
-  defp build_staff_query(query, []), do: query
+  defp build_query(query, [{"department_id", department_id} | tail ]) do
+    query
+    |> Ecto.Query.join(:inner, [s], sp in assoc(s, :staff_postings))
+    |> Ecto.Query.where([s, sp], sp.department_id == ^department_id)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"active", active} | tail ]) do
+    query
+    |> Ecto.Query.join(:inner, [s], sp in assoc(s, :staff_postings))
+    |> Ecto.Query.where([s, sp], sp.active == ^active)
+    |> build_query(tail)
+  end
+
+  defp build_query(query, []), do: query
+
+  defp associations do
+    [:marital_status, :gender, :local_government_area, :staff_postings]
+  end
+
+
 
 end

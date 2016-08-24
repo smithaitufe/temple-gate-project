@@ -1,4 +1,4 @@
-defmodule PortalApi.Repo.Migrations.CreateCourseEnrollment do
+defmodule PortalApi.Repo.Migrations.CreateStudentCourse do
   use Ecto.Migration
 
   def change do
@@ -13,7 +13,7 @@ defmodule PortalApi.Repo.Migrations.CreateCourseEnrollment do
     create index(:student_courses, [:course_id])
     create index(:student_courses, [:student_id])
     create index(:student_courses, [:level_id])
-    create index(:student_courses, [:academic_session_id])
+    create index(:student_courses, [:academic_session_id])  
 
   end
 end

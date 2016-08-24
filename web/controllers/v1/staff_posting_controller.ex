@@ -9,8 +9,7 @@ defmodule PortalApi.V1.StaffPostingController do
     staff_postings = StaffPosting
     |> build_query(Map.to_list(params))
     |> Repo.all
-    |> Repo.preload([:staff, :department, :job])
-
+    |> Repo.preload(associations)
     render(conn, "index.json", staff_postings: staff_postings)
   end
 
@@ -31,7 +30,7 @@ defmodule PortalApi.V1.StaffPostingController do
   end
 
   def show(conn, %{"id" => id}) do
-    staff_posting = Repo.get!(StaffPosting, id)
+    staff_posting = Repo.get!(StaffPosting, id) |> Repo.preload(associations)
     render(conn, "show.json", staff_posting: staff_posting)
   end
 
@@ -74,6 +73,10 @@ defmodule PortalApi.V1.StaffPostingController do
     query
     |> Ecto.Query.where([sp], sp.active == ^active)
     |> build_query(tail)
+  end
+
+  defp associations do
+    [:staff, :department, {:job, [:department_type] }, {:salary_grade_step, [ {:salary_grade_level, :salary_structure_type} ]} ]
   end
 
 end

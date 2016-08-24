@@ -17,5 +17,6 @@ defmodule PortalApi.V1.DepartmentHeadView do
       appointment_date: department_head.appointment_date,
       effective_date: department_head.effective_date,
       end_date: department_head.end_date}
+      |> Map.put(:department, render_one(department_head.department, PortalApi.V1.DepartmentView, "department_lite.json"))
   end
 end

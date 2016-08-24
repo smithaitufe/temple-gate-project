@@ -7,33 +7,12 @@ defmodule PortalApi.V1.StudentController do
 
   def index(conn, params) do
     students = Student
-    |> build_student_query(Map.to_list(params))
+    |> build_query(Map.to_list(params))
     |> Repo.all
-    |> preload_models
+    |> Repo.preload(Student.associations)
 
     render(conn, "index.json", students: students)
   end
-
-  # def create(conn, %{"student" => student_params}) do
-  #
-  #   changeset = Student.changeset(%Student{}, student_params)
-  #   |> PortalApi.Service.Student.generate_registration_no(8)
-  #   |> PortalApi.Service.Student.generate_matriculation_no
-  #
-  #
-  #   case Repo.insert(changeset) do
-  #     {:ok, student} ->
-  #       student = preload_models(student)
-  #       conn
-  #       |> put_status(:created)
-  #       |> put_resp_header("location", v1_student_path(conn, :show, student))
-  #       |> render("show.json", student: student)
-  #     {:error, changeset} ->
-  #       conn
-  #       |> put_status(:unprocessable_entity)
-  #       |> render(PortalApi.ChangesetView, "error.json", changeset: changeset)
-  #   end
-  # end
 
   def create(conn, %{"student" => student_params}) do
 
@@ -41,11 +20,10 @@ defmodule PortalApi.V1.StudentController do
     |> Student.changeset(student_params)
     |> PortalApi.Service.Student.generate_registration_no(8)
     |> PortalApi.Service.Student.generate_matriculation_no
-
     |> Repo.insert()
     |> case do
       {:ok, student} ->
-        student = preload_models(student)
+        student = Repo.preload(student, Student.associations)
         conn
         |> put_status(:created)
         |> put_resp_header("location", v1_student_path(conn, :show, student))
@@ -62,7 +40,7 @@ defmodule PortalApi.V1.StudentController do
   def show(conn, %{"id" => id}) do
     student = Student
     |> Repo.get!(id)
-    |> preload_models
+    |> Repo.preload(Student.associations)
 
     render(conn, "show.json", student: student)
   end
@@ -73,7 +51,7 @@ defmodule PortalApi.V1.StudentController do
 
     case Repo.update(changeset) do
       {:ok, student} ->
-        student = preload_models(student)
+        student = Repo.preload(student, Student.associations)
         render(conn, "show.json", student: student)
       {:error, changeset} ->
         conn
@@ -95,13 +73,16 @@ defmodule PortalApi.V1.StudentController do
   defp build_student_query(query, [{"user_id", user_id} | tail]) do
     query
     |> Ecto.Query.where([s], s.user_id == ^user_id)
-    |> build_student_query(tail)
+    |> build_query(tail)
   end
-  defp build_student_query(query, []), do: query
+  defp build_query(query, [{"department_id", department_id} | tail]) do
+    query
+    |> Ecto.Query.where([s], s.department_id == ^department_id)
+    |> build_query(tail)
+  end
+  defp build_query(query, []), do: query
 
-  defp preload_models(query) do
-    Repo.preload(query, [:program, {:department, [:faculty, :department_type]}, :level, :gender, :marital_status])
-  end
+
 
 
 

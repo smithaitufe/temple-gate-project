@@ -29,9 +29,7 @@ defmodule PortalApi.Program do
     |> cast(params, @required_fields, @optional_fields)
   end
 
-  def load_levels(query) do
-    from q in query, join: l in assoc(q, :levels), preload: [levels: l]
-  end
+  
 
 
 end
