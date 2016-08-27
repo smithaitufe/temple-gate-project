@@ -59,8 +59,11 @@ defmodule PortalApi.Router do
       resources "staffs", StaffController, except: [:new, :edit]
       resources "staff_postings", StaffPostingController, except: [:new, :edit]
       resources "staff_academic_qualifications", StaffAcademicQualificationController, except: [:new, :edit]
+      resources "staff_leave_entitlements", StaffLeaveEntitlementController, except: [:new, :edit]
+      resources "staff_leave_requests", StaffLeaveRequestController, except: [:new, :edit]
       # Courses Module
       resources "grades", GradeController, except: [:new, :edit]
+      resources "grade_change_requests", GradeChangeRequestController, except: [:new, :edit]
       resources "courses", CourseController, except: [:new, :edit]
       resources "course_tutors", CourseTutorController, except: [:new, :edit]
       # Accounts/Bursary
@@ -83,7 +86,7 @@ defmodule PortalApi.Router do
 
       resources "project_topics", ProjectTopicController, except: [:new, :edit]
       resources "student_project_supervisors", StudentProjectSupervisorController, except: [:new, :edit]
-      resources "student_assessments", StudentAssessmentController, except: [:new, :edit]
+      resources "student_course_assessments", StudentCourseAssessmentController, except: [:new, :edit]
       resources "student_results", StudentResultController, except: [:new, :edit]
       resources "student_result_grades", StudentResultGradeController, except: [:new, :edit]
       resources "student_assignments", StudentAssignmentController, except: [:new, :edit]

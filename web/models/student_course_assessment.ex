@@ -24,4 +24,8 @@ defmodule PortalApi.StudentCourseAssessment do
     model
     |> cast(params, @required_fields, @optional_fields)
   end
+
+  def associations do
+    [:assessment_type]
+  end
 end

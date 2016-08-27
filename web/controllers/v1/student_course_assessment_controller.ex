@@ -7,6 +7,7 @@ defmodule PortalApi.V1.StudentCourseAssessmentController do
 
   def index(conn, _params) do
     student_course_assessments = Repo.all(StudentCourseAssessment)
+    |> Repo.preload(StudentCourseAssessment.associations)
     render(conn, "index.json", student_course_assessments: student_course_assessments)
   end
 
@@ -15,6 +16,7 @@ defmodule PortalApi.V1.StudentCourseAssessmentController do
 
     case Repo.insert(changeset) do
       {:ok, student_course_assessment} ->
+        student_course_assessment = student_course_assessment |> Repo.preload(StudentCourseAssessment.associations)
         conn
         |> put_status(:created)
         |> put_resp_header("location", v1_student_course_assessment_path(conn, :show, student_course_assessment))
@@ -28,6 +30,7 @@ defmodule PortalApi.V1.StudentCourseAssessmentController do
 
   def show(conn, %{"id" => id}) do
     student_course_assessment = Repo.get!(StudentCourseAssessment, id)
+    |> Repo.preload(StudentCourseAssessment.associations)
     render(conn, "show.json", student_course_assessment: student_course_assessment)
   end
 
@@ -37,6 +40,7 @@ defmodule PortalApi.V1.StudentCourseAssessmentController do
 
     case Repo.update(changeset) do
       {:ok, student_course_assessment} ->
+        student_course_assessment = student_course_assessment |> Repo.preload(StudentCourseAssessment.associations)
         render(conn, "show.json", student_course_assessment: student_course_assessment)
       {:error, changeset} ->
         conn

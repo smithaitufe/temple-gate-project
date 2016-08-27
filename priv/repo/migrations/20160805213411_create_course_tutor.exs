@@ -6,6 +6,8 @@ defmodule PortalApi.Repo.Migrations.CreateCourseTutor do
       add :course_id, references(:courses)
       add :staff_id, references(:staffs)
       add :academic_session_id, references(:academic_sessions)
+      add :grades_submitted, :boolean, default: false
+      add :grades_submitted_at, :datetime
 
       timestamps
     end

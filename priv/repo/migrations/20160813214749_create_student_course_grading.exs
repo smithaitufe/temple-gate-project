@@ -3,9 +3,7 @@ defmodule PortalApi.Repo.Migrations.CreateStudentCourseGrading do
 
   def change do
     create table(:student_course_gradings) do
-      add :exam, :float, null: false
-      add :ca, :float
-      add :total, :float, null: false
+      add :score, :float, null: false
       add :letter, :string, limit: 3, null: false
       add :weight, :float, null: false
       add :grade_point, :float, null: false

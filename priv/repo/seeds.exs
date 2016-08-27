@@ -1,5 +1,5 @@
 import Ecto.Query
-alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Student, Role, User, UserRole, StudentCourse,StudentCourseGrading, Fee, Payment, StudentPayment, TransactionResponse, Newsroom, ProgramAdvert, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Staff, StaffPosting, CourseTutor}
+alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Student, Role, User, UserRole, StudentCourse,StudentCourseAssessment,StudentCourseGrading, Fee, Payment, StudentPayment, TransactionResponse, Newsroom, ProgramAdvert, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Staff, StaffPosting, CourseTutor}
 
 divider = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 commit = fn(term_set, terms) ->
@@ -91,7 +91,8 @@ term_sets = [
   %{ name: "user_category", display_name: "User Category" },
   %{ name: "fee_category", display_name: "Fee Category" },
   %{ name: "payment_method", display_name: "Payment Method" },
-  %{ name: "entry_mode", display_name: "Entry Mode" }
+  %{ name: "entry_mode", display_name: "Entry Mode" },
+  %{ name: "grade_change_request_reason", display_name: "Grade Change Request Reason" }
 
 ]
 for term_set <- term_sets do
@@ -285,6 +286,16 @@ terms =[
   %{description: "Practical"},
   %{description: "Test"},
   %{description: "Examination"}
+]
+commit.(term_set, terms)
+
+term_set = TermSet |> Repo.get_by(name: "grade_change_request_reason")
+terms =[
+  %{description: "Instructor error"},
+  %{description: "Misevaluation of an exam"},
+  %{description: "Miscalculation of student average"},
+  %{description: "Error in grading several assignments"},
+  %{description: "Mixup in my grading book"}
 ]
 commit.(term_set, terms)
 
@@ -2610,13 +2621,19 @@ student = Student |> where([s], s.registration_no == ^"DS151690003477") |> Repo.
 student_courses = student |> Ecto.assoc(:student_courses) |> join(:inner, [sc], c in assoc(sc, :course)) |> where([sc,c], c.semester_id == ^semester.id and sc.level_id == ^level.id and sc.academic_session_id == ^academic_session.id) |> Repo.all |> Repo.preload([:course])
 staff = Repo.get_by(Staff, [user_id: staff_1_user.id])
 Enum.each(student_courses, fn student_course ->
-    scores = [13,12,7,15,14]
+    scores = [13,12,7,15,14,9,8,11]
     # score = 6 * (scores |> Enum.at(Stream.repeatedly(fn -> trunc(:random.uniform * Enum.count(scores)) end) |> Enum.take(1) |> Enum.join |> String.to_integer ))
-    score = 6 * Enum.random(scores)
-    grade = Grade |> where([g], g.minimum <= ^score and g.maximum >= ^score) |> Repo.one
+    # score = 6 * Enum.random(scores)
+    # grade = Grade |> where([g], g.minimum <= ^score and g.maximum >= ^score) |> Repo.one
+    #
+    # %StudentCourseGrading{}
+    # |> StudentCourseGrading.changeset(%{student_course_id: student_course.id, exam: score, ca: 0, total: score, letter: grade.description, weight: grade.point, grade_point: grade.point * student_course.course.units, grade_id: grade.id, uploaded_by_staff_id: staff.id})
+    # |> Repo.insert!()
 
-    %StudentCourseGrading{}
-    |> StudentCourseGrading.changeset(%{student_course_id: student_course.id, exam: score, ca: 0, total: score, letter: grade.description, weight: grade.point, grade_point: grade.point * student_course.course.units, grade_id: grade.id, uploaded_by_staff_id: staff.id})
+
+    assessment_type = Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> where([t, ts], t.description == "Assignment" and ts.name=="assessment_type") |> Repo.one
+    %StudentCourseAssessment{}
+    |> StudentCourseAssessment.changeset(%{student_course_id: student_course.id, staff_id: staff.id, assessment_type_id: assessment_type.id, score: Enum.random(scores)})
     |> Repo.insert!()
 
   end)

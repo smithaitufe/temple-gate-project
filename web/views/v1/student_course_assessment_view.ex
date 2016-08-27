@@ -16,6 +16,8 @@ defmodule PortalApi.V1.StudentCourseAssessmentView do
       staff_id: student_course_assessment.staff_id,
       assessment_type_id: student_course_assessment.assessment_type_id,
       score: student_course_assessment.score,
+      inserted_at: student_course_assessment.inserted_at
     }
+    |> Map.put(:assessment_type, render_one(student_course_assessment.assessment_type, PortalApi.V1.TermView, "term.json"))
   end
 end

@@ -6,7 +6,7 @@ defmodule PortalApi.StudentCourse do
     belongs_to :level, PortalApi.Course
     belongs_to :student, PortalApi.Student
     belongs_to :academic_session, PortalApi.AcademicSession
-
+    field :graded, :boolean, default: false
     has_one :course_grading, PortalApi.StudentCourseGrading
     has_many :assessments, PortalApi.StudentCourseAssessment
 
@@ -15,7 +15,7 @@ defmodule PortalApi.StudentCourse do
   end
 
   @required_fields ~w(student_id course_id level_id academic_session_id)
-  @optional_fields ~w()
+  @optional_fields ~w(graded)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -43,7 +43,7 @@ defmodule PortalApi.StudentCourse do
   end
 
   def associations do
-     [{:student,[:gender, :marital_status, {:program, [:levels]}, :level, {:department, [:faculty, :department_type]}]}, :academic_session, {:course, [{:department, [:faculty, :department_type]}, :level, :semester]}, :course_grading, :assessments]
+     [{:student,[:gender, :marital_status, {:program, [:levels]}, :level, {:department, [:faculty, :department_type]}]}, :academic_session, {:course, [{:department, [:faculty, :department_type]}, :level, :semester]}, :course_grading, {:assessments, [:assessment_type]}]
   end
 
 

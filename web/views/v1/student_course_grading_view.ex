@@ -12,9 +12,7 @@ defmodule PortalApi.V1.StudentCourseGradingView do
   def render("student_course_grading.json", %{student_course_grading: student_course_grading}) do
     %{id: student_course_grading.id,
       student_course_id: student_course_grading.student_course_id,
-      exam: student_course_grading.exam,
-      ca: student_course_grading.ca,
-      total: student_course_grading.total,
+      score: student_course_grading.score,
       letter: student_course_grading.letter,
       weight: student_course_grading.weight,
       grade_point: student_course_grading.grade_point,

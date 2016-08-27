@@ -3,7 +3,7 @@ defmodule PortalApi.StudentCourseGradingTest do
 
   alias PortalApi.StudentCourseGrading
 
-  @valid_attrs %{ca: "120.5", exam: "120.5", grade_point: "some content", letter: "some content", total: "120.5", weight: "some content"}
+  @valid_attrs %{grade_point: "some content", letter: "some content", total: "120.5", weight: "some content"}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do

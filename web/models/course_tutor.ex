@@ -2,6 +2,8 @@ defmodule PortalApi.CourseTutor do
   use PortalApi.Web, :model
 
   schema "course_tutors" do
+    field :grades_submitted, :boolean, default: false
+    field :grades_submitted_at, Ecto.DateTime
     belongs_to :course, PortalApi.Course
     belongs_to :staff, PortalApi.Staff
     belongs_to :academic_session, PortalApi.AcademicSession
@@ -10,7 +12,7 @@ defmodule PortalApi.CourseTutor do
   end
 
   @required_fields ~w(course_id staff_id academic_session_id)
-  @optional_fields ~w()
+  @optional_fields ~w(grades_submitted grades_submitted_at)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
