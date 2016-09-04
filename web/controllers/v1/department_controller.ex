@@ -7,7 +7,7 @@ defmodule PortalApi.V1.DepartmentController do
 
   def index(conn, params) do
     departments = Department
-    |> build_department_query(Map.to_list(params))
+    |> build_query(Map.to_list(params))
     |> Repo.all
     |> preload_models
     render(conn, "index.json", departments: departments)
@@ -61,29 +61,36 @@ defmodule PortalApi.V1.DepartmentController do
     send_resp(conn, :no_content, "")
   end
 
-  defp build_department_query(query, []), do: query
-  defp build_department_query(query, [{"faculty_id", faculty_id} | tail]) do
+  defp build_query(query, []), do: query
+  defp build_query(query, [{"faculty_id", faculty_id} | tail]) do
     query
     |> Ecto.Query.where([d], d.faculty_id == ^faculty_id)
-    |> build_department_query(tail)
+    |> build_query(tail)
   end
-  defp build_department_query(query, [{"department_type_id", department_type_id} | tail]) do
+  defp build_query(query, [{"department_type_id", department_type_id} | tail]) do
     query
     |> Ecto.Query.where([d], d.department_type_id == ^department_type_id)
-    |> build_department_query(tail)
+    |> build_query(tail)
   end
-  defp build_department_query(query, [{"order_by", field} | tail]) do
+  defp build_query(query, [{"order_by", field} | tail]) do
     query
     |> Ecto.Query.order_by([asc: ^String.to_existing_atom(field)])
-    |> build_department_query(tail)
+    |> build_query(tail)
   end
-  defp build_department_query(query, [{"program_id", program_id} | tail]) do
+  defp build_query(query, [{"program_id", program_id} | tail]) do
     query
     |> Ecto.Query.join(:left, [d], pd in assoc(d, :program_departments))
     |> Ecto.Query.join(:left, [d, pd], p in assoc(pd, :program))
     |> Ecto.Query.where([d, pd, p], p.id == ^program_id)
-    |> build_department_query(tail)
+    |> build_query(tail)
   end
+  defp build_query(query, [{"admit", admit} | tail]) do
+    query
+    |> Ecto.Query.join(:left, [d], pd in assoc(d, :program_departments))
+    |> Ecto.Query.where([d, pd], pd.admit == ^admit)
+    |> build_query(tail)
+  end
+
 
   # defp build_department_query(query, [{"available_department", value} | tail]) do
   #   query
@@ -94,7 +101,7 @@ defmodule PortalApi.V1.DepartmentController do
   # end
 
   defp preload_models(query) do
-    Repo.preload(query, [:faculty, :department_type])
+    Repo.preload(query, [:faculty])
   end
 
 end

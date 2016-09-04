@@ -1,16 +1,15 @@
-defmodule PortalApi.LeaveDuration do
+defmodule PortalApi.StudentCertificateItem do
   use PortalApi.Web, :model
 
-  schema "leave_durations" do
-    field :minimum_grade_level, :integer
-    field :maximum_grade_level, :integer
-    field :duration, :integer
-    belongs_to :leave_track_type, PortalApi.Term, foreign_key: :leave_track_type_id
+  schema "student_certificate_items" do
+    belongs_to :student_certificate, PortalApi.StudentCertificate
+    belongs_to :subject, PortalApi.Term
+    belongs_to :grade, PortalApi.Term
 
     timestamps
   end
 
-  @required_fields ~w(minimum_grade_level maximum_grade_level duration leave_track_type_id)
+  @required_fields ~w()
   @optional_fields ~w()
 
   @doc """

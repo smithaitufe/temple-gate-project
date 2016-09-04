@@ -64,6 +64,13 @@ defmodule PortalApi.V1.ProgramAdvertController do
     send_resp(conn, :no_content, "")
   end
 
+
+  defp build_program_advert_query(query, [{"name", name} | tail]) do
+    query
+    |> Ecto.Query.join(:inner, [pa], p in assoc(pa, :program))
+    |> Ecto.Query.where([_, p], fragment("lower(?) = ?", p.name, type(^name, :string)))
+    |> build_program_advert_query(tail)
+  end
   defp build_program_advert_query(query, [{"program_id", program_id} | tail]) do
     query
     |> Ecto.Query.where([pa], pa.program_id == ^program_id)
@@ -84,6 +91,6 @@ defmodule PortalApi.V1.ProgramAdvertController do
 
   defp preload_models(query) do
     query
-    |> Repo.preload([:program, :academic_session])
+    |> Repo.preload([{:program, [:levels]}, :academic_session])
   end
 end

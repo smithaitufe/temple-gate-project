@@ -8,6 +8,11 @@ defmodule PortalApi.User do
     field :encrypted_password, :string
     field :password, :string, virtual: true
 
+    field :confirmed, :boolean, default: false
+    field :confirmation_code, :string
+    field :locked, :boolean, default: false
+    field :suspended, :boolean, default: false
+
 
     belongs_to :user_category, PortalApi.Term
     has_one :student, PortalApi.Student, foreign_key: :user_id
@@ -18,8 +23,8 @@ defmodule PortalApi.User do
     timestamps
   end
 
-  @required_fields ~w(user_name email password user_category_id)
-  @optional_fields ~w()
+  @required_fields ~w(user_name password user_category_id)
+  @optional_fields ~w(email confirmed confirmation_code locked suspended)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -44,6 +49,11 @@ defmodule PortalApi.User do
       %Ecto.Changeset{valid?: true, changes: %{password: password}} -> put_change(current_changeset, :encrypted_password, Comeonin.Bcrypt.hashpwsalt(password))
       _ -> current_changeset
     end
+  end
+
+
+  def associations do
+    [:user_category]
   end
 
 

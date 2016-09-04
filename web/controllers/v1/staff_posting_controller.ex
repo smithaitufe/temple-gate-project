@@ -76,7 +76,8 @@ defmodule PortalApi.V1.StaffPostingController do
   end
 
   defp associations do
-    [:staff, :department, {:job, [:department_type] }, {:salary_grade_step, [ {:salary_grade_level, :salary_structure_type} ]} ]
+    [:staff, :department, {:job, [:department_type] }, {:salary_grade_step, [{:salary_grade_level, [:salary_structure_type]} ]} ]   
+
   end
 
 end

@@ -68,7 +68,7 @@ defmodule PortalApi.V1.FeeController do
   end
 
   defp load_related_models(query) do
-    Repo.preload(query, [:program, :level, :fee_category])
+    Repo.preload(query, [{:program, [:levels]}, :level, :fee_category])
   end
 
 
@@ -80,6 +80,11 @@ defmodule PortalApi.V1.FeeController do
   defp build_fee_query(query, [{"fee_category_id", fee_category_id} |  tail]) do
     query
     |> Ecto.Query.where([f], f.fee_category_id == ^fee_category_id)
+    |> build_fee_query(tail)
+  end
+  defp build_fee_query(query, [{"description", description} |  tail]) do
+    query
+    |> Ecto.Query.where([f], fragment("lower(?) = ?", f.description, type(^String.downcase(description), :string)))
     |> build_fee_query(tail)
   end
   defp build_fee_query(query, []), do: query

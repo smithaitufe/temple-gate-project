@@ -5,8 +5,12 @@ defmodule PortalApi.V1.StaffLeaveRequestController do
 
   plug :scrub_params, "staff_leave_request" when action in [:create, :update]
 
-  def index(conn, _params) do
-    staff_leave_requests = Repo.all(StaffLeaveRequest)
+  def index(conn, params) do
+    staff_leave_requests = StaffLeaveRequest
+    |> build_query(Map.to_list(params))
+    |> Repo.all
+    |> Repo.preload(StaffLeaveRequest.associations)
+
     render(conn, "index.json", staff_leave_requests: staff_leave_requests)
   end
 
@@ -27,7 +31,10 @@ defmodule PortalApi.V1.StaffLeaveRequestController do
   end
 
   def show(conn, %{"id" => id}) do
-    staff_leave_request = Repo.get!(StaffLeaveRequest, id)
+    staff_leave_request = StaffLeaveRequest
+    |> Repo.get!(id)
+    |> Repo.preload(StaffLeaveRequest.associations)
+
     render(conn, "show.json", staff_leave_request: staff_leave_request)
   end
 
@@ -37,6 +44,9 @@ defmodule PortalApi.V1.StaffLeaveRequestController do
 
     case Repo.update(changeset) do
       {:ok, staff_leave_request} ->
+
+        staff_leave_request = staff_leave_request |> Repo.preload(StaffLeaveRequest.associations)
+
         render(conn, "show.json", staff_leave_request: staff_leave_request)
       {:error, changeset} ->
         conn
@@ -54,4 +64,31 @@ defmodule PortalApi.V1.StaffLeaveRequestController do
 
     send_resp(conn, :no_content, "")
   end
+
+  defp build_query(query, [{"staff_id", staff_id} | tail ]) do
+    query
+    |> Ecto.Query.where([slr],slr.staff_id == ^staff_id)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"approved", approved} | tail ]) do
+    query
+    |> Ecto.Query.where([slr],slr.approved == ^approved)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"closed", closed} | tail ]) do
+    query
+    |> Ecto.Query.where([slr],slr.closed == ^closed)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{attr, value} | tail]) when attr == "month" or attr == "year" do
+    query
+    |> Ecto.Query.where([slr], fragment("date_part(?, ?) = ?", ^attr, slr.proposed_start_date, type(^value, :integer)))
+    |> build_query(tail)
+  end
+
+  defp build_query(query, []), do: query
+
+
+
+
 end

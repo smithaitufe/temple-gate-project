@@ -1,5 +1,5 @@
 import Ecto.Query
-alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Student, Role, User, UserRole, StudentCourse,StudentCourseAssessment,StudentCourseGrading, Fee, Payment, StudentPayment, TransactionResponse, Newsroom, ProgramAdvert, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Staff, StaffPosting, CourseTutor}
+alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Student, Role, User, UserRole, StudentCourse,StudentCourseAssessment,StudentCourseGrading, Fee, Payment, StudentPayment, TransactionResponse, Newsroom, ProgramAdvert, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Staff, StaffPosting, CourseTutor, LeaveDuration, StaffLeaveRequest}
 
 divider = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 commit = fn(term_set, terms) ->
@@ -92,7 +92,9 @@ term_sets = [
   %{ name: "fee_category", display_name: "Fee Category" },
   %{ name: "payment_method", display_name: "Payment Method" },
   %{ name: "entry_mode", display_name: "Entry Mode" },
-  %{ name: "grade_change_request_reason", display_name: "Grade Change Request Reason" }
+  %{ name: "grade_change_request_reason", display_name: "Grade Change Request Reason" },
+  %{ name: "leave_type", display_name: "Leave Type" },
+  %{ name: "leave_track_type", display_name: "Leave Track Type" }
 
 ]
 for term_set <- term_sets do
@@ -299,10 +301,32 @@ terms =[
 ]
 commit.(term_set, terms)
 
+term_set = TermSet |> Repo.get_by(name: "leave_type")
+terms =[
+  %{description: "Maternity Leave"},
+  %{description: "Overtime Leave"},
+  %{description: "Annual Leave"},
+  %{description: "Sick Leave"},
+  %{description: "Adoptive Leave"},
+  %{description: "Career Leave"}
+]
+commit.(term_set, terms)
+
+term_set = TermSet |> Repo.get_by(name: "leave_track_type")
+terms =[
+  %{description: "Days"},
+  %{description: "Months"}
+]
+commit.(term_set, terms)
+
+
 
 
 [
   %{name: "Admin", description: "Administration"},
+  %{name: "Registry", description: "Registry"},
+  %{name: "RegistryAssist", description: "Registry Assistant"},
+  %{name: "RegistryOfficer", description: "Registry Officer"},
   %{name: "FacultyHead", description: "Head of Faculty"},
   %{name: "DepartmentHead", description: "Head of Department"},
   %{name: "Lecturer", description: "Lecturer"},
@@ -1221,13 +1245,19 @@ end
 
 term_set = Repo.get_by(TermSet, [name: "faculty_type"])
 faculty_type = Repo.get_by(Term, [description: "Academic", term_set_id: term_set.id])
+faculty_type_2 = Repo.get_by(Term, [description: "Non Academic", term_set_id: term_set.id])
 
 faculties = [
   %{name: "School of General Studies", faculty_type_id: faculty_type.id},
   %{name: "School of Art and Design", faculty_type_id: faculty_type.id},
   %{name: "School of Business Studies", faculty_type_id: faculty_type.id},
   %{name: "School of Engineering", faculty_type_id: faculty_type.id},
-  %{name: "School of Applied Sciences", faculty_type_id: faculty_type.id}
+  %{name: "School of Applied Sciences", faculty_type_id: faculty_type.id},
+  %{name: "Rectory", faculty_type_id: faculty_type_2.id},
+  %{name: "Registry", faculty_type_id: faculty_type_2.id},
+  %{name: "Bursary", faculty_type_id: faculty_type_2.id},
+  %{name: "Library", faculty_type_id: faculty_type_2.id},
+  %{name: "Service", faculty_type_id: faculty_type_2.id}
 ]
 for faculty <- faculties do
   result = Repo.get_by(Faculty, [name: faculty[:name]])
@@ -1263,13 +1293,21 @@ department_list = [
   %{name: "Agricultural & Bio-Environmental Engineering Technology", abbreviation: "ABE", school: "School of Engineering", program: "ND"},
   %{name: "Civil Engineering Technology", abbreviation: "CEC", school: "School of Engineering", program: "ND"},
 ]
-term_set = Repo.get_by(TermSet, [name: "department_type"])
-department_type = Repo.get_by(Term, [description: "Academic", term_set_id: term_set.id])
+
+add_department_to_faculty = fn (departments, faculty)->
+  faculty = Repo.get_by(Faculty, name: faculty)
+  for department <- departments do
+    %Department{}
+    |> Department.changeset(department |> Map.put(:faculty_id, faculty.id))
+    |> Repo.insert!()
+  end
+end
+
 
 for dept <- department_list do
   if Repo.get_by(Department, name: dept[:name]) == nil do
     faculty = Repo.get_by(Faculty, name: dept[:school])
-    department = %{name: dept[:name], code: dept[:abbreviation], department_type_id: department_type.id, faculty_id: faculty.id}
+    department = %{name: dept[:name], code: dept[:abbreviation], faculty_id: faculty.id}
     changeset = Department.changeset(%Department{}, department)
     if changeset.valid? do
       department = Repo.insert!(changeset)
@@ -1290,6 +1328,51 @@ for dept <- department_list do
     end
   end
 end
+
+[
+  %{name: "Rector’s Office"},
+  %{name: "Deputy Rector (Academic)"},
+  %{name: "Student Affairs"},
+  %{name: "Internal Audit"},
+  %{name: "Student Industrial Work Experience/Placement )SIWES"},
+  %{name: "Public Relations"},
+  %{name: "Information and Communication Technology (ICT)"}
+]
+|> add_department_to_faculty.("Rectory")
+
+[
+  %{name: "Registrar’s Main Office"},
+  %{name: "Personnel Department"},
+  %{name: "Academic Registry Department"},
+  %{name: "Admissions Department"}
+]
+|> add_department_to_faculty.("Registry")
+
+[
+  %{name: "Bursar’s Office"},
+  %{name: "Students Accounts"},
+  %{name: "Final Accounts"},
+  %{name: "Budget and Expenditure Control"},
+  %{name: "Payroll"},
+  %{name: "Central Stores"},
+  %{name: "Cash Office"}
+]
+|> add_department_to_faculty.("Bursary")
+[
+  %{name: "Circulation"},
+  %{name: "Reference"},
+  %{name: "Serials"},
+  %{name: "Reserve Collection"}
+]
+|> add_department_to_faculty.("Library")
+
+[
+  %{name: "Physical Planning and Development Division"},
+  %{name: "Works and Maintenance"},
+  %{name: "Medical Centre"}
+]
+|> add_department_to_faculty.("Service")
+
 
 
 courses = [
@@ -2347,6 +2430,9 @@ users = [
   %{user_name: String.downcase("WLD/STF/000304"), email: "thankgod.goodwill@walden.edu.ng", password: "password", user_category_id: user_category.id},
   %{user_name: String.downcase("WLD/STF/000305"), email: "stephen.oboh@walden.edu.ng", password: "password", user_category_id: user_category.id},
   %{user_name: String.downcase("WLD/STF/000306"), email: "ogechi.onouha@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{user_name: String.downcase("WLD/STF/000307"), email: "juliet.jeb@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{user_name: String.downcase("WLD/STF/000308"), email: "uche.okeke@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{user_name: String.downcase("WLD/STF/000309"), email: "jose.conte@walden.edu.ng", password: "password", user_category_id: user_category.id},
 ]
 Enum.each(users, fn user ->
 %User{}
@@ -2445,6 +2531,9 @@ staff_3_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000303")])
 staff_4_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000304")])
 staff_5_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000305")])
 staff_6_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000306")])
+staff_7_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000307")])
+staff_8_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000308")])
+staff_9_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000309")])
 
 [
   %{first_name: "Clinton", last_name: "John", email: "john.clinton@walden.edu.ng", registration_no: "WLD/STF/000300", user_id: staff_1_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
@@ -2452,7 +2541,10 @@ staff_6_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000306")])
   %{first_name: "Efemena", last_name: "Agbi", email: "efemena.abi@walden.edu.ng", registration_no: "WLD/STF/000303", user_id: staff_3_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
   %{first_name: "ThankGod", last_name: "Goodwill", email: "thankgod.goodwill@walden.edu.ng", registration_no: "WLD/STF/000304", user_id: staff_4_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
   %{first_name: "Stephen", last_name: "Oboh", email: "stephen.oboh@walden.edu.ng", registration_no: "WLD/STF/000305", user_id: staff_5_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
-  %{first_name: "Ogechi", last_name: "Onouha", email: "ogechi.onouha@walden.edu.ng", registration_no: "WLD/STF/000306", user_id: staff_6_user.id, gender_id: gender.id, marital_status_id: marital_status.id}
+  %{first_name: "Ogechi", last_name: "Onouha", email: "ogechi.onouha@walden.edu.ng", registration_no: "WLD/STF/000306", user_id: staff_6_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
+  %{first_name: "Juliet", last_name: "Jeb", email: "juliet.jeb@walden.edu.ng", registration_no: "WLD/STF/000307", user_id: staff_7_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
+  %{first_name: "Uche", last_name: "Okeke", email: "uche.okeke@walden.edu.ng", registration_no: "WLD/STF/000308", user_id: staff_8_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
+  %{first_name: "Jose", last_name: "Conte", email: "jose.conte@walden.edu.ng", registration_no: "WLD/STF/000309", user_id: staff_9_user.id, gender_id: gender.id, marital_status_id: marital_status.id}
 ]
 |> Enum.each(&(
 %Staff{}
@@ -2461,18 +2553,27 @@ staff_6_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000306")])
 ))
 
 [
-  %{user_name: "WLD/STF/000305", role: "Lecturer", default: true},
+  %{user_name: "WLD/STF/000300", role: "Lecturer", default: true},
+  %{user_name: "WLD/STF/000301", role: "Lecturer", default: true},
   %{user_name: "WLD/STF/000302", role: "Lecturer", default: true},
+  %{user_name: "WLD/STF/000303", role: "Lecturer", default: true},
+  %{user_name: "WLD/STF/000304", role: "Lecturer", default: true},
+  %{user_name: "WLD/STF/000305", role: "Lecturer", default: true},
   %{user_name: "WLD/STF/000305", role: "FacultyHead", default: false},
-  %{user_name: "WLD/STF/000302", role: "DepartmentHead", default: false}
+  %{user_name: "WLD/STF/000302", role: "DepartmentHead", default: false},
+  %{user_name: "WLD/STF/000307", role: "Registry", default: true},
+  %{user_name: "WLD/STF/000308", role: "RegistryAssist", default: true},
+  %{user_name: "WLD/STF/000309", role: "RegistryOfficer", default: false}
 ]
 |> Enum.each(&(assign_role.(&1)))
 
 staff_posting.(%{user: staff_1_user, job_title: "Lecturer I", department_name: "Mechanical Engineering", posted_date: "2016-08-04", effective_date: "2016-09-01"})
 staff_posting.(%{user: staff_2_user, job_title: "Lecturer II", department_name: "Mechanical Engineering", posted_date: "2016-08-04", effective_date: "2016-09-01"})
-staff_posting.(%{user: staff_3_user, job_title: "Lecturer II", department_name: "Business Administration", posted_date: "2016-08-04", effective_date: "2016-09-01"})
-staff_posting.(%{user: staff_4_user, job_title: "Principal Lecturer", department_name: "Electrical/Electronics Engineering", posted_date: "2016-08-04", effective_date: "2016-09-01"})
+staff_posting.(%{user: staff_3_user, job_title: "Lecturer II", department_name: "Mechanical Engineering", posted_date: "2016-08-04", effective_date: "2016-09-01"})
+staff_posting.(%{user: staff_4_user, job_title: "Principal Lecturer", department_name: "Mechanical Engineering", posted_date: "2016-08-04", effective_date: "2016-09-01"})
 staff_posting.(%{user: staff_5_user, job_title: "Principal Lecturer", department_name: "Mechanical Engineering", posted_date: "2016-08-04", effective_date: "2016-09-01"})
+
+
 
 assign_office_head.(%{type: "faculty", user: staff_5_user, name: "School of Engineering", appointment_date: "2016-12-20", effective_date: "2017-02-01", end_date: "2018-05-30", active: true})
 assign_office_head.(%{type: "department", user: staff_2_user, name: "Mechanical Engineering", appointment_date: "2016-12-20", effective_date: "2017-02-01", end_date: "2018-05-30", active: true})
@@ -2637,3 +2738,28 @@ Enum.each(student_courses, fn student_course ->
     |> Repo.insert!()
 
   end)
+  leave_track_type = Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> where([t, ts], t.description == "Days" and ts.name=="leave_track_type") |> Repo.one
+
+
+
+
+[
+  %{minimum_grade_level: 1, maximum_grade_level: 5, duration: 15, leave_track_type_id: leave_track_type.id},
+  %{minimum_grade_level: 6, maximum_grade_level: 15, duration: 30, leave_track_type_id: leave_track_type.id}
+]
+|> Enum.each(fn leave_duration -> %LeaveDuration{}
+                                  |> LeaveDuration.changeset(leave_duration)
+                                  |> Repo.insert!() end
+)
+
+staff = Repo.get_by(Staff, [registration_no: "WLD/STF/000300"])
+staff_2 = Repo.get_by(Staff, [registration_no: "WLD/STF/000302"])
+
+leave_types = Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> where([_, ts], ts.name=="leave_type") |> Repo.all
+
+
+[
+%{staff_id: staff.id, leave_type_id: Enum.random(leave_types).id, proposed_start_date: "2016-10-01", proposed_end_date: "2016-10-10", approved_start_date: "2016-10-01", approved_end_date: "2016-10-10", approved: true, closed: true, closed_by_staff_id: staff_2.id, closed_at: DateTime.utc_now},
+%{staff_id: staff.id, leave_type_id: Enum.random(leave_types).id, proposed_start_date: "2016-10-01", proposed_end_date: "2016-10-10", approved_start_date: "2016-10-01", approved_end_date: "2016-10-10", approved: false, closed: true, closed_by_staff_id: staff_2.id, closed_at: DateTime.utc_now}
+]
+|> Enum.each(&(%StaffLeaveRequest{} |> StaffLeaveRequest.changeset(&1) |> Repo.insert!()))

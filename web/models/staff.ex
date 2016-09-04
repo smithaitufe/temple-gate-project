@@ -16,6 +16,8 @@ defmodule PortalApi.Staff do
 
 
     has_many :staff_postings, PortalApi.StaffPosting
+    has_many :salary_grade_steps, through: [:staff_postings, :salary_grade_step]
+    has_many :salary_grade_levels, through: [:salary_grade_steps, :salary_grade_level]
 
 
   end

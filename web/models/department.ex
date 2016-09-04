@@ -5,7 +5,7 @@ defmodule PortalApi.Department do
     field :name, :string
     field :code, :string
     belongs_to :faculty, PortalApi.Faculty
-    belongs_to :department_type, PortalApi.Term
+
 
 
 
@@ -17,7 +17,7 @@ defmodule PortalApi.Department do
     timestamps
   end
 
-  @required_fields ~w(name department_type_id faculty_id)
+  @required_fields ~w(name faculty_id)
   @optional_fields ~w(code)
 
   @doc """

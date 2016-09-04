@@ -81,7 +81,7 @@ defmodule PortalApi.V1.StaffController do
   defp build_query(query, []), do: query
 
   defp associations do
-    [:marital_status, :gender, :local_government_area, :staff_postings]
+    [:marital_status, :gender, :local_government_area, {:staff_postings,[:staff, :department, {:job, [:department_type] }, {:salary_grade_step, [{:salary_grade_level, [:salary_structure_type]} ]} ]   }]
   end
 
 

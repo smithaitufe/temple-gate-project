@@ -7,12 +7,12 @@ defmodule PortalApi.StudentCertificate do
     belongs_to :student, PortalApi.Student
     belongs_to :examination_body, PortalApi.ExaminationBody
 
-    has_many :student_certificate_subject_grades, PortalApi.StudentCertificateSubjectGrade
+    has_many :student_certificate_items, PortalApi.StudentCertificateSubjectGrade
 
     timestamps
   end
 
-  @required_fields ~w(year_obtained registration_no)
+  @required_fields ~w(year_obtained examination_body_id registration_no)
   @optional_fields ~w()
 
   @doc """

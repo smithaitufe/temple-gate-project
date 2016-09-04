@@ -1,6 +1,6 @@
 defmodule PortalApi.V1.StaffPostingView do
   use PortalApi.Web, :view
-  alias PortalApi.V1.{StaffPostingView, StaffView, DepartmentView, JobView}
+  alias PortalApi.V1.{StaffPostingView, StaffView, DepartmentView, JobView, SalaryGradeLevelView, SalaryGradeStepView}
 
   def render("index.json", %{staff_postings: staff_postings}) do
     render_many(staff_postings, StaffPostingView, "staff_posting.json")
@@ -24,6 +24,9 @@ defmodule PortalApi.V1.StaffPostingView do
     # |> Map.put(:staff, render_one(staff_posting.staff, StaffView, "staff_lite.json"))
     |> Map.put(:department, render_one(staff_posting.department, DepartmentView, "department_lite.json"))
     |> Map.put(:job, render_one(staff_posting.job, JobView, "job.json"))
+    |> Map.put(:salary_grade_level, render_one(staff_posting.salary_grade_step.salary_grade_level, SalaryGradeLevelView, "salary_grade_level.json"))
+    |> Map.put(:salary_grade_step, render_one(staff_posting.salary_grade_step, SalaryGradeStepView, "salary_grade_step.json"))
+
   end
 
 

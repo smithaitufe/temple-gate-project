@@ -12,15 +12,13 @@ defmodule PortalApi.V1.DepartmentView do
 
   def render("department.json", %{department: department}) do
     render("department_lite.json", department: department)
-    |> FacultyView.render_faculty(%{faculty: department.faculty})
-    |> TermView.render_term("department_type", %{term: department.department_type})
+    |> Map.put(:faculty, render_one(department.faculty, FacultyView, "faculty.json"))    
   end
   def render("department_lite.json", %{department: department}) do
     %{
       id: department.id,
       name: department.name,
       faculty_id: department.faculty_id,
-      department_type_id: department.department_type_id,
       code: department.code
     }
   end

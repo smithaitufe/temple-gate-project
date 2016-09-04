@@ -6,7 +6,10 @@ defmodule PortalApi.V1.LeaveDurationController do
   plug :scrub_params, "leave_duration" when action in [:create, :update]
 
   def index(conn, _params) do
-    leave_durations = Repo.all(LeaveDuration)
+    leave_durations = LeaveDuration
+    |> Repo.all
+    |> Repo.preload([:leave_track_type])
+
     render(conn, "index.json", leave_durations: leave_durations)
   end
 
@@ -15,6 +18,7 @@ defmodule PortalApi.V1.LeaveDurationController do
 
     case Repo.insert(changeset) do
       {:ok, leave_duration} ->
+        leave_duration = leave_duration |> Repo.preload([:leave_track_type])
         conn
         |> put_status(:created)
         |> put_resp_header("location", v1_leave_duration_path(conn, :show, leave_duration))
@@ -27,7 +31,7 @@ defmodule PortalApi.V1.LeaveDurationController do
   end
 
   def show(conn, %{"id" => id}) do
-    leave_duration = Repo.get!(LeaveDuration, id)
+    leave_duration = Repo.get!(LeaveDuration, id) |> Repo.preload([:leave_track_type])
     render(conn, "show.json", leave_duration: leave_duration)
   end
 
@@ -37,6 +41,7 @@ defmodule PortalApi.V1.LeaveDurationController do
 
     case Repo.update(changeset) do
       {:ok, leave_duration} ->
+        leave_duration = leave_duration |> Repo.preload([:leave_track_type])
         render(conn, "show.json", leave_duration: leave_duration)
       {:error, changeset} ->
         conn

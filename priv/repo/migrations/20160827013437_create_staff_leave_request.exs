@@ -10,18 +10,23 @@ defmodule PortalApi.Repo.Migrations.CreateStaffLeaveRequest do
       add :approved, :boolean, default: false
       add :approved_start_date, :date
       add :approved_end_date, :date
-      add :no_of_days, :integer, default: 0
+      add :duration, :integer, default: 0
       add :closed, :boolean, default: false
       add :closed_at, :datetime
       add :staff_id, references(:staffs)
       add :closed_by_staff_id, references(:staffs)
       add :leave_type_id, references(:terms)
+      add :signed, :boolean, default: false
+      add :signed_by_staff_id, references(:staffs)
+      add :accepted, :boolean, default: false
+      add :deferred, :boolean, default: false
 
 
       timestamps
     end
     create index(:staff_leave_requests, [:staff_id])
     create index(:staff_leave_requests, [:closed_by_staff_id])
+    create index(:staff_leave_requests, [:signed_by_staff_id])
     create index(:staff_leave_requests, [:leave_type_id])
 
 

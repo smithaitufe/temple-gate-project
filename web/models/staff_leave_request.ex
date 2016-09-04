@@ -9,11 +9,16 @@ defmodule PortalApi.StaffLeaveRequest do
     field :approved, :boolean, default: false
     field :approved_start_date, Ecto.Date
     field :approved_end_date, Ecto.Date
-    field :no_of_days, :integer
+    field :duration, :integer
     field :closed, :boolean, default: false
     field :closed_at, Ecto.DateTime
+    field :signed, :boolean, default: false
+    field :accepted, :boolean, default: false
+    field :deferred, :boolean, default: false
+
     belongs_to :staff, PortalApi.Staff
     belongs_to :closed_by, PortalApi.Staff, foreign_key: :closed_by_staff_id
+    belongs_to :signed_by, PortalApi.Staff, foreign_key: :signed_by_staff_id
     belongs_to :leave_type, PortalApi.Term, foreign_key: :leave_type_id
 
 
@@ -21,7 +26,7 @@ defmodule PortalApi.StaffLeaveRequest do
   end
 
   @required_fields ~w(staff_id leave_type_id proposed_start_date proposed_end_date)
-  @optional_fields ~w(read details approved approved_start_date approved_end_date no_of_days closed closed_at closed_by_staff_id)
+  @optional_fields ~w(read details approved approved_start_date approved_end_date duration closed closed_at closed_by_staff_id signed signed_by_staff_id accepted deferred)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -33,4 +38,10 @@ defmodule PortalApi.StaffLeaveRequest do
     model
     |> cast(params, @required_fields, @optional_fields)
   end
+
+  def associations do
+    [:closed_by, :signed_by, :leave_type]
+  end
+
+
 end

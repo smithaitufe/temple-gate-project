@@ -6,16 +6,15 @@ defmodule PortalApi.V1.UserController do
   def index(conn, _) do
     users = User
     |> Repo.all
-    |> preload_models
+    |> Repo.preload(User.associations)
 
     render(conn, "index.json", users: users)
   end
 
   def show(conn, %{"id" => id}) do
-    user = Repo.get(User,id)
+    user = Repo.get(User,id) |> Repo.preload(User.associations)
     render(conn, "show.json", user: user)
   end
-
 
   def create(conn, %{"user" => user_params}) do
 
@@ -47,6 +46,7 @@ defmodule PortalApi.V1.UserController do
 
     case Repo.update(changeset) do
       {:ok, user} ->
+        user = user |> Repo.preload(User.associations)
         render(conn, "show.json", user: user)
       {:error, changeset} ->
         conn
@@ -55,10 +55,6 @@ defmodule PortalApi.V1.UserController do
     end
   end
 
-  defp preload_models(query) do
-    query
-    |> Repo.preload([:user_category])
-  end
 
 
 end
