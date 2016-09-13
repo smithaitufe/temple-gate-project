@@ -1,6 +1,6 @@
 defmodule PortalApi.V1.StudentView do
   use PortalApi.Web, :view
-  alias PortalApi.V1.{StudentView, ProgramView, LevelView, DepartmentView, TermView}
+  alias PortalApi.V1.{StudentView, ProgramView, LevelView, DepartmentView, TermView, }
 
   def render("index.json", %{students: students}) do
     render_many(students, StudentView, "student.json")
@@ -12,11 +12,16 @@ defmodule PortalApi.V1.StudentView do
 
   def render("student.json", %{student: student}) do
       render("student_lite.json", student: student)
-      |> ProgramView.render_program(%{program: student.program})
-      |> LevelView.render_level(%{level: student.level})
-      |> DepartmentView.render_department(%{department: student.department})
-      |> TermView.render_term("marital_status", %{term: student.marital_status})
-      |> TermView.render_term("gender", %{term: student.gender})
+      |> Map.put(:program, render_one(student.program, ProgramView, "program.json"))
+      |> Map.put(:level, render_one(student.level, LevelView, "level.json"))
+      |> Map.put(:department, render_one(student.department, DepartmentView, "department.json"))
+      |> Map.put(:marital_status, render_one(student.marital_status, TermView, "term.json"))
+      |> Map.put(:gender, render_one(student.gender, TermView, "term.json"))
+      |> Map.put(:local_government_area, render_one(student.local_government_area, PortalApi.V1.LocalGovernmentAreaView, "local_government_area.json"))
+      |> Map.put(:state_of_origin, render_one(student.local_government_area.state, PortalApi.V1.StateView, "state.json"))
+      |> Map.put(:entry_mode, render_one(student.entry_mode, PortalApi.V1.TermView, "term.json"))
+
+
 
   end
 

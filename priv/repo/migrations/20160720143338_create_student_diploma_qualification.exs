@@ -6,7 +6,8 @@ defmodule PortalApi.Repo.Migrations.CreateStudentDiplomaQualification do
       add :school, :string
       add :course, :string
       add :cgpa, :float
-      add :year_graduated, :integer
+      add :year_admitted, :integer, null: false
+      add :year_graduated, :integer, null: false
       add :student_id, references(:students)
 
       timestamps

@@ -5,13 +5,14 @@ defmodule PortalApi.StudentDiplomaQualification do
     field :school, :string
     field :course, :string
     field :cgpa, :float
+    field :year_admitted, :integer
     field :year_graduated, :integer
     belongs_to :student, PortalApi.Student
 
     timestamps
   end
 
-  @required_fields ~w(school course cgpa year_graduated)
+  @required_fields ~w(school course cgpa year_admitted year_graduated)
   @optional_fields ~w()
 
   @doc """

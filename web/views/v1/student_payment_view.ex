@@ -10,26 +10,27 @@ defmodule PortalApi.V1.StudentPaymentView do
   end
 
   def render("student_payment.json", %{student_payment: student_payment}) do
+    render("student_payment_lite.json", student_payment: student_payment)
+    |> Map.put(:fee, render_one(student_payment.fee, PortalApi.V1.FeeView, "fee.json"))
+    |> Map.put(:payment_method, render_one(student_payment.payment_method, PortalApi.V1.TermView, "term.json"))
+    |> Map.put(:transaction_response, render_one(student_payment.transaction_response, PortalApi.V1.TermView, "term.json"))
+    |> Map.put(:academic_session, render_one(student_payment.academic_session, PortalApi.V1.AcademicSessionView, "academic_session.json"))
+
+  end
+
+  def render("student_payment_lite.json", %{student_payment: student_payment}) do
     %{
       id: student_payment.id,
-      student_id: student_payment.student_id,
-      payment_id: student_payment.payment_id
+      transaction_no: student_payment.transaction_no,
+      fee_id: student_payment.fee_id,
+      amount: student_payment.amount,
+      service_charge: student_payment.service_charge,
+      payment_status_id: student_payment.payment_status_id,
+      payment_method_id: student_payment.payment_method_id,
+      transaction_response_id: student_payment.transaction_response_id,
+      academic_session_id: student_payment.academic_session_id,
+      successful: student_payment.successful,
+      inserted_at: student_payment.inserted_at
     }
-    |> render_payment(%{payment: student_payment.payment})
-    |> render_student(%{student: student_payment.student})
-  end
-
-  defp render_payment(json, %{payment: payment}) when is_map(payment) do
-    Map.put(json, :payment, render_one(payment, PortalApi.V1.PaymentView, "payment.json"))
-  end
-  defp render_payment(json, _) do
-    json
-  end
-
-  defp render_student(json, %{student: student}) when is_map(student) do
-    Map.put(json, :student, render_one(student, PortalApi.V1.StudentView, "student.json"))
-  end
-  defp render_student(json, _) do
-    json
   end
 end

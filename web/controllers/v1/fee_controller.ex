@@ -9,7 +9,8 @@ defmodule PortalApi.V1.FeeController do
     fees = Fee
     |> build_fee_query(Map.to_list(params))
     |> Repo.all
-    |> load_related_models
+    |> Repo.preload(Fee.associations)
+
 
     render(conn, "index.json", fees: fees)
   end
@@ -20,9 +21,8 @@ defmodule PortalApi.V1.FeeController do
     case Repo.insert(changeset) do
       {:ok, fee} ->
 
-        fee = Fee
-        |> Fee.load_associations
-        |> Repo.get!(fee.id)
+        fee = fee |> Repo.preload(Fee.associations)
+
 
         conn
         |> put_status(:created)
@@ -37,8 +37,8 @@ defmodule PortalApi.V1.FeeController do
 
   def show(conn, %{"id" => id}) do
     fee =  Fee
-    |> Fee.load_associations
     |> Repo.get!(id)
+    |> Repo.preload(Fee.associations)
 
     render(conn, "show.json", fee: fee)
   end
@@ -49,6 +49,7 @@ defmodule PortalApi.V1.FeeController do
 
     case Repo.update(changeset) do
       {:ok, fee} ->
+        fee = fee |> Repo.preload(Fee.associations)
         render(conn, "show.json", fee: fee)
       {:error, changeset} ->
         conn
@@ -67,9 +68,7 @@ defmodule PortalApi.V1.FeeController do
     send_resp(conn, :no_content, "")
   end
 
-  defp load_related_models(query) do
-    Repo.preload(query, [{:program, [:levels]}, :level, :fee_category])
-  end
+
 
 
   defp build_fee_query(query, [{"program_id", program_id} |  tail]) do

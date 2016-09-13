@@ -53,6 +53,7 @@ defmodule PortalApi.Repo.Migrations.CreateStudent do
       add :level_id, references(:levels)
       add :entry_mode_id, references(:terms)
       add :user_id, references(:users)
+      add :local_government_area_id, references(:local_government_areas)
 
 
       timestamps

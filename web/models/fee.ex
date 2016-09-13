@@ -27,6 +27,13 @@ defmodule PortalApi.Fee do
     model
     |> cast(params, @required_fields, @optional_fields)
   end
-   
-  
+
+
+  def associations do
+    level_query = from l in PortalApi.Level, order_by: [asc: l.id]
+
+    [{:program, [levels: level_query]}, :level, :fee_category]
+  end
+
+
 end

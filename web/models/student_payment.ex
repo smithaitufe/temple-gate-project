@@ -2,23 +2,22 @@ defmodule PortalApi.StudentPayment do
   use PortalApi.Web, :model
 
   schema "student_payments" do
-    belongs_to :student, PortalApi.Student
-    belongs_to :payment, PortalApi.Payment
 
-    # Virtual fields
-    field :transaction_no, :string, virtual: true
-    field :amount, :decimal, virtual: true
-    field :service_charge, :decimal, virtual: true
-    field :fee_id, :integer, virtual: true
-    field :payment_status_id, :integer, virtual: true
-    field :payment_method_id, :integer, virtual: true
-    field :transaction_response_id, :integer, virtual: true
+    field :transaction_no, :string
+    field :amount, :decimal
+    field :service_charge, :decimal
+    field :successful, :boolean, default: false
+    belongs_to :student, PortalApi.Student
+    belongs_to :fee, PortalApi.Fee
+    belongs_to :payment_method, PortalApi.Term
+    belongs_to :transaction_response, PortalApi.TransactionResponse
+    belongs_to :academic_session, PortalApi.AcademicSession
 
     timestamps
   end
 
-  @required_fields ~w(student_id payment_id)
-  @optional_fields ~w()
+  @required_fields ~w(student_id academic_session_id fee_id amount service_charge payment_method_id transaction_response_id)
+  @optional_fields ~w(transaction_no successful)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -29,5 +28,25 @@ defmodule PortalApi.StudentPayment do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> generate_transaction_no
   end
+
+
+  def associations do
+    [
+      {:student, [:program, {:department, [:faculty, :department_type]}, :level, :marital_status, :gender]},
+      :transaction_response, :academic_session, {:fee, [:level, :program] }, :payment_method, :payment_status
+    ]
+  end
+  defp generate_transaction_no(changeset) do
+    case get_change(changeset, :transaction_no) do
+        nil ->
+            :random.seed(:os.timestamp)
+            transaction_no = Stream.repeatedly(fn -> trunc(:random.uniform * 10) end ) |> Enum.take(8) |> Enum.join
+            put_change(changeset, :transaction_no, transaction_no)
+
+        _ -> changeset
+    end
+  end
+
 end

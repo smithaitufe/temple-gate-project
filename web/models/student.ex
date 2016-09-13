@@ -23,6 +23,7 @@ defmodule PortalApi.Student do
     belongs_to :level, PortalApi.Level
     belongs_to :user, PortalApi.User
     belongs_to :entry_mode, PortalApi.Term
+    belongs_to :local_government_area, PortalApi.LocalGovernmentArea
 
     has_one :student_program, PortalApi.StudentProgram
     has_many :student_courses, PortalApi.StudentCourse
@@ -34,15 +35,11 @@ defmodule PortalApi.Student do
     has_many :student_payments, PortalApi.StudentPayment
     has_many :payments, through: [:student_payments, :payment]
 
-
-    # field :password, :string, virtual: true
-
-
     timestamps
   end
 
-  @required_fields ~w(first_name last_name email program_id department_id academic_session_id entry_mode_id)
-  @optional_fields ~w(middle_name marital_status_id gender_id birth_date phone_number registration_no matriculation_no level_id admitted user_id)
+  @required_fields ~w(first_name last_name email program_id department_id academic_session_id entry_mode_id level_id)
+  @optional_fields ~w(middle_name marital_status_id gender_id birth_date phone_number registration_no matriculation_no local_government_area_id admitted user_id)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -58,7 +55,12 @@ defmodule PortalApi.Student do
 
 
   def associations do
-    [{:program, [:levels]}, {:department, [:faculty, :department_type]}, :level, :gender, :marital_status]
+    [
+      {:program, [:levels]},
+      {:department, [:faculty]},
+      :level, :gender, :marital_status,:entry_mode,
+      {:local_government_area, [:state]}
+    ]
   end
 
 end

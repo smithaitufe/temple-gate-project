@@ -1,5 +1,5 @@
 import Ecto.Query
-alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Student, Role, User, UserRole, StudentCourse,StudentCourseAssessment,StudentCourseGrading, Fee, Payment, StudentPayment, TransactionResponse, Newsroom, ProgramAdvert, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Staff, StaffPosting, CourseTutor, LeaveDuration, StaffLeaveRequest}
+alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Student, Role, User, UserRole, StudentCourse,StudentCourseAssessment,StudentCourseGrading, Fee, StudentPayment, TransactionResponse, Newsroom, ProgramAdvert, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Staff, StaffPosting, CourseTutor, LeaveDuration, StaffLeaveRequest}
 
 divider = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 commit = fn(term_set, terms) ->
@@ -85,7 +85,6 @@ term_sets = [
   %{ name: "admission_status", display_name: "Admission Status" },
   %{ name: "examination_body", display_name: "Examination Body" },
   %{ name: "salary_structure_type", display_name: "Salary Structure Type" },
-  %{ name: "payment_status", display_name: "Payment Status" },
   %{ name: "allowance", display_name: "Allowance" },
   %{ name: "assessment_type", display_name: "Assessment Type" },
   %{ name: "user_category", display_name: "User Category" },
@@ -192,18 +191,10 @@ terms = [
 ]
 commit.(term_set, terms)
 
-term_set = TermSet |> Repo.get_by(name: "payment_status")
-terms = [
-  %{description: "Pending"},
-  %{description: "Successful"},
-  %{description: "Unsuccessful"}
-]
-commit.(term_set, terms)
-
 term_set = TermSet |> Repo.get_by(name: "payment_method")
 terms = [
-  %{description: "Web Pay"},
-  %{description: "Bank Branch"}
+  %{description: "WebPAY"},
+  %{description: "Bank"}
 ]
 commit.(term_set, terms)
 
@@ -2369,6 +2360,7 @@ entry_mode = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.
 academic_session = Repo.get_by(AcademicSession, [description: "2016/2017", active: true])
 level = Repo.get_by(Level, description: "ND I")
 semester = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"1st" and ts.name == ^"semester")
+local_government_area = LocalGovernmentArea |> Repo.all |> Enum.random
 
 
 
@@ -2379,19 +2371,20 @@ if Repo.get_by(User, [user_name: user.user_name]) == nil do
   changeset = User.changeset(%User{}, user)
   if changeset.valid? do
     {:ok, user} = Repo.insert(changeset)
-    student = %{first_name: "Jane", last_name: "Brown", email: "jane.brown@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, entry_mode_id: entry_mode.id, user_id: user.id, academic_session_id: academic_session.id}
+    student = %{first_name: "Jane", last_name: "Brown", email: "jane.brown@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, entry_mode_id: entry_mode.id, user_id: user.id, academic_session_id: academic_session.id, level_id: level.id, local_government_area_id: local_government_area.id}
     changeset = Student.changeset(%Student{}, student)
     if changeset.valid?, do: Repo.insert!(changeset)
   end
 end
 
+local_government_area = LocalGovernmentArea |> Repo.all |> Enum.random
 registration_no = "DS151690003470"
 user_category = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"user_category")
 User.changeset(%User{}, %{user_name: String.downcase(registration_no), email: "ufuoma.brown@walden.edu.ng", password: "password", user_category_id: user_category.id})
 |> Repo.insert()
 |> case do
     {:ok, user} ->
-      Student.changeset(%Student{}, %{first_name: "Ufuoma", last_name: "Brown", email: "ufuoma.brown@walden.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, user_id: user.id, level_id: level.id, gender_id: gender.id, marital_status_id: marital_status.id, entry_mode_id: entry_mode.id, academic_session_id: academic_session.id})
+      Student.changeset(%Student{}, %{first_name: "Ufuoma", last_name: "Brown", email: "ufuoma.brown@walden.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, user_id: user.id, level_id: level.id, gender_id: gender.id, marital_status_id: marital_status.id, entry_mode_id: entry_mode.id, academic_session_id: academic_session.id, local_government_area_id: local_government_area.id})
       |> Repo.insert()
       |> case do
          {:ok, student} -> register_courses.(student)
@@ -2400,12 +2393,13 @@ User.changeset(%User{}, %{user_name: String.downcase(registration_no), email: "u
     _ -> IO.inspect "failed to create user #{registration_no}"
 end
 
+local_government_area = LocalGovernmentArea |> Repo.all |> Enum.random
 registration_no = "DS151690003477"
 if Repo.get_by(User, [user_name: String.downcase(registration_no)]) == nil do
   changeset = User.changeset(%User{}, %{user_name: String.downcase(registration_no), email: "brown.fish@dspg.edu.ng", password: "password", user_category_id: user_category.id})
   if changeset.valid? do
     {:ok, user} = Repo.insert(changeset)
-    student = %{first_name: "Brown", last_name: "Fish", email: "brown.fish@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, user_id: user.id, level_id: level.id, gender_id: gender.id, marital_status_id: marital_status.id, entry_mode_id: entry_mode.id, academic_session_id: academic_session.id}
+    student = %{first_name: "Brown", last_name: "Fish", email: "brown.fish@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, user_id: user.id, level_id: level.id, gender_id: gender.id, marital_status_id: marital_status.id, entry_mode_id: entry_mode.id, academic_session_id: academic_session.id, local_government_area_id: local_government_area.id}
     changeset = Student.changeset(%Student{}, student)
     if changeset.valid? do
       {:ok, student} = Repo.insert(changeset)
@@ -2645,21 +2639,16 @@ end
 registration_no = "DS151690003477"
 student = Repo.get_by(Student, registration_no: registration_no)
 fee = Repo.get_by(Fee, code: "212")
-payment_method = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Web Pay" and ts.name == ^"payment_method")
-payment_status = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Successful" and ts.name == ^"payment_status")
-academic_session = Repo.get_by(AcademicSession, active: true)
+payment_method = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"WebPAY" and ts.name == ^"payment_method")
 
+academic_session = Repo.get_by(AcademicSession, active: true)
 transaction_response = Repo.get_by(TransactionResponse, code: "00")
 
-payment = %{fee_id: fee.id, amount: fee.amount, service_charge: fee.service_charge, payment_method_id: payment_method.id, payment_status_id: payment_status.id, transaction_response_id: transaction_response.id, academic_session_id: academic_session.id }
 
-changeset = Payment.changeset(%Payment{}, payment)
-if changeset.valid? do
-  {:ok, payment} = Repo.insert(changeset)
+%StudentPayment{}
+|> StudentPayment.changeset(%{student_id: student.id, fee_id: fee.id, amount: fee.amount, service_charge: fee.service_charge, payment_method_id: payment_method.id, successful: true, transaction_response_id: transaction_response.id, academic_session_id: academic_session.id})
+|> Repo.insert()
 
-  changeset = StudentPayment.changeset(%StudentPayment{}, %{student_id: student.id, payment_id: payment.id})
-  Repo.insert(changeset)
-end
 
 
 academic_session = Repo.get_by(AcademicSession, active: true)

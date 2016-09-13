@@ -1,7 +1,7 @@
 defmodule PortalApi.V1.StudentController do
   use PortalApi.Web, :controller
   alias PortalApi.Student
-  alias PortalApi.V1.{StudentView, PaymentView}
+  
 
   plug :scrub_params, "student" when action in [:create, :update]
 
@@ -70,7 +70,7 @@ defmodule PortalApi.V1.StudentController do
   end
 
 
-  defp build_student_query(query, [{"user_id", user_id} | tail]) do
+  defp build_query(query, [{"user_id", user_id} | tail]) do
     query
     |> Ecto.Query.where([s], s.user_id == ^user_id)
     |> build_query(tail)

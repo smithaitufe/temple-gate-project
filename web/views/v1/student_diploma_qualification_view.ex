@@ -15,6 +15,7 @@ defmodule PortalApi.V1.StudentDiplomaQualificationView do
       school: student_diploma_qualification.school,
       course: student_diploma_qualification.course,
       cgpa: student_diploma_qualification.cgpa,
+      year_admitted: student_diploma_qualification.year_admitted,
       year_graduated: student_diploma_qualification.year_graduated}
   end
 end
