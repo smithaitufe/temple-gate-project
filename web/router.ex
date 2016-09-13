@@ -80,6 +80,7 @@ defmodule PortalApi.Router do
       resources "student_payments", StudentPaymentController, only: [:index, :create]
       resources "student_jamb_records", StudentJambRecordController, except: [:new, :edit]
       resources "student_diploma_qualifications", StudentDiplomaQualificationController, except: [:new, :edit]
+      resources "student_direct_entry_qualifications", StudentDirectEntryQualificationController, except: [:new, :edit]
       resources "student_certificates", StudentCertificateController, except: [:new, :edit]
       resources "student_certificate_items", StudentCertificateItemController, except: [:new, :edit]
 
