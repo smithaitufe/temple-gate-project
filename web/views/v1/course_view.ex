@@ -12,17 +12,12 @@ defmodule PortalApi.V1.CourseView do
 
   def render("course.json", %{course: course}) do
     render("course_lite.json", course: course)
-    |> DepartmentView.render_department(%{department: course.department})
-    |> LevelView.render_level(%{level: course.level})
-    |> TermView.render_term("semester", %{term: course.semester})
+    |> Map.put(:department, render_one(course.department, DepartmentView, "department.json"))
+    |> Map.put(:level, render_one(course.level, LevelView, "level.json"))
+    |> Map.put(:course_category, render_one(course.course_category, TermView, "term.json"))
+    |> Map.put(:semester, render_one(course.semester, TermView, "term.json"))
   end
 
-  def render_course(json, %{course: course}) when is_map(course) do
-    Map.put(json, :course, render_one(course, CourseView, "course.json"))
-  end
-  def render_course(json, _) do
-    Map.put(json, :course, %{})
-  end
 
   def render("course_lite.json", %{course: course}) do
     %{id: course.id,
@@ -33,8 +28,8 @@ defmodule PortalApi.V1.CourseView do
       title: course.title,
       units: course.units,
       hours: course.hours,
-      core: course.core,
-      description: course.description
+      description: course.description,
+      course_category_id: course.course_category_id
     }
   end
 

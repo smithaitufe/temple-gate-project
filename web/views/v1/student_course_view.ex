@@ -15,10 +15,11 @@ defmodule PortalApi.V1.StudentCourseView do
       course_id: student_course.course_id,
       student_id: student_course.student_id,
       academic_session_id: student_course.academic_session_id,
-      graded: student_course.graded      
+      graded: student_course.graded
     }
-    |> StudentView.render_student(%{student: student_course.student})
-    |> CourseView.render_course(%{course: student_course.course})
+
+    |> Map.put(:student, render_one(student_course.student, StudentView, "student_lite.json"))
+    |> Map.put(:course, render_one(student_course.course, CourseView, "course.json"))    
     |> Map.put(:course_grade, render_one(student_course.course_grading, StudentCourseGradingView, "student_course_grading.json"))
     |> Map.put(:assessments, render_many(student_course.assessments, StudentCourseAssessmentView, "student_course_assessment.json"))
   end

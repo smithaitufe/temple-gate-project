@@ -34,8 +34,8 @@ defmodule PortalApi.StudentPayment do
 
   def associations do
     [
-      {:student, [:program, {:department, [:faculty, :department_type]}, :level, :marital_status, :gender]},
-      :transaction_response, :academic_session, {:fee, [:level, :program] }, :payment_method, :payment_status
+      {:student, [:program, {:department, [:faculty]}, :level, :marital_status, :gender]},
+      :transaction_response, :academic_session, {:fee, [:level, {:program, [:levels]}] }, :payment_method
     ]
   end
   defp generate_transaction_no(changeset) do

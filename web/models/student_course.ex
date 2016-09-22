@@ -31,19 +31,20 @@ defmodule PortalApi.StudentCourse do
 
   def load_associations(query) do
     course_query = from c in PortalApi.Course, preload: [:department, :semester, :level]
-
     from q in query,
     join: c in assoc(q, :course),
     join: s in assoc(q, :student),
     join: a in assoc(q, :academic_session),
     preload: [course: ^course_query, student: s, academic_session: a]
-
-
-
   end
 
   def associations do
-     [{:student,[:gender, :marital_status, {:program, [:levels]}, :level, {:department, [:faculty, :department_type]}]}, :academic_session, {:course, [{:department, [:faculty, :department_type]}, :level, :semester]}, :course_grading, {:assessments, [:assessment_type]}]
+     [
+       {:student,[:gender, :marital_status, {:program, [:levels]}, :level, {:department, [:faculty]}] },
+        :academic_session,
+      {:course, [{:department, [:faculty]}, :level, :semester, :course_category]},
+      :course_grading, {:assessments, [:assessment_type]}
+    ]
   end
 
 

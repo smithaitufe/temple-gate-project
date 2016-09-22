@@ -12,6 +12,7 @@ defmodule PortalApi.Repo.Migrations.CreateCourse do
       add :department_id, references(:departments)
       add :level_id, references(:levels)
       add :semester_id, references(:terms)
+      add :course_category_id, references(:terms)
 
       timestamps
     end

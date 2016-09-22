@@ -7,6 +7,9 @@ defmodule PortalApi.V1.StudentCourseController do
 
   def index(conn, params) do
     student_courses = StudentCourse
+    |> Ecto.Query.join(:inner, [sc], a in assoc(sc, :academic_session))
+    |> Ecto.Query.join(:inner, [sc, a], c in assoc(sc, :course))
+
     |> build_query(Map.to_list(params))
     |> Repo.all
     |> Repo.preload(StudentCourse.associations)
@@ -65,23 +68,28 @@ defmodule PortalApi.V1.StudentCourseController do
   defp build_query(query, []), do: query
   defp build_query(query, [{"level_id", level_id} | tail]) do
     query
-    |> Ecto.Query.join(:left, [sc], c in assoc(sc, :course))
-    |> Ecto.Query.where([_, c], c.level_id == ^level_id)
+    |> Ecto.Query.where([_, _, c], c.level_id == ^level_id)
     |> build_query(tail)
   end
   defp build_query(query, [{"course_id", course_id} | tail]) do
     query
-    |> Ecto.Query.where([sc], sc.course_id == ^course_id)
+    |> Ecto.Query.where([sc, _, _], sc.course_id == ^course_id)
     |> build_query(tail)
   end
   defp build_query(query, [{"academic_session_id", academic_session_id} | tail]) do
     query
-    |> Ecto.Query.where([sc], sc.academic_session_id == ^academic_session_id)
+    |> Ecto.Query.where([sc,_, _], sc.academic_session_id == ^academic_session_id)
     |> build_query(tail)
   end
+  defp build_query(query, [{"academic_session", academic_session} | tail]) do
+    query
+    |> Ecto.Query.where([_, a, _], a.description == ^academic_session)
+    |> build_query(tail)
+  end
+
   defp build_query(query, [{"student_id", student_id} | tail]) do
     query
-    |> Ecto.Query.where([sc], sc.student_id == ^student_id)
+    |> Ecto.Query.where([sc, _, _], sc.student_id == ^student_id)
     |> build_query(tail)
   end
 

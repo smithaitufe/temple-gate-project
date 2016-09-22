@@ -6,11 +6,11 @@ defmodule PortalApi.Course do
     field :title, :string
     field :units, :integer
     field :hours, :integer
-    field :core, :boolean, default: false
     field :description, :string
     belongs_to :department, PortalApi.Department
     belongs_to :level, PortalApi.Level
-    belongs_to :semester, PortalApi.Term
+    belongs_to :semester, PortalApi.Term, foreign_key: :semester_id
+    belongs_to :course_category, PortalApi.Term, foreign_key: :course_category_id
 
     timestamps
 
@@ -19,7 +19,7 @@ defmodule PortalApi.Course do
 
   end
 
-  @required_fields ~w(code title units hours core department_id level_id semester_id)
+  @required_fields ~w(code title units hours department_id level_id semester_id course_category_id)
   @optional_fields ~w(description)
 
   @doc """
@@ -45,6 +45,6 @@ defmodule PortalApi.Course do
   end
 
   def associations() do
-    [:semester, :level, {:department, [:faculty, :department_type]}]
+    [:semester, :level, {:department, [:faculty, :department_type]}, :course_category]
   end
 end
