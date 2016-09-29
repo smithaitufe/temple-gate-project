@@ -1,5 +1,6 @@
 defmodule PortalApi.LeaveDuration do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "leave_durations" do
     field :minimum_grade_level, :integer
@@ -10,8 +11,8 @@ defmodule PortalApi.LeaveDuration do
     timestamps
   end
 
-  @required_fields ~w(minimum_grade_level maximum_grade_level duration leave_track_type_id)
-  @optional_fields ~w()
+  @required_fields ~w(minimum_grade_level maximum_grade_level duration leave_track_type_id)a
+  @optional_fields ~w()a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -19,8 +20,9 @@ defmodule PortalApi.LeaveDuration do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 end

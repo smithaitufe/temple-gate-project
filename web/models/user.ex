@@ -1,5 +1,6 @@
 defmodule PortalApi.User do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "users" do
 
@@ -23,8 +24,8 @@ defmodule PortalApi.User do
     timestamps
   end
 
-  @required_fields ~w(user_name password user_category_id)
-  @optional_fields ~w(email confirmed confirmation_code locked suspended)
+  @required_fields ~w(user_name password user_category_id)a
+  @optional_fields ~w(email confirmed confirmation_code locked suspended)a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -32,9 +33,10 @@ defmodule PortalApi.User do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
     |> encrypt_password
   end
   def load_user_category_and_roles(query) do

@@ -1,5 +1,6 @@
 defmodule PortalApi.TransactionResponse do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "transaction_responses" do
     field :code, :string
@@ -8,8 +9,8 @@ defmodule PortalApi.TransactionResponse do
     timestamps
   end
 
-  @required_fields ~w(code description)
-  @optional_fields ~w()
+  @required_fields ~w(code description)a
+  @optional_fields ~w()a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -17,8 +18,9 @@ defmodule PortalApi.TransactionResponse do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 end

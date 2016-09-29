@@ -1,5 +1,6 @@
 defmodule PortalApi.Faculty do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "faculties" do
     field :name, :string
@@ -9,8 +10,8 @@ defmodule PortalApi.Faculty do
     timestamps
   end
 
-  @required_fields ~w(name faculty_type_id)
-  @optional_fields ~w()
+  @required_fields ~w(name faculty_type_id)a
+  @optional_fields ~w()a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -18,9 +19,10 @@ defmodule PortalApi.Faculty do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 
 

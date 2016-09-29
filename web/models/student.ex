@@ -1,5 +1,6 @@
 defmodule PortalApi.Student do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   # @primary_key {:id, :integer, autogenerate: false}
   schema "students" do
@@ -38,8 +39,8 @@ defmodule PortalApi.Student do
     timestamps
   end
 
-  @required_fields ~w(first_name last_name email program_id department_id academic_session_id entry_mode_id level_id)
-  @optional_fields ~w(middle_name marital_status_id gender_id birth_date phone_number registration_no matriculation_no local_government_area_id admitted user_id)
+  @required_fields ~w(first_name last_name email program_id department_id academic_session_id entry_mode_id level_id)a
+  @optional_fields ~w(middle_name marital_status_id gender_id birth_date phone_number registration_no matriculation_no local_government_area_id admitted user_id)a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -47,10 +48,10 @@ defmodule PortalApi.Student do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
-
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 
 

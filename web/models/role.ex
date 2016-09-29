@@ -1,5 +1,6 @@
 defmodule PortalApi.Role do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "roles" do
     field :name, :string
@@ -8,8 +9,8 @@ defmodule PortalApi.Role do
     timestamps
   end
 
-  @required_fields ~w(name description)
-  @optional_fields ~w(slug)
+  @required_fields ~w(name description)a
+  @optional_fields ~w(slug)a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -17,10 +18,11 @@ defmodule PortalApi.Role do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
-    |> generate_slug()
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
+    |> generate_slug
   end
 
   defp generate_slug(changeset) do

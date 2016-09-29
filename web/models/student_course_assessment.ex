@@ -1,5 +1,6 @@
 defmodule PortalApi.StudentCourseAssessment do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "student_course_assessments" do
     field :score, :float
@@ -11,8 +12,8 @@ defmodule PortalApi.StudentCourseAssessment do
     timestamps
   end
 
-  @required_fields ~w(staff_id student_course_id assessment_type_id score)
-  @optional_fields ~w()
+  @required_fields ~w(staff_id student_course_id assessment_type_id score)a
+  @optional_fields ~w()a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -20,9 +21,10 @@ defmodule PortalApi.StudentCourseAssessment do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 
   def associations do

@@ -1,5 +1,6 @@
 defmodule PortalApi.Newsroom do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "newsrooms" do
     field :heading, :string
@@ -12,8 +13,8 @@ defmodule PortalApi.Newsroom do
     timestamps
   end
 
-  @required_fields ~w(heading lead body release_at active duration)
-  @optional_fields ~w()
+  @required_fields ~w(heading lead body release_at active duration)a
+  @optional_fields ~w()a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -21,8 +22,9 @@ defmodule PortalApi.Newsroom do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 end

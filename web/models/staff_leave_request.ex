@@ -1,5 +1,6 @@
 defmodule PortalApi.StaffLeaveRequest do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "staff_leave_requests" do
     field :proposed_start_date, Ecto.Date
@@ -25,8 +26,8 @@ defmodule PortalApi.StaffLeaveRequest do
     timestamps
   end
 
-  @required_fields ~w(staff_id leave_type_id proposed_start_date proposed_end_date)
-  @optional_fields ~w(read details approved approved_start_date approved_end_date duration closed closed_at closed_by_staff_id signed signed_by_staff_id accepted deferred)
+  @required_fields ~w(staff_id leave_type_id proposed_start_date proposed_end_date)a
+  @optional_fields ~w(read details approved approved_start_date approved_end_date duration closed closed_at closed_by_staff_id signed signed_by_staff_id accepted deferred)a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -34,9 +35,10 @@ defmodule PortalApi.StaffLeaveRequest do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 
   def associations do

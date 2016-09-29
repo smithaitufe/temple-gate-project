@@ -1,5 +1,6 @@
 defmodule PortalApi.ProgramDepartment do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "program_departments" do
     belongs_to :program, PortalApi.Program
@@ -8,8 +9,8 @@ defmodule PortalApi.ProgramDepartment do
     timestamps
   end
 
-  @required_fields ~w(program_id department_id)
-  @optional_fields ~w(admit)
+  @required_fields ~w(program_id department_id)a
+  @optional_fields ~w(admit)a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -17,9 +18,10 @@ defmodule PortalApi.ProgramDepartment do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 
   def program_department_advert_changeset(model, params \\ :empty) do

@@ -1,6 +1,6 @@
 defmodule PortalApi.V1.StudentCourseView do
-  use PortalApi.Web, :view
-  alias PortalApi.V1.{StudentCourseView, StudentView, CourseView, StudentCourseGradingView, StudentCourseAssessmentView}
+  use     PortalApi.Web, :view
+  alias   PortalApi.V1.{StudentCourseView, StudentView, CourseView, StudentCourseGradingView, StudentCourseAssessmentView, AcademicSessionView}
 
   def render("index.json", %{student_courses: student_courses}) do
     render_many(student_courses, StudentCourseView, "student_course.json")
@@ -19,7 +19,8 @@ defmodule PortalApi.V1.StudentCourseView do
     }
 
     |> Map.put(:student, render_one(student_course.student, StudentView, "student_lite.json"))
-    |> Map.put(:course, render_one(student_course.course, CourseView, "course.json"))    
+    |> Map.put(:academic_session, render_one(student_course.academic_session, AcademicSessionView, "academic_session.json"))
+    |> Map.put(:course, render_one(student_course.course, CourseView, "course.json"))
     |> Map.put(:course_grade, render_one(student_course.course_grading, StudentCourseGradingView, "student_course_grading.json"))
     |> Map.put(:assessments, render_many(student_course.assessments, StudentCourseAssessmentView, "student_course_assessment.json"))
   end

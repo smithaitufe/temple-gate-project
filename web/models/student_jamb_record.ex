@@ -1,5 +1,6 @@
 defmodule PortalApi.StudentJambRecord do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "student_jamb_records" do
     field :score, :float
@@ -9,8 +10,8 @@ defmodule PortalApi.StudentJambRecord do
     timestamps
   end
 
-  @required_fields ~w(score registration_no)
-  @optional_fields ~w()
+  @required_fields ~w(student_id score registration_no)a
+  @optional_fields ~w()a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -18,8 +19,9 @@ defmodule PortalApi.StudentJambRecord do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 end

@@ -1,5 +1,6 @@
 defmodule PortalApi.StudentDirectEntryQualification do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "student_direct_entry_qualifications" do
     field :school, :string
@@ -15,8 +16,8 @@ defmodule PortalApi.StudentDirectEntryQualification do
     timestamps
   end
 
-  @required_fields ~w(school course_studied cgpa year_admitted year_graduated)
-  @optional_fields ~w(verified verified_at verified_by_staff_id)
+  @required_fields ~w(school course_studied cgpa year_admitted year_graduated)a
+  @optional_fields ~w(verified verified_at verified_by_staff_id)a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -24,8 +25,9 @@ defmodule PortalApi.StudentDirectEntryQualification do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 end

@@ -1,5 +1,5 @@
 import Ecto.Query
-alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Student, Role, User, UserRole, StudentCourse,StudentCourseAssessment,StudentCourseGrading, Fee, StudentPayment, TransactionResponse, Newsroom, ProgramAdvert, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Staff, StaffPosting, CourseTutor, LeaveDuration, StaffLeaveRequest}
+alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Student, Role, User, UserRole, StudentCourse,StudentCourseAssessment,StudentCourseGrading, Fee, StudentPayment, TransactionResponse, Newsroom, ProgramAdvert, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Staff, StaffPosting, CourseTutor, LeaveDuration, StaffLeaveRequest, Assignment}
 
 divider = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 commit = fn(term_set, terms) ->
@@ -15,6 +15,12 @@ commit = fn(term_set, terms) ->
       end
     end
   end
+end
+get_term = fn description, term_set ->
+  Term
+  |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set))
+  |> Ecto.Query.where([t, ts],t.description == ^description and ts.name == ^term_set)
+  |> Repo.one
 end
 assign_role = fn %{user_name: user_name, role: role, default: default} ->
   role = Role |> Repo.get_by(name: role)
@@ -65,10 +71,6 @@ register_courses = fn (student) ->
   end
 end
 
-
-
-
-
 term_sets = [
   %{ name: "country", display_name: "Country" },
   %{ name: "gender", display_name: "Gender" },
@@ -89,13 +91,14 @@ term_sets = [
   %{ name: "assessment_type", display_name: "Assessment Type" },
   %{ name: "user_category", display_name: "User Category" },
   %{ name: "fee_category", display_name: "Fee Category" },
+  %{ name: "payer_category", display_name: "Payer Category" },
+  %{ name: "area_type", display_name: "Area Type" },
   %{ name: "payment_method", display_name: "Payment Method" },
   %{ name: "entry_mode", display_name: "Entry Mode" },
   %{ name: "grade_change_request_reason", display_name: "Grade Change Request Reason" },
   %{ name: "leave_type", display_name: "Leave Type" },
   %{ name: "leave_track_type", display_name: "Leave Track Type" },
   %{ name: "course_category", display_name: "Course Category"}
-
 ]
 for term_set <- term_sets do
   t = TermSet |> Repo.get_by(name: term_set.name)
@@ -319,8 +322,6 @@ terms =[
 ]
 commit.(term_set, terms)
 
-
-
 [
   %{name: "Admin", description: "Administration"},
   %{name: "Registry", description: "Registry"},
@@ -341,17 +342,30 @@ commit.(term_set, terms)
 |> Repo.insert()
 ))
 
-
-
-
-
-term_set = TermSet |> Repo.get_by(name: "fee_category")
+term_set = TermSet |> Repo.get_by(name: "payer_category")
 terms =[
   %{description: "Applicant"},
   %{description: "Student"}
 ]
 commit.(term_set, terms)
 
+term_set = TermSet |> Repo.get_by(name: "fee_category")
+terms =[
+  %{description: "Tuition"},
+  %{description: "Form"},
+  %{description: "Hostel"},
+  %{description: "Library"},
+  %{description: "Departmental"}
+]
+commit.(term_set, terms)
+
+term_set = TermSet |> Repo.get_by(name: "area_type")
+terms =[
+  %{description: "Catchment"},
+  %{description: "Non-Catchment"},
+  %{description: "Both"}
+]
+commit.(term_set, terms)
 
 
 term_set = TermSet |> Repo.get_by(name: "allowance")
@@ -374,8 +388,6 @@ terms = [
   %{description: "Post UTME"}
 ]
 commit.(term_set, terms)
-
-
 
 programs = [
   %{name: "ND", description: "National Diploma", duration: 2 }, %{name: "HND", description: "Higher National Diploma", duration: 2 }
@@ -2445,8 +2457,6 @@ Enum.each(users, fn user ->
 |> Repo.insert()
 end)
 
-
-
 department_type = Repo.one(Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> Ecto.Query.where([t, ts], ts.name == ^"department_type" and t.description == ^"Non Academic"))
 academic_department = Repo.one(Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> Ecto.Query.where([t, ts], ts.name == ^"department_type" and t.description == ^"Academic"))
 [
@@ -2488,14 +2498,15 @@ for st <- salary_structure_types do
     if st == "CONPCASS" && i != 11 do
       grade_level = %{description: description, salary_structure_type_id: salary_structure_type.id}
       changeset = SalaryGradeLevel.changeset(%SalaryGradeLevel{}, grade_level)
+      grade_steps = 1 .. 9
       if changeset.valid? do
         {:ok, salary_grade_level} = Repo.insert(changeset)
-        cond do
-          i <= 9 -> steps = 1..15
-          i >= 10 && i < 12 -> steps = 1..11
-          true -> steps = 1..9
+        grade_steps = cond do
+          i <= 9 -> 1..15
+          i >= 10 && i < 12 -> 1..11
+          true -> 1..9
         end
-        for s <- steps do
+        for s <- grade_steps do
           gs = s |> Integer.to_string |> String.rjust(2, ?0)
           grade_step = %{description: gs, salary_grade_level_id: salary_grade_level.id}
           changeset = SalaryGradeStep.changeset(%SalaryGradeStep{}, grade_step)
@@ -2509,11 +2520,10 @@ for st <- salary_structure_types do
       changeset = SalaryGradeLevel.changeset(%SalaryGradeLevel{}, grade_level)
         if changeset.valid? do
           {:ok, salary_grade_level} = Repo.insert(changeset)
-          cond do
-            i <= 9 -> steps = 1..15
-            i >= 11 && i <= 12 -> steps = 1..11
-            i >= 13 && i <= 15 -> steps = 1..9
-
+          grade_steps = cond do
+            i <= 9 -> 1..15
+            i >= 11 && i <= 12 -> 1..11
+            i >= 13 && i <= 15 -> 1..9
           end
           for s <- grade_steps do
             gs = s |> Integer.to_string |> String.rjust(2, ?0)
@@ -2590,27 +2600,31 @@ staff = Repo.get_by(Staff, [registration_no: "WLD/STF/000302"])
 |> CourseTutor.changeset(%{course_id:  course.id, staff_id: staff.id, academic_session_id: academic_session.id})
 |> Repo.insert!()
 
+
+
+
+
 fees = [
-  %{code: "200", description: "ND Application Fee", amount: 2000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "ND"]).id, is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Applicant" and ts.name == ^"fee_category").id },
-  %{code: "201", description: "HND Application Fee", amount: 8000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "HND"]).id, is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Applicant" and ts.name == ^"fee_category").id },
-  %{code: "202", description: "ND Acceptance Fee", amount: 10000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "ND"]).id, is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "203", description: "HND Acceptance Fee", amount: 14000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "HND"]).id, is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "204", description: "ND I School Fee", amount: 24000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "205", description: "ND I School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "206", description: "ND II School Fee", amount: 23000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "207", description: "ND II School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "208", description: "HND I School Fee", amount: 29000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "209", description: "HND I School Fee", amount: 32000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "210", description: "HND II School Fee", amount: 34500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "211", description: "HND II School Fee", amount: 37500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "212", description: "ND I School Fee", amount: 24000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "213", description: "ND II School Fee", amount: 23000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "214", description: "HND I School Fee", amount: 29000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "216", description: "HND II School Fee", amount: 34500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  is_catchment_area: true, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "219", description: "ND I School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "220", description: "ND II School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "221", description: "HND I School Fee", amount: 32000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id },
-  %{code: "222", description: "HND II School Fee", amount: 37500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  is_catchment_area: false, fee_category_id: Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"fee_category").id }
+  %{code: "200", description: "ND Application Fee", amount: 2000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "ND"]).id, area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Applicant", "payer_category").id, fee_category_id: get_term.("Form", "fee_category").id },
+  %{code: "201", description: "HND Application Fee", amount: 8000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "HND"]).id, area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Applicant", "payer_category").id, fee_category_id: get_term.("Form", "fee_category").id },
+  %{code: "202", description: "ND Acceptance Fee", amount: 10000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "ND"]).id, area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Form", "fee_category").id },
+  %{code: "203", description: "HND Acceptance Fee", amount: 14000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "HND"]).id, area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Form", "fee_category").id },
+  %{code: "204", description: "ND I School Fee", amount: 24000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "205", description: "ND I School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "206", description: "ND II School Fee", amount: 23000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "207", description: "ND II School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "208", description: "HND I School Fee", amount: 29000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "209", description: "HND I School Fee", amount: 32000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "210", description: "HND II School Fee", amount: 34500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "211", description: "HND II School Fee", amount: 37500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "212", description: "ND I School Fee", amount: 24000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "213", description: "ND II School Fee", amount: 23000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "214", description: "HND I School Fee", amount: 29000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "216", description: "HND II School Fee", amount: 34500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "219", description: "ND I School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "220", description: "ND II School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "221", description: "HND I School Fee", amount: 32000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "222", description: "HND II School Fee", amount: 37500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id }
 ]
 for fee <- fees do
   if Repo.get_by(Fee, code: fee.code) == nil do
@@ -2723,14 +2737,6 @@ student_courses = student |> Ecto.assoc(:student_courses) |> join(:inner, [sc], 
 staff = Repo.get_by(Staff, [user_id: staff_1_user.id])
 Enum.each(student_courses, fn student_course ->
     scores = [13,12,7,15,14,9,8,11]
-    # score = 6 * (scores |> Enum.at(Stream.repeatedly(fn -> trunc(:random.uniform * Enum.count(scores)) end) |> Enum.take(1) |> Enum.join |> String.to_integer ))
-    # score = 6 * Enum.random(scores)
-    # grade = Grade |> where([g], g.minimum <= ^score and g.maximum >= ^score) |> Repo.one
-    #
-    # %StudentCourseGrading{}
-    # |> StudentCourseGrading.changeset(%{student_course_id: student_course.id, exam: score, ca: 0, total: score, letter: grade.description, weight: grade.point, grade_point: grade.point * student_course.course.units, grade_id: grade.id, uploaded_by_staff_id: staff.id})
-    # |> Repo.insert!()
-
 
     assessment_type = Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> where([t, ts], t.description == "Assignment" and ts.name=="assessment_type") |> Repo.one
     %StudentCourseAssessment{}
@@ -2739,9 +2745,6 @@ Enum.each(student_courses, fn student_course ->
 
   end)
   leave_track_type = Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> where([t, ts], t.description == "Days" and ts.name=="leave_track_type") |> Repo.one
-
-
-
 
 [
   %{minimum_grade_level: 1, maximum_grade_level: 5, duration: 15, leave_track_type_id: leave_track_type.id},
@@ -2763,3 +2766,15 @@ leave_types = Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |>
 %{staff_id: staff.id, leave_type_id: Enum.random(leave_types).id, proposed_start_date: "2016-10-01", proposed_end_date: "2016-10-10", approved_start_date: "2016-10-01", approved_end_date: "2016-10-10", approved: false, closed: true, closed_by_staff_id: staff_2.id, closed_at: DateTime.utc_now}
 ]
 |> Enum.each(&(%StaffLeaveRequest{} |> StaffLeaveRequest.changeset(&1) |> Repo.insert!()))
+
+
+course_tutor = %{"course_id": course_id, "staff_id": staff_id} = Repo.all(CourseTutor) |> List.first
+[
+  "An accurate record of changes made to release drawings is tracked via this",
+  "Most architectural drawings produced for field use by building contractors are printed on architectural \"D\" size paper which measures",
+  "If a designer is developing a plan for a project in which the entire part is made out of ¾ thick plywood and he only wants to use one view, he should use the ________ view",
+  "When creating a block the drafter needs to pay particular attention to selecting a base point because it determines the"
+] |> Enum.each(fn question ->
+          Assignment.changeset(%Assignment{}, %{course_id: course_id, staff_id: staff_id, academic_session_id: academic_session.id, question: question, start_date: "2016-11-20", start_time: "12:00:00", stop_date: "2016-11-22", stop_time: "12:00:00" })
+          |> Repo.insert!
+        end)

@@ -1,5 +1,6 @@
 defmodule PortalApi.UserRole do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "user_roles" do
     field :default, :boolean, default: false
@@ -9,8 +10,8 @@ defmodule PortalApi.UserRole do
     timestamps
   end
 
-  @required_fields ~w(user_id role_id)
-  @optional_fields ~w(default)
+  @required_fields ~w(user_id role_id)a
+  @optional_fields ~w(default)a
 
   @doc """
   Creates a changeset based on the `model` and `params`.

@@ -31,10 +31,10 @@ defmodule PortalApi.ChannelCase do
   end
 
   setup tags do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(PortalApi.Repo)
     unless tags[:async] do
-      Ecto.Adapters.SQL.restart_test_transaction(PortalApi.Repo, [])
+      Ecto.Adapters.SQL.Sandbox.mode(PortalApi.Repo, {:shared, self()})
     end
-
     :ok
   end
 end

@@ -1,5 +1,6 @@
 defmodule PortalApi.SalaryGradeLevel do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "salary_grade_levels" do
     field :description, :string
@@ -9,8 +10,8 @@ defmodule PortalApi.SalaryGradeLevel do
     timestamps
   end
 
-  @required_fields ~w(description salary_structure_type_id)
-  @optional_fields ~w()
+  @required_fields ~w(description salary_structure_type_id)a
+  @optional_fields ~w()a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -18,8 +19,9 @@ defmodule PortalApi.SalaryGradeLevel do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 end

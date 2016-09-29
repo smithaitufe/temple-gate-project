@@ -9,7 +9,6 @@ defmodule PortalApi.V1.StudentCourseController do
     student_courses = StudentCourse
     |> Ecto.Query.join(:inner, [sc], a in assoc(sc, :academic_session))
     |> Ecto.Query.join(:inner, [sc, a], c in assoc(sc, :course))
-
     |> build_query(Map.to_list(params))
     |> Repo.all
     |> Repo.preload(StudentCourse.associations)

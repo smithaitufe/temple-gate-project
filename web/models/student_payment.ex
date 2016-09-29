@@ -1,5 +1,6 @@
 defmodule PortalApi.StudentPayment do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "student_payments" do
 
@@ -16,8 +17,8 @@ defmodule PortalApi.StudentPayment do
     timestamps
   end
 
-  @required_fields ~w(student_id academic_session_id fee_id amount service_charge payment_method_id transaction_response_id)
-  @optional_fields ~w(transaction_no successful)
+  @required_fields ~w(student_id academic_session_id fee_id amount service_charge payment_method_id transaction_response_id)a
+  @optional_fields ~w(transaction_no successful)a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -25,10 +26,10 @@ defmodule PortalApi.StudentPayment do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
-    |> generate_transaction_no
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 
 

@@ -1,21 +1,25 @@
 defmodule PortalApi.Fee do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  alias PortalApi.{Program, Level, Term}
 
   schema "fees" do
     field :code, :string
     field :description, :string
     field :amount, :decimal
     field :service_charge, :decimal
-    field :is_catchment_area, :boolean, default: false
-    belongs_to :program, PortalApi.Program
-    belongs_to :level, PortalApi.Level
-    belongs_to :fee_category, PortalApi.Term
+    belongs_to :program, Program
+    belongs_to :level, Level
+    belongs_to :fee_category, Term
+    belongs_to :payer_category, Term
+    belongs_to :area_type, Term
 
     timestamps
   end
 
-  @required_fields ~w(program_id fee_category_id code description amount service_charge is_catchment_area)
-  @optional_fields ~w(level_id)
+  @required_fields ~w(program_id level_id area_type_id payer_category_id fee_category_id code description amount service_charge)a
+  @optional_fields ~w()a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -23,16 +27,16 @@ defmodule PortalApi.Fee do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 
 
   def associations do
     level_query = from l in PortalApi.Level, order_by: [asc: l.id]
-
-    [{:program, [levels: level_query]}, :level, :fee_category]
+    [{:program, [levels: level_query]}, :level, :fee_category, :payer_category, :area_type]
   end
 
 

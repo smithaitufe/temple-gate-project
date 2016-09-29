@@ -5,8 +5,10 @@ defmodule PortalApi.Repo.Migrations.CreateAssignment do
     create table(:assignments) do
       add :question, :text
       add :note, :text
-      add :closing_date, :date
-      add :closing_time, :time
+      add :start_date, :date
+      add :start_time, :time
+      add :stop_date, :date
+      add :stop_time, :time
       add :staff_id, references(:staffs)
       add :course_id, references(:courses)
       add :academic_session_id, references(:academic_sessions)

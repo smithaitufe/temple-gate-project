@@ -1,5 +1,6 @@
 defmodule PortalApi.TermSet do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "term_sets" do
     field :name, :string
@@ -8,8 +9,8 @@ defmodule PortalApi.TermSet do
     timestamps
   end
 
-  @required_fields ~w(name display_name)
-  @optional_fields ~w()
+  @required_fields ~w(name display_name)a
+  @optional_fields ~w()a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -17,8 +18,9 @@ defmodule PortalApi.TermSet do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 end

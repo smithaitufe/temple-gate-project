@@ -1,5 +1,6 @@
 defmodule PortalApi.GradeChangeRequest do
-  use PortalApi.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "grade_change_requests" do
     field :previous_score, :float
@@ -21,8 +22,8 @@ defmodule PortalApi.GradeChangeRequest do
     timestamps
   end
 
-  @required_fields ~w(student_course_grading_id requested_by_staff_id previous_score previous_grade_letter previous_grade_id reason_id)
-  @optional_fields ~w(current_score current_grade_letter current_grade_id read approved closed closed_at closed_by_staff_id)
+  @required_fields ~w(student_course_grading_id requested_by_staff_id previous_score previous_grade_letter previous_grade_id reason_id)a
+  @optional_fields ~w(current_score current_grade_letter current_grade_id read approved closed closed_at closed_by_staff_id)a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -30,9 +31,10 @@ defmodule PortalApi.GradeChangeRequest do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, @required_fields, @optional_fields)
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(@required_fields)
   end
 
   def associations do

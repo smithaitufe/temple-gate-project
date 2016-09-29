@@ -7,11 +7,13 @@ defmodule PortalApi.V1.FeeController do
 
   def index(conn, params) do
     fees = Fee
-    |> build_fee_query(Map.to_list(params))
+    |> Ecto.Query.join(:inner, [f], fc in assoc(f, :fee_category))
+    |> Ecto.Query.join(:inner, [f, fc], pc in assoc(f, :payer_category))
+    |> Ecto.Query.join(:inner, [f, fc, pc], at in assoc(f, :area_type))
+    |> build_query(Map.to_list(params))
     |> Repo.all
     |> Repo.preload(Fee.associations)
-
-
+    
     render(conn, "index.json", fees: fees)
   end
 
@@ -71,22 +73,39 @@ defmodule PortalApi.V1.FeeController do
 
 
 
-  defp build_fee_query(query, [{"program_id", program_id} |  tail]) do
+  defp build_query(query, [{"program_id", program_id} |  tail]) do
     query
     |> Ecto.Query.where([f], f.program_id == ^program_id)
-    |> build_fee_query(tail)
+    |> build_query(tail)
   end
-  defp build_fee_query(query, [{"fee_category_id", fee_category_id} |  tail]) do
+  defp build_query(query, [{"area_type_id", area_type_id} |  tail]) do
+    query
+    |> Ecto.Query.where([f], f.area_type_id == ^area_type_id)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"payer_category_id", payer_category_id} |  tail]) do
+    query
+
+    |> Ecto.Query.where([f], f.payer_category_id == ^payer_category_id)
+    |> build_query(tail)
+  end
+
+  defp build_query(query, [{"payer_category_id", payer_category_id} |  tail]) do
+    query
+    |> Ecto.Query.where([f], f.payer_category_id == ^payer_category_id)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"fee_category_id", fee_category_id} |  tail]) do
     query
     |> Ecto.Query.where([f], f.fee_category_id == ^fee_category_id)
-    |> build_fee_query(tail)
+    |> build_query(tail)
   end
-  defp build_fee_query(query, [{"description", description} |  tail]) do
+  defp build_query(query, [{"description", description} |  tail]) do
     query
     |> Ecto.Query.where([f], fragment("lower(?) = ?", f.description, type(^String.downcase(description), :string)))
-    |> build_fee_query(tail)
+    |> build_query(tail)
   end
-  defp build_fee_query(query, []), do: query
+  defp build_query(query, []), do: query
 
 
 
