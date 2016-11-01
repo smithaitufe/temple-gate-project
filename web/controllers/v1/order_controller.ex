@@ -1,7 +1,7 @@
 defmodule PortalApi.V1.OrderController do
   use PortalApi.Web, :controller
 
-  alias PortalApi.V1.Order
+  alias PortalApi.Order
 
   def index(conn, _params) do
     orders = Repo.all(Order)
@@ -15,7 +15,7 @@ defmodule PortalApi.V1.OrderController do
       {:ok, order} ->
         conn
         |> put_status(:created)
-        |> put_resp_header("location", order_path(conn, :show, order))
+        |> put_resp_header("location", v1_order_path(conn, :show, order))
         |> render("show.json", order: order)
       {:error, changeset} ->
         conn
