@@ -1,6 +1,5 @@
 defmodule PortalApi.Term do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "terms" do
     field :description, :string

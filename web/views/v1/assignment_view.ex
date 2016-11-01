@@ -1,6 +1,6 @@
 defmodule PortalApi.V1.AssignmentView do
   use PortalApi.Web, :view
-  alias PortalApi.V1.{AssignmentView, CourseView, AcademicSessionView, StaffView}
+  alias PortalApi.V1.{AssignmentView, CourseView, AcademicSessionView, UserView}
 
   def render("index.json", %{assignments: assignments}) do
     render_many(assignments, AssignmentView, "assignment.json")
@@ -10,10 +10,10 @@ defmodule PortalApi.V1.AssignmentView do
     render_one(assignment, AssignmentView, "assignment.json")
   end
 
-  @course_fields [:title, :units, :hours]
+  
   def render("assignment.json", %{assignment: assignment}) do
     %{id: assignment.id,
-      staff_id: assignment.staff_id,
+      assigner_user_id: assignment.assigner_user_id,
       course_id: assignment.course_id,
       question: assignment.question,
       note: assignment.note,

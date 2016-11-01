@@ -13,6 +13,7 @@ defmodule PortalApi.V1.LocalGovernmentAreaView do
     %{
       id: local_government_area.id,
       name: local_government_area.name,
+      is_catchment_area: local_government_area.is_catchment_area,
       state_id: local_government_area.state_id
     }
   end

@@ -1,6 +1,5 @@
 defmodule PortalApi.Job do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "jobs" do
     field :title, :string

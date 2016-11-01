@@ -4,6 +4,7 @@ defmodule PortalApi.Repo.Migrations.CreateState do
   def change do
     create table(:states) do
       add :name, :string, limit: 150, null: false
+      add :is_catchment_area, :boolean, default: false
       add :country_id, references(:terms)
 
       timestamps

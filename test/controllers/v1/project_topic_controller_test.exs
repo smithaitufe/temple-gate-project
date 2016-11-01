@@ -2,7 +2,7 @@ defmodule PortalApi.V1.ProjectTopicControllerTest do
   use PortalApi.ConnCase
 
   alias PortalApi.V1.ProjectTopic
-  @valid_attrs %{approved: true, title: "some content"}
+  @valid_attrs %{user_id: 4, approved: true, title: "some content"}
   @invalid_attrs %{}
 
   setup do

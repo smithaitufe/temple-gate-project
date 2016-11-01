@@ -13,7 +13,8 @@ defmodule PortalApi.V1.StateView do
     %{
       id: state.id,
       name: state.name,
-      country_id: state.country_id
+      country_id: state.country_id,
+      is_catchment_area: state.is_catchment_area
     }
   end
 end

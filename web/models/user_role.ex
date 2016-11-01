@@ -1,6 +1,5 @@
 defmodule PortalApi.UserRole do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "user_roles" do
     field :default, :boolean, default: false

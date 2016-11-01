@@ -1,6 +1,5 @@
 defmodule PortalApi.Level do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "levels" do
     field :description, :string

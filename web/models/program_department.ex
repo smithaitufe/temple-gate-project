@@ -1,6 +1,5 @@
 defmodule PortalApi.ProgramDepartment do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "program_departments" do
     belongs_to :program, PortalApi.Program
@@ -9,8 +8,8 @@ defmodule PortalApi.ProgramDepartment do
     timestamps
   end
 
-  @required_fields ~w(program_id department_id)a
-  @optional_fields ~w(admit)a
+  @required_fields [:program_id, :department_id]
+  @optional_fields [:admit]
 
   @doc """
   Creates a changeset based on the `model` and `params`.

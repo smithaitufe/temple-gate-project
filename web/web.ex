@@ -18,7 +18,11 @@ defmodule PortalApi.Web do
 
   def model do
     quote do
-      use Ecto.Model
+      use Ecto.Schema
+
+      import Ecto
+      import Ecto.Changeset
+      import Ecto.Query
     end
   end
 
@@ -27,7 +31,7 @@ defmodule PortalApi.Web do
       use Phoenix.Controller
 
       alias PortalApi.Repo
-      import Ecto.Model
+      import Ecto
       import Ecto.Query, only: [from: 1, from: 2]
 
       import PortalApi.Router.Helpers
@@ -59,7 +63,7 @@ defmodule PortalApi.Web do
       use Phoenix.Channel
 
       alias PortalApi.Repo
-      import Ecto.Model
+      import Ecto
       import Ecto.Query, only: [from: 1, from: 2]
 
     end

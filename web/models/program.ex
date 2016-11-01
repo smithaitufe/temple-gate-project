@@ -1,11 +1,10 @@
 defmodule PortalApi.Program do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "programs" do
     field :name, :string
     field :description, :string
-    field :text, :string
+    field :details, :string
     field :duration, :integer
 
 
@@ -16,8 +15,8 @@ defmodule PortalApi.Program do
     timestamps
   end
 
-  @required_fields ~w(name description duration)a
-  @optional_fields ~w(text)a
+  @required_fields [:name, :description, :duration]
+  @optional_fields [:details]
 
   @doc """
   Creates a changeset based on the `model` and `params`.

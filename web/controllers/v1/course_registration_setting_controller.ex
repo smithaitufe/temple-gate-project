@@ -77,6 +77,6 @@ defmodule PortalApi.V1.CourseRegistrationSettingController do
 
 
   defp preload_models(query) do
-    Repo.preload(query, [:program, :academic_session])
+    Repo.preload(query, [{:program, [:levels]}, :academic_session])
   end
 end

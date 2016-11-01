@@ -11,7 +11,7 @@ defmodule PortalApi.V1.GradeChangeRequestView do
 
   def render("grade_change_request.json", %{grade_change_request: grade_change_request}) do
     %{id: grade_change_request.id,
-      student_course_grading_id: grade_change_request.student_course_grading_id,
+      course_grading_id: grade_change_request.course_grading_id,
       reason_id: grade_change_request.reason_id,
       previous_score: grade_change_request.previous_score,
       previous_grade_letter: grade_change_request.previous_grade_letter,
@@ -19,15 +19,15 @@ defmodule PortalApi.V1.GradeChangeRequestView do
       current_score: grade_change_request.current_score,
       current_grade_letter: grade_change_request.current_grade_letter,
       current_grade_id: grade_change_request.current_grade_id,
-      requested_by_staff_id: grade_change_request.requested_by_staff_id,
+      requester_user_id: grade_change_request.requester_user_id,
       read: grade_change_request.read,
       approved: grade_change_request.approved,
       closed: grade_change_request.closed,
       closed_at: grade_change_request.closed_at,
-      closed_by_staff_id: grade_change_request.closed_by_staff_id
+      closed_by_user_id: grade_change_request.closed_by_user_id
     }
     |> Map.put(:reason, render_one(grade_change_request.reason, PortalApi.V1.TermView, "term.json"))
-    |> Map.put(:requested_by, render_one(grade_change_request.requested_by, PortalApi.V1.StaffView, "staff_lite.json"))
-    |> Map.put(:closed_by, render_one(grade_change_request.requested_by, PortalApi.V1.StaffView, "staff_lite.json"))
+    |> Map.put(:requester, render_one(grade_change_request.requester, PortalApi.V1.UserView, "user.json"))
+    |> Map.put(:closed_by, render_one(grade_change_request.closed_by, PortalApi.V1.UserView, "user.json"))
   end
 end

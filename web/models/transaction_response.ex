@@ -1,6 +1,5 @@
 defmodule PortalApi.TransactionResponse do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "transaction_responses" do
     field :code, :string
@@ -9,8 +8,8 @@ defmodule PortalApi.TransactionResponse do
     timestamps
   end
 
-  @required_fields ~w(code description)a
-  @optional_fields ~w()a
+  @required_fields [:code, :description]
+  @optional_fields []
 
   @doc """
   Creates a changeset based on the `model` and `params`.

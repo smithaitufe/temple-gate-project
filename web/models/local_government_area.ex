@@ -1,16 +1,16 @@
 defmodule PortalApi.LocalGovernmentArea do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "local_government_areas" do
     field :name, :string
+    field :is_catchment_area, :boolean, default: true
     belongs_to :state, PortalApi.State
 
     timestamps
   end
 
-  @required_fields ~w(name state_id)a
-  @optional_fields ~w()a
+  @required_fields [:name, :state_id]
+  @optional_fields [:is_catchment_area]
 
   @doc """
   Creates a changeset based on the `model` and `params`.

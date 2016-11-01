@@ -35,7 +35,10 @@ config :phoenix, :stacktrace_depth, 20
 # Configure your database
 config :portal_api, PortalApi.Repo,
   adapter: Ecto.Adapters.Postgres,
+  hostname: "127.0.0.1",
   username: "postgres",
   password: "postgres",
   database: "portal_api_dev",
-  pool_size: 10
+  pool_size: 10,
+  timeout: 60_000,
+  pool_timeout: 60_000

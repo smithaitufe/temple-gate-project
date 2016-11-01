@@ -2,7 +2,7 @@ defmodule PortalApi.V1.AssignmentControllerTest do
   use PortalApi.ConnCase
 
   alias PortalApi.V1.Assignment
-  @valid_attrs %{closing_date: "2010-04-17", closing_time: "14:00:00", note: "some content", question: "some content"}
+  @valid_attrs %{course_id: 2, assigner_user_id: 20, closing_date: "2010-04-17", closing_time: "14:00:00", note: "some content", question: "some content"}
   @invalid_attrs %{}
 
   setup do
@@ -19,7 +19,7 @@ defmodule PortalApi.V1.AssignmentControllerTest do
     assignment = Repo.insert! %Assignment{}
     conn = get conn, assignment_path(conn, :show, assignment)
     assert json_response(conn, 200)["data"] == %{"id" => assignment.id,
-      "staff_id" => assignment.staff_id,
+      "assigner_user_id" => assignment.assigner_user_id,
       "course_id" => assignment.course_id,
       "question" => assignment.question,
       "note" => assignment.note,

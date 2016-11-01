@@ -1,6 +1,5 @@
 defmodule PortalApi.StudentProjectSupervisor do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "student_project_supervisors" do
     belongs_to :staff, PortalApi.Staff

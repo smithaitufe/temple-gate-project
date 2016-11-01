@@ -5,6 +5,7 @@ defmodule PortalApi.V1.SessionController do
 
 
   def create(conn, %{"session" => %{"user_name" => user_name, "password" => password}}) do
+    
     query = Repo.get_by(User, [user_name: String.downcase(user_name)])
 
     case query do

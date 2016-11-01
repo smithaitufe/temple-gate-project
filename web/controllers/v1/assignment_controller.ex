@@ -1,8 +1,6 @@
 defmodule PortalApi.V1.AssignmentController do
   use PortalApi.Web, :controller
-
   alias PortalApi.Assignment
-
   plug :scrub_params, "assignment" when action in [:create, :update]
 
   def index(conn, params) do
@@ -65,27 +63,22 @@ defmodule PortalApi.V1.AssignmentController do
 
 
   defp build_query(query, [{"department_id", department_id } | tail]) do
-    query
-    # |> Ecto.Query.join(:inner, [assignment], course in assoc(assignment, :course))
+    query    
     |> Ecto.Query.where([assignment, course], course.department_id == ^department_id)
     |> build_query(tail)
   end
   defp build_query(query, [{"program_id", program_id } | tail]) do
-    query
-    # |> Ecto.Query.join(:inner, [assignment], course in assoc(assignment, :course))
-    # |> Ecto.Query.join(:inner, [assignment, course], level in assoc(course, :level))
+    query    
     |> Ecto.Query.where([assignment, course, level], level.program_id == ^program_id)
     |> build_query(tail)
   end
   defp build_query(query, [{"level_id", level_id } | tail]) do
     query
-    # |> Ecto.Query.join(:inner, [assignment], course in assoc(assignment, :course))
     |> Ecto.Query.where([assignment, course], course.level_id == ^level_id)
     |> build_query(tail)
   end
   defp build_query(query, [{"semester_id", semester_id } | tail]) do
     query
-    # |> Ecto.Query.join(:inner, [assignment], course in assoc(assignment, :course))
     |> Ecto.Query.where([assignment, course], course.semester_id == ^semester_id)
     |> build_query(tail)
   end
@@ -110,8 +103,7 @@ defmodule PortalApi.V1.AssignmentController do
     |> build_query(tail)
   end
   defp build_query(query, [{"status", "closed" } | tail]) do
-    date_time = %{current_date: date} = get_datetime_map
-    IO.inspect date
+    date_time = %{current_date: date} = get_datetime_map    
     query
     |> Ecto.Query.where([assignment], assignment.stop_date < ^date)
     |> build_query(tail)

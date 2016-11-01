@@ -1,17 +1,16 @@
 defmodule PortalApi.SalaryGradeLevel do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "salary_grade_levels" do
     field :description, :string
     belongs_to :salary_structure_type, PortalApi.Term
 
-    has_many :salary_grade_steps, PortalApi.V1.SalaryGradeStep
+    has_many :salary_grade_steps, PortalApi.SalaryGradeStep
     timestamps
   end
 
-  @required_fields ~w(description salary_structure_type_id)a
-  @optional_fields ~w()a
+  @required_fields [:description, :salary_structure_type_id]
+  @optional_fields []
 
   @doc """
   Creates a changeset based on the `model` and `params`.

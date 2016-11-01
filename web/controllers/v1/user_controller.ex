@@ -2,6 +2,7 @@ defmodule PortalApi.V1.UserController do
   use PortalApi.Web, :controller
   plug :scrub_params, "user" when action in [:create]
   alias PortalApi.{Repo, User, UserRole, Term}
+  # plug Guardian.Plug.EnsureAuthenticated, %{ on_failure: { PortalApi.V1.SessionController, :new } } when not action in [:new, :create]
 
   def index(conn, _) do
     users = User

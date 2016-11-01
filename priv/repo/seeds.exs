@@ -1,7 +1,7 @@
 import Ecto.Query
-alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Student, Role, User, UserRole, StudentCourse,StudentCourseAssessment,StudentCourseGrading, Fee, StudentPayment, TransactionResponse, Newsroom, ProgramAdvert, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Staff, StaffPosting, CourseTutor, LeaveDuration, StaffLeaveRequest, Assignment}
+alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Role, User, UserRole, CourseEnrollment,CourseEnrollmentAssessment,CourseGrading, Fee, Payment, TransactionResponse, Announcement, ProgramAdvert, ProgramApplication, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Posting, CourseTutor, LeaveDuration, LeaveRequest, Assignment, UserProfile}
 
-divider = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+divider = " = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = "
 commit = fn(term_set, terms) ->
   for term <- terms do
     result = Term |> Repo.get_by([term_set_id: term_set.id, description: term.description])
@@ -31,7 +31,6 @@ assign_role = fn %{user_name: user_name, role: role, default: default} ->
   |> Repo.insert()
 end
 staff_posting = fn(%{user: user, job_title: job_title, department_name: department_name, posted_date: posted_date, effective_date: effective_date}) ->
-  staff = Repo.get_by(Staff, user_id: user.id)
   job = Repo.get_by(Job, title: job_title)
   department = Repo.get_by(Department, name: department_name)
   salary_grade_step = SalaryGradeStep
@@ -42,13 +41,13 @@ staff_posting = fn(%{user: user, job_title: job_title, department_name: departme
   |> Repo.all
   |> List.first
 
-  %StaffPosting{}
-  |> StaffPosting.changeset(%{staff_id: staff.id, department_id: department.id, salary_grade_step_id: salary_grade_step.id, job_id: job.id, active: true, posted_date: posted_date, effective_date: effective_date})
+  %Posting{}
+  |> Posting.changeset(%{posted_user_id: user.id, department_id: department.id, salary_grade_step_id: salary_grade_step.id, job_id: job.id, active: true, posted_date: posted_date, effective_date: effective_date})
   |> Repo.insert()
 end
-assign_office_head = fn %{type: type, user: user, name: name, appointment_date: appointment_date, effective_date: effective_date, end_date: end_date, active: active} ->
-  staff = Repo.get_by(Staff, user_id: user.id)
-  params = %{staff_id: staff.id, appointment_date: appointment_date, effective_date: effective_date, end_date: end_date, active: active}
+
+assign_office_head = fn %{type: type, user: user, name: name, appointment_date: appointment_date, effective_date: effective_date, end_date: end_date, active: active} ->  
+  params = %{assigned_user_id: user.id, appointment_date: appointment_date, effective_date: effective_date, end_date: end_date, active: active}
   case type do
     "faculty" ->
       faculty = Faculty |> Repo.get_by(name: name)
@@ -58,16 +57,20 @@ assign_office_head = fn %{type: type, user: user, name: name, appointment_date: 
       %DepartmentHead{} |> DepartmentHead.changeset(Map.put(params, :department_id, department.id)) |> Repo.insert!()
     end
 end
-register_courses = fn (student) ->
+register_courses = fn (user) ->
   department = Repo.get_by(Department, [name: "Mechanical Engineering"])
   level = Repo.get_by(Level, description: "ND I")
   academic_session = Repo.get_by(AcademicSession, [description: "2016/2017", active: true])
   courses = Repo.all(from c in Course, where: c.level_id == ^level.id and c.department_id == ^department.id)
   for course <- courses do
-    changeset = StudentCourse.changeset(%StudentCourse{}, %{course_id: course.id, student_id: student.id, academic_session_id: academic_session.id, level_id: level.id})
-    if changeset.valid? do
-      Repo.insert!(changeset)
-    end
+    course_params = %{
+      course_id: course.id, 
+      enrolled_by_user_id: user.id, 
+      academic_session_id: academic_session.id, 
+      level_id: level.id
+    }
+    CourseEnrollment.changeset(%CourseEnrollment{}, course_params) |> Repo.insert!
+    
   end
 end
 
@@ -363,7 +366,7 @@ term_set = TermSet |> Repo.get_by(name: "area_type")
 terms =[
   %{description: "Catchment"},
   %{description: "Non-Catchment"},
-  %{description: "Both"}
+  %{description: "All"}
 ]
 commit.(term_set, terms)
 
@@ -1306,7 +1309,7 @@ department_list = [
 ]
 
 add_department_to_faculty = fn (departments, faculty)->
-  faculty = Repo.get_by(Faculty, name: faculty)
+  faculty = Repo.get_by(Faculty, [name: faculty])
   for department <- departments do
     %Department{}
     |> Department.changeset(department |> Map.put(:faculty_id, faculty.id))
@@ -1315,10 +1318,10 @@ add_department_to_faculty = fn (departments, faculty)->
 end
 
 
-for dept <- department_list do
-  if Repo.get_by(Department, name: dept[:name]) == nil do
-    faculty = Repo.get_by(Faculty, name: dept[:school])
-    department = %{name: dept[:name], code: dept[:abbreviation], faculty_id: faculty.id}
+for dept <- department_list do  
+  if Repo.get_by(Department,[name: dept[:name]]) == nil do    
+    faculty = Repo.get_by(Faculty, [name: dept[:school]])    
+    department = %{name: dept[:name], code: dept[:abbreviation], faculty_id: faculty.id}    
     changeset = Department.changeset(%Department{}, department)
     if changeset.valid? do
       department = Repo.insert!(changeset)
@@ -2389,46 +2392,101 @@ local_government_area = LocalGovernmentArea |> Repo.all |> Enum.random
 
 user_category = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Applicant" and ts.name == ^"user_category")
 registration_no = "DS151690003478"
-user = %{user_name: String.downcase(registration_no), email: "jane.brown@dspg.edu.ng", password: "password", user_category_id: user_category.id}
+
+user = %{first_name: "Jane", last_name: "Brown", user_name: String.downcase(registration_no), email: "jane.brown@dspg.edu.ng", password: "password", user_category_id: user_category.id}
+
 if Repo.get_by(User, [user_name: user.user_name]) == nil do
   changeset = User.changeset(%User{}, user)
   if changeset.valid? do
     {:ok, user} = Repo.insert(changeset)
-    student = %{first_name: "Jane", last_name: "Brown", email: "jane.brown@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, entry_mode_id: entry_mode.id, user_id: user.id, academic_session_id: academic_session.id, level_id: level.id, local_government_area_id: local_government_area.id}
-    changeset = Student.changeset(%Student{}, student)
-    if changeset.valid?, do: Repo.insert!(changeset)
+    user_profile_params = %{ 
+      user_id: user.id, 
+      birth_date: "1999-01-22", 
+      local_government_area_id: local_government_area.id, 
+      marital_status_id: marital_status.id, 
+      gender_id: gender.id,
+      phone_number: "08050999022"
+    }
+    UserProfile.changeset(%UserProfile{}, user_profile_params) |> Repo.insert!
+    program_application_params = %{
+      applicant_user_id: user.id, 
+      registration_no: registration_no, 
+      matriculation_no: "#{program.name}/#{department.code}/#{2015}/00001",
+      program_id: program.id, 
+      level_id: level.id, 
+      department_id: department.id, 
+      entry_mode_id: entry_mode.id, 
+      academic_session_id: academic_session.id,
+      is_admitted: true     
+    }
+    ProgramApplication.changeset(%ProgramApplication{}, program_application_params) 
+    |> PortalApi.Service.ProgramApplication.generate_registration_no(8) 
+    |> Repo.insert!
   end
 end
 
 local_government_area = LocalGovernmentArea |> Repo.all |> Enum.random
 registration_no = "DS151690003470"
 user_category = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"user_category")
-User.changeset(%User{}, %{user_name: String.downcase(registration_no), email: "ufuoma.brown@walden.edu.ng", password: "password", user_category_id: user_category.id})
+User.changeset(%User{}, %{first_name: "Ufuoma", last_name: "Brown", user_name: String.downcase(registration_no), email: "ufuoma.brown@walden.edu.ng", password: "password", user_category_id: user_category.id})
 |> Repo.insert()
 |> case do
     {:ok, user} ->
-      Student.changeset(%Student{}, %{first_name: "Ufuoma", last_name: "Brown", email: "ufuoma.brown@walden.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, user_id: user.id, level_id: level.id, gender_id: gender.id, marital_status_id: marital_status.id, entry_mode_id: entry_mode.id, academic_session_id: academic_session.id, local_government_area_id: local_government_area.id})
-      |> Repo.insert()
-      |> case do
-         {:ok, student} -> register_courses.(student)
-         _ -> IO.inspect "failed to create student #{registration_no}"
-      end
-    _ -> IO.inspect "failed to create user #{registration_no}"
+      user_profile_params = %{
+        user_id: user.id,
+        birth_date: "1999-01-22", 
+        gender_id: gender.id, 
+        marital_status_id: marital_status.id, 
+        local_government_area_id: local_government_area.id
+      } 
+      program_application_params = %{
+        applicant_user_id: user.id, 
+        registration_no: registration_no, 
+        matriculation_no: "#{program.name}/#{department.code}/#{2015}/00002",
+        program_id: program.id, 
+        department_id: department.id, 
+        level_id: level.id, 
+        entry_mode_id: entry_mode.id, 
+        academic_session_id: academic_session.id
+      }
+      UserProfile.changeset(%UserProfile{}, user_profile_params) |> Repo.insert!
+      ProgramApplication.changeset(%ProgramApplication{}, program_application_params) 
+      |> PortalApi.Service.ProgramApplication.generate_registration_no(8)
+      |> Repo.insert!
+      
+      register_courses.(user)       
+     _ -> IO.inspect "failed to create user #{registration_no}"
 end
 
 local_government_area = LocalGovernmentArea |> Repo.all |> Enum.random
 registration_no = "DS151690003477"
 if Repo.get_by(User, [user_name: String.downcase(registration_no)]) == nil do
-  changeset = User.changeset(%User{}, %{user_name: String.downcase(registration_no), email: "brown.fish@dspg.edu.ng", password: "password", user_category_id: user_category.id})
+  changeset = User.changeset(%User{}, %{first_name: "Brown", last_name: "Fish", user_name: String.downcase(registration_no), email: "brown.fish@dspg.edu.ng", password: "password", user_category_id: user_category.id})
   if changeset.valid? do
     {:ok, user} = Repo.insert(changeset)
-    student = %{first_name: "Brown", last_name: "Fish", email: "brown.fish@dspg.edu.ng", registration_no: registration_no, program_id: program.id, department_id: department.id, user_id: user.id, level_id: level.id, gender_id: gender.id, marital_status_id: marital_status.id, entry_mode_id: entry_mode.id, academic_session_id: academic_session.id, local_government_area_id: local_government_area.id}
-    changeset = Student.changeset(%Student{}, student)
-    if changeset.valid? do
-      {:ok, student} = Repo.insert(changeset)
-      register_courses.(student)
-    end
+    user_profile_params = %{
+      user_id: user.id,
+      birth_date: "1990-10-21",
+      gender_id: gender.id, 
+      marital_status_id: marital_status.id,
+      local_government_area_id: local_government_area.id
+    }
+    UserProfile.changeset(%UserProfile{}, user_profile_params) |> Repo.insert!
 
+    program_application_params = %{
+      applicant_user_id: user.id, 
+      registration_no: registration_no,
+      matriculation_no: "#{program.name}/#{department.code}/#{2015}/00003",
+      program_id: program.id, 
+      department_id: department.id, 
+      level_id: level.id, 
+      entry_mode_id: entry_mode.id, 
+      academic_session_id: academic_session.id, 
+      is_admitted: true
+    }
+
+    ProgramApplication.changeset(%ProgramApplication{}, program_application_params) |> Repo.insert!
+    register_courses.(user)
   end
 end
 
@@ -2440,22 +2498,43 @@ end
 
 user_category = Repo.all(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Staff" and ts.name == ^"user_category") |> List.first
 users = [
-  %{user_name: String.downcase("WLD/STF/000301"), email: "evragab@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{user_name: String.downcase("WLD/STF/000300"), email: "smithaitufe@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{user_name: String.downcase("WLD/STF/000302"), email: "jun.gospel@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{user_name: String.downcase("WLD/STF/000303"), email: "efemena.agbi@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{user_name: String.downcase("WLD/STF/000304"), email: "thankgod.goodwill@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{user_name: String.downcase("WLD/STF/000305"), email: "stephen.oboh@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{user_name: String.downcase("WLD/STF/000306"), email: "ogechi.onouha@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{user_name: String.downcase("WLD/STF/000307"), email: "juliet.jeb@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{user_name: String.downcase("WLD/STF/000308"), email: "uche.okeke@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{user_name: String.downcase("WLD/STF/000309"), email: "jose.conte@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{first_name: "Clinton", last_name: "John", user_name: String.downcase("WLD/STF/000301"), email: "evragab@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{first_name: "Smith", last_name: "Samuel", user_name: String.downcase("WLD/STF/000300"), email: "smithsamuel@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{first_name: "John", last_name: "Gospel", user_name: String.downcase("WLD/STF/000302"), email: "jun.gospel@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{first_name: "Efemena", last_name: "Agbi", user_name: String.downcase("WLD/STF/000303"), email: "efemena.agbi@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{first_name: "ThankGod", last_name: "Goodwill", user_name: String.downcase("WLD/STF/000304"), email: "thankgod.goodwill@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{first_name: "Stephen", last_name: "Oboh", user_name: String.downcase("WLD/STF/000305"), email: "stephen.oboh@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{first_name: "Ogechi", last_name: "Onouha", user_name: String.downcase("WLD/STF/000306"), email: "ogechi.onouha@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{first_name: "Juliet", last_name: "Jeb", user_name: String.downcase("WLD/STF/000307"), email: "juliet.jeb@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{first_name: "Uche", last_name: "Okeke", user_name: String.downcase("WLD/STF/000308"), email: "uche.okeke@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{first_name: "Jose", last_name: "Conte", user_name: String.downcase("WLD/STF/000309"), email: "jose.conte@walden.edu.ng", password: "password", user_category_id: user_category.id},
 ]
-Enum.each(users, fn user ->
-%User{}
-|> User.changeset(user)
-|> Repo.insert()
+Enum.each(users, fn user -> User.changeset(%User{}, user) |> Repo.insert!
 end)
+
+
+staff_1_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000300")])
+staff_2_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000302")])
+staff_3_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000303")])
+staff_4_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000304")])
+staff_5_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000305")])
+staff_6_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000306")])
+staff_7_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000307")])
+staff_8_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000308")])
+staff_9_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000309")])
+
+[
+  %{user_id: staff_1_user.id, gender_id: gender.id, marital_status_id: marital_status.id, local_government_area_id: (LocalGovernmentArea |> Repo.all |> Enum.random).id, birth_date: "1975-02-10"},
+  %{user_id: staff_2_user.id, gender_id: gender.id, marital_status_id: marital_status.id, local_government_area_id: (LocalGovernmentArea |> Repo.all |> Enum.random).id, birth_date: "1975-02-10"},
+  %{user_id: staff_3_user.id, gender_id: gender.id, marital_status_id: marital_status.id, local_government_area_id: (LocalGovernmentArea |> Repo.all |> Enum.random).id, birth_date: "1975-02-10"},
+  %{user_id: staff_4_user.id, gender_id: gender.id, marital_status_id: marital_status.id, local_government_area_id: (LocalGovernmentArea |> Repo.all |> Enum.random).id, birth_date: "1975-02-10"},
+  %{user_id: staff_5_user.id, gender_id: gender.id, marital_status_id: marital_status.id, local_government_area_id: (LocalGovernmentArea |> Repo.all |> Enum.random).id, birth_date: "1975-02-10"},
+  %{user_id: staff_6_user.id, gender_id: gender.id, marital_status_id: marital_status.id, local_government_area_id: (LocalGovernmentArea |> Repo.all |> Enum.random).id, birth_date: "1975-02-10"},
+  %{user_id: staff_7_user.id, gender_id: gender.id, marital_status_id: marital_status.id, local_government_area_id: (LocalGovernmentArea |> Repo.all |> Enum.random).id, birth_date: "1975-02-10"},
+  %{user_id: staff_8_user.id, gender_id: gender.id, marital_status_id: marital_status.id, local_government_area_id: (LocalGovernmentArea |> Repo.all |> Enum.random).id, birth_date: "1975-02-10"},
+  %{user_id: staff_9_user.id, gender_id: gender.id, marital_status_id: marital_status.id, local_government_area_id: (LocalGovernmentArea |> Repo.all |> Enum.random).id, birth_date: "1975-02-10"}
+]
+|> Enum.each(&(UserProfile.changeset(%UserProfile{}, &1) |> Repo.insert!()))
 
 department_type = Repo.one(Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> Ecto.Query.where([t, ts], ts.name == ^"department_type" and t.description == ^"Non Academic"))
 academic_department = Repo.one(Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> Ecto.Query.where([t, ts], ts.name == ^"department_type" and t.description == ^"Academic"))
@@ -2482,18 +2561,18 @@ for st <- salary_structure_types do
   |> Ecto.Query.where([t,ts], t.description == ^st and ts.name == ^"salary_structure_type")
   |> Repo.all
   |> List.first
-  start = 0
-  stop  = 0
+  start_point = 0
+  stop_point  = 0
   case st do
     "CONPCASS" ->
-      start = 7
-      stop = 15
+      start_point = 7
+      stop_point = 15
     "CONTEDISS" ->
-      start = 1
-      stop = 15
+      start_point = 1
+      stop_point = 15
   end
 
-  for i <- start..stop do
+  for i <- start_point..stop_point do
     description = i |> Integer.to_string |> String.rjust(2, ?0)
     if st == "CONPCASS" && i != 11 do
       grade_level = %{description: description, salary_structure_type_id: salary_structure_type.id}
@@ -2539,34 +2618,6 @@ for st <- salary_structure_types do
   end
 end
 
-
-staff_1_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000300")])
-staff_2_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000302")])
-staff_3_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000303")])
-staff_4_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000304")])
-staff_5_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000305")])
-staff_6_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000306")])
-staff_7_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000307")])
-staff_8_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000308")])
-staff_9_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000309")])
-
-[
-  %{first_name: "Clinton", last_name: "John", email: "john.clinton@walden.edu.ng", registration_no: "WLD/STF/000300", user_id: staff_1_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
-  %{first_name: "Gospel", last_name: "Junior", email: "jun.gospel@walden.edu.ng", registration_no: "WLD/STF/000302", user_id: staff_2_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
-  %{first_name: "Efemena", last_name: "Agbi", email: "efemena.abi@walden.edu.ng", registration_no: "WLD/STF/000303", user_id: staff_3_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
-  %{first_name: "ThankGod", last_name: "Goodwill", email: "thankgod.goodwill@walden.edu.ng", registration_no: "WLD/STF/000304", user_id: staff_4_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
-  %{first_name: "Stephen", last_name: "Oboh", email: "stephen.oboh@walden.edu.ng", registration_no: "WLD/STF/000305", user_id: staff_5_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
-  %{first_name: "Ogechi", last_name: "Onouha", email: "ogechi.onouha@walden.edu.ng", registration_no: "WLD/STF/000306", user_id: staff_6_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
-  %{first_name: "Juliet", last_name: "Jeb", email: "juliet.jeb@walden.edu.ng", registration_no: "WLD/STF/000307", user_id: staff_7_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
-  %{first_name: "Uche", last_name: "Okeke", email: "uche.okeke@walden.edu.ng", registration_no: "WLD/STF/000308", user_id: staff_8_user.id, gender_id: gender.id, marital_status_id: marital_status.id},
-  %{first_name: "Jose", last_name: "Conte", email: "jose.conte@walden.edu.ng", registration_no: "WLD/STF/000309", user_id: staff_9_user.id, gender_id: gender.id, marital_status_id: marital_status.id}
-]
-|> Enum.each(&(
-%Staff{}
-|> Staff.changeset(&1)
-|> Repo.insert!()
-))
-
 [
   %{user_name: "WLD/STF/000300", role: "Lecturer", default: true},
   %{user_name: "WLD/STF/000301", role: "Lecturer", default: true},
@@ -2588,27 +2639,53 @@ staff_posting.(%{user: staff_3_user, job_title: "Lecturer II", department_name: 
 staff_posting.(%{user: staff_4_user, job_title: "Principal Lecturer", department_name: "Mechanical Engineering", posted_date: "2016-08-04", effective_date: "2016-09-01"})
 staff_posting.(%{user: staff_5_user, job_title: "Principal Lecturer", department_name: "Mechanical Engineering", posted_date: "2016-08-04", effective_date: "2016-09-01"})
 
-
-
 assign_office_head.(%{type: "faculty", user: staff_5_user, name: "School of Engineering", appointment_date: "2016-12-20", effective_date: "2017-02-01", end_date: "2018-05-30", active: true})
 assign_office_head.(%{type: "department", user: staff_2_user, name: "Mechanical Engineering", appointment_date: "2016-12-20", effective_date: "2017-02-01", end_date: "2018-05-30", active: true})
 
-academic_session = Repo.get_by(AcademicSession, [description: "2017/2018"])
-course = Repo.get_by(Course, [code: "MEC 211"])
-staff = Repo.get_by(Staff, [registration_no: "WLD/STF/000302"])
+academic_session = Repo.get_by!(AcademicSession, [description: "2017/2018"])
+course = Repo.get_by!(Course, [code: "MEC 211"])
+user = Repo.get_by!(User, [user_name: String.downcase("WLD/STF/000302")])
 %CourseTutor{}
-|> CourseTutor.changeset(%{course_id:  course.id, staff_id: staff.id, academic_session_id: academic_session.id})
-|> Repo.insert!()
+|> CourseTutor.changeset(%{course_id:  course.id, tutor_user_id: user.id, academic_session_id: academic_session.id, assigned_by_user_id: staff_2_user.id})
+|> Repo.insert!
 
+[
+  %{
+    code: "200", 
+    description: "ND Application Fee", 
+    amount: 2000, 
+    service_charge: 1000, program_id: Repo.get_by(Program, [name: "ND"]).id, 
+    area_type_id: get_term.("All", "area_type").id, 
+    payer_category_id: get_term.("Applicant", "payer_category").id, 
+    fee_category_id: get_term.("Form", "fee_category").id,
+    level_id: Repo.get_by(Level, [description: "ND I"]).id
 
-
-
-
-fees = [
-  %{code: "200", description: "ND Application Fee", amount: 2000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "ND"]).id, area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Applicant", "payer_category").id, fee_category_id: get_term.("Form", "fee_category").id },
-  %{code: "201", description: "HND Application Fee", amount: 8000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "HND"]).id, area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Applicant", "payer_category").id, fee_category_id: get_term.("Form", "fee_category").id },
-  %{code: "202", description: "ND Acceptance Fee", amount: 10000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "ND"]).id, area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Form", "fee_category").id },
-  %{code: "203", description: "HND Acceptance Fee", amount: 14000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "HND"]).id, area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Form", "fee_category").id },
+    },
+  %{
+    code: "201", 
+    description: "HND Application Fee", 
+    amount: 8000, 
+    service_charge: 1000, 
+    program_id: Repo.get_by(Program, [name: "HND"]).id, 
+    level_id: Repo.get_by(Level, [description: "HND I"]).id,
+    area_type_id: get_term.("All", "area_type").id, 
+    payer_category_id: get_term.("Applicant", "payer_category").id, 
+    fee_category_id: get_term.("Form", "fee_category").id 
+    },
+  %{
+    code: "202", description: "ND Acceptance Fee", amount: 10000, service_charge: 1000, 
+    program_id: Repo.get_by(Program, [name: "ND"]).id, 
+    level_id: Repo.get_by(Level, [description: "ND I"]).id,
+    area_type_id: get_term.("Non-Catchment", "area_type").id, 
+    payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Form", "fee_category").id
+    },
+  %{
+    code: "203", description: "HND Acceptance Fee", 
+    amount: 14000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "HND"]).id, 
+    level_id: Repo.get_by(Level, [description: "HND I"]).id,
+    area_type_id: get_term.("Non-Catchment", "area_type").id, 
+    payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Form", "fee_category").id 
+    },
   %{code: "204", description: "ND I School Fee", amount: 24000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
   %{code: "205", description: "ND I School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
   %{code: "206", description: "ND II School Fee", amount: 23000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
@@ -2626,13 +2703,14 @@ fees = [
   %{code: "221", description: "HND I School Fee", amount: 32000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
   %{code: "222", description: "HND II School Fee", amount: 37500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id }
 ]
-for fee <- fees do
-  if Repo.get_by(Fee, code: fee.code) == nil do
-    changeset = Fee.changeset(%Fee{}, fee)
-    if changeset.valid?, do: Repo.insert!(changeset)
-  end
-end
-transaction_responses = [
+|> Enum.each(fn fee -> 
+    case Repo.get_by(Fee, code: fee.code) do
+      nil -> Fee.changeset(%Fee{}, fee) |> Repo.insert!
+      _ -> IO.inspect "Existing"
+    end
+  end)
+
+[
   %{code: "Z4", description: "Interface Integration Error"},
   %{code: "51", description: "Insufficient Funds"},
   %{code: "41", description: "Lost(Card, Pick - Up)"},
@@ -2653,49 +2731,49 @@ transaction_responses = [
   %{code: "61", description: "Exceeds Withdrawal Limit"},
   %{code: "Z0", description: "Transaction Status Unconfirmed"}
 ]
-
-for transaction_response <- transaction_responses do
-  if Repo.get_by(TransactionResponse, code: transaction_response.code) == nil do
-    changeset = TransactionResponse.changeset(%TransactionResponse{}, transaction_response)
-    Repo.insert!(changeset)
+|> Enum.each(
+  fn transaction_response -> 
+    case Repo.get_by(TransactionResponse,[code: transaction_response[:code]]) do
+      nil -> TransactionResponse.changeset(%TransactionResponse{}, transaction_response) |> Repo.insert!
+      _ -> IO.inspect "Duplicate"
+    end
   end
-end
+)
 
-registration_no = "DS151690003477"
-student = Repo.get_by(Student, registration_no: registration_no)
+user_name = "DS151690003477"
+student = Repo.get_by(User, user_name: String.downcase(user_name))
+
 fee = Repo.get_by(Fee, code: "212")
 payment_method = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"WebPAY" and ts.name == ^"payment_method")
-
 academic_session = Repo.get_by(AcademicSession, active: true)
-transaction_response = Repo.get_by(TransactionResponse, code: "00")
+transaction_response = Repo.get_by(TransactionResponse, [code: "00"])
 
 
-%StudentPayment{}
-|> StudentPayment.changeset(%{student_id: student.id, fee_id: fee.id, amount: fee.amount, service_charge: fee.service_charge, payment_method_id: payment_method.id, successful: true, transaction_response_id: transaction_response.id, academic_session_id: academic_session.id})
-|> Repo.insert()
 
 
+payment_params = %{paid_by_user_id: student.id, fee_id: fee.id, amount: fee.amount, service_charge: fee.service_charge, payment_method_id: payment_method.id, successful: true, transaction_response_id: transaction_response.id, academic_session_id: academic_session.id}
+Payment.changeset(%Payment{}, payment_params) |> Repo.insert!
 
 academic_session = Repo.get_by(AcademicSession, active: true)
 program = Repo.get_by(Program, name: "ND")
-
-course_registration_setting = %{academic_session_id: academic_session.id, program_id: program.id, opening_date: "2016-07-13", closing_date: "2016-08-13"}
+course_registration_setting_params = %{academic_session_id: academic_session.id, program_id: program.id, opening_date: "2016-07-13", closing_date: "2016-08-13"}
 if Repo.get_by(CourseRegistrationSetting, [academic_session_id: academic_session.id, program_id: program.id]) == nil do
-  changeset = CourseRegistrationSetting.changeset(%CourseRegistrationSetting{}, course_registration_setting)
-  if changeset.valid? do
-    Repo.insert!(changeset)
-  end
+  CourseRegistrationSetting.changeset(%CourseRegistrationSetting{}, course_registration_setting_params) |> Repo.insert!  
 end
 
 news = [
-  %{heading: "Admission into 2016/2017 academic session has begun", lead: "Admission into 2016/2017 academic session has begun.", release_at: "2017-07-23", duration: 5, body: "Admission into 2016/2017 academic session is currently going on. Those who applied to study a course in our prestigious learning centre are to go online to apply as soon as possible. Successful applicants will be invited for screening"},
-  %{heading: "Excursion", lead: "HND II mechanical engineering students will be embarking on a trip to Dubai for a tour ...", release_at: "2017-07-23", duration: 10, body: "In a bid to enhance the quality of education students of this polytechnic, the management of the Mechanical engineering department has organized a tour to Dubai car manufacturing company"}
+  %{ 
+    heading: "Admission into 2016/2017 academic session has begun", 
+    lead: "Admission into 2016/2017 academic session has begun.", 
+    expires_at: "2016-10-23", 
+    body: "Admission into 2016/2017 academic session is currently going on. Those who applied to study a course in our prestigious learning centre are to go online to apply as soon as possible. Successful applicants will be invited for screening"},
+  %{
+    heading: "Excursion", 
+    lead: "HND II mechanical engineering students will be embarking on a trip to Dubai for a tour ...", 
+    expires_at: "2016-11-23", 
+    body: "In a bid to enhance the quality of education students of this polytechnic, the management of the Mechanical engineering department has organized a tour to Dubai car manufacturing company"}
 ]
-
-Enum.each(news, fn n ->
-  changeset = Newsroom.changeset(%Newsroom{}, n)
-  if changeset.valid?, do: Repo.insert!(changeset)
-end)
+|> Enum.each(fn announcement ->  Announcement.changeset(%Announcement{}, announcement) |> Repo.insert! end)
 
 academic_session_id = AcademicSession
 |> Ecto.Query.select([ac], ac.id)
@@ -2724,25 +2802,27 @@ level = Level |> where([l], l.description == ^"ND I") |> Repo.one
 semester = Term |> join(:inner, [t], ts in assoc(t, :term_set)) |> where([t, ts], t.description == ^"1st" and ts.name == ^"semester") |> Repo.one
 department = Department |> where([d], d.name == ^"Mechanical Engineering") |> Repo.all |> List.first
 courses = Course |> where([c], c.department_id == ^department.id and c.level_id == ^level.id and c.semester_id == ^semester.id) |> Repo.all
-staff_postings = StaffPosting |> where([sp], sp.department_id == ^department.id and sp.active == ^true) |> Repo.all
+staff_postings = Posting |> where([sp], sp.department_id == ^department.id and sp.active == ^true) |> Repo.all
 
 Enum.each(courses, fn course ->
   %CourseTutor{}
-  |> CourseTutor.changeset(%{course_id: course.id, academic_session_id: academic_session.id, staff_id: Enum.random(staff_postings).staff_id})
+  |> CourseTutor.changeset(%{course_id: course.id, academic_session_id: academic_session.id, tutor_user_id: Enum.random(staff_postings).posted_user_id})
   |> Repo.insert()
 end)
 
-student = Student |> where([s], s.registration_no == ^"DS151690003477") |> Repo.one
-student_courses = student |> Ecto.assoc(:student_courses) |> join(:inner, [sc], c in assoc(sc, :course)) |> where([sc,c], c.semester_id == ^semester.id and sc.level_id == ^level.id and sc.academic_session_id == ^academic_session.id) |> Repo.all |> Repo.preload([:course])
-staff = Repo.get_by(Staff, [user_id: staff_1_user.id])
-Enum.each(student_courses, fn student_course ->
-    scores = [13,12,7,15,14,9,8,11]
+student = User |> where([u], u.user_name == ^String.downcase("DS151690003477")) |> Repo.one
+student_courses_enrolled = student 
+|> Ecto.assoc(:course_enrollments) 
+|> join(:inner, [sc], c in assoc(sc, :course)) 
+|> where([sc,c], c.semester_id == ^semester.id and sc.level_id == ^level.id and sc.academic_session_id == ^academic_session.id) 
+|> Repo.all |> Repo.preload([:course])
 
-    assessment_type = Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> where([t, ts], t.description == "Assignment" and ts.name=="assessment_type") |> Repo.one
-    %StudentCourseAssessment{}
-    |> StudentCourseAssessment.changeset(%{student_course_id: student_course.id, staff_id: staff.id, assessment_type_id: assessment_type.id, score: Enum.random(scores)})
-    |> Repo.insert!()
-
+staff = staff_1_user
+assessment_type = Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> where([t, ts], t.description == "Assignment" and ts.name=="assessment_type") |> Repo.one
+Enum.each(student_courses_enrolled, fn student_course ->
+    scores = [13,12,7,15,14,9,8,11]    
+    course_enrollment_assessment_params = %{course_enrollment_id: student_course.id, assessed_by_user_id: staff.id, assessment_type_id: assessment_type.id, score: Enum.random(scores)}
+    CourseEnrollmentAssessment.changeset(%CourseEnrollmentAssessment{}, course_enrollment_assessment_params) |> Repo.insert!
   end)
   leave_track_type = Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> where([t, ts], t.description == "Days" and ts.name=="leave_track_type") |> Repo.one
 
@@ -2750,31 +2830,29 @@ Enum.each(student_courses, fn student_course ->
   %{minimum_grade_level: 1, maximum_grade_level: 5, duration: 15, leave_track_type_id: leave_track_type.id},
   %{minimum_grade_level: 6, maximum_grade_level: 15, duration: 30, leave_track_type_id: leave_track_type.id}
 ]
-|> Enum.each(fn leave_duration -> %LeaveDuration{}
-                                  |> LeaveDuration.changeset(leave_duration)
-                                  |> Repo.insert!() end
-)
+|> Enum.each(fn leave_duration -> LeaveDuration.changeset(%LeaveDuration{}, leave_duration) |> Repo.insert!() end)
 
-staff = Repo.get_by(Staff, [registration_no: "WLD/STF/000300"])
-staff_2 = Repo.get_by(Staff, [registration_no: "WLD/STF/000302"])
+user_1 = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000300")])
+user_2 = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000302")])
 
 leave_types = Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> where([_, ts], ts.name=="leave_type") |> Repo.all
 
 
 [
-%{staff_id: staff.id, leave_type_id: Enum.random(leave_types).id, proposed_start_date: "2016-10-01", proposed_end_date: "2016-10-10", approved_start_date: "2016-10-01", approved_end_date: "2016-10-10", approved: true, closed: true, closed_by_staff_id: staff_2.id, closed_at: DateTime.utc_now},
-%{staff_id: staff.id, leave_type_id: Enum.random(leave_types).id, proposed_start_date: "2016-10-01", proposed_end_date: "2016-10-10", approved_start_date: "2016-10-01", approved_end_date: "2016-10-10", approved: false, closed: true, closed_by_staff_id: staff_2.id, closed_at: DateTime.utc_now}
+%{requested_by_user_id: user_1.id, leave_type_id: Enum.random(leave_types).id, proposed_start_date: "2016-10-01", proposed_end_date: "2016-10-10", approved_start_date: "2016-10-01", approved_end_date: "2016-10-10", approved: true, closed: true, closed_by_staff_id: user_2.id, closed_at: DateTime.utc_now},
+%{requested_by_user_id: user_2.id, leave_type_id: Enum.random(leave_types).id, proposed_start_date: "2016-10-01", proposed_end_date: "2016-10-10", approved_start_date: "2016-10-01", approved_end_date: "2016-10-10", approved: false, closed: true, closed_by_staff_id: user_2.id, closed_at: DateTime.utc_now}
 ]
-|> Enum.each(&(%StaffLeaveRequest{} |> StaffLeaveRequest.changeset(&1) |> Repo.insert!()))
+|> Enum.each(&(%LeaveRequest{} |> LeaveRequest.changeset(&1) |> Repo.insert!()))
 
 
-course_tutor = %{"course_id": course_id, "staff_id": staff_id} = Repo.all(CourseTutor) |> List.first
+course_tutor = %{"course_id": course_id, "tutor_user_id": tutor_user_id } = Repo.all(CourseTutor) |> List.first
 [
   "An accurate record of changes made to release drawings is tracked via this",
   "Most architectural drawings produced for field use by building contractors are printed on architectural \"D\" size paper which measures",
   "If a designer is developing a plan for a project in which the entire part is made out of ¾ thick plywood and he only wants to use one view, he should use the ________ view",
   "When creating a block the drafter needs to pay particular attention to selecting a base point because it determines the"
-] |> Enum.each(fn question ->
-          Assignment.changeset(%Assignment{}, %{course_id: course_id, staff_id: staff_id, academic_session_id: academic_session.id, question: question, start_date: "2016-11-20", start_time: "12:00:00", stop_date: "2016-11-22", stop_time: "12:00:00" })
+]
+|> Enum.each(fn question ->
+    Assignment.changeset(%Assignment{}, %{course_id: course_id, assigned_by_user_id: user_1.id, academic_session_id: academic_session.id, question: question, start_date: "2016-11-20", start_time: "12:00:00", stop_date: "2016-11-22", stop_time: "12:00:00" })
           |> Repo.insert!
         end)

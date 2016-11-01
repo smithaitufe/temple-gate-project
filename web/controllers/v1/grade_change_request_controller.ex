@@ -59,9 +59,9 @@ defmodule PortalApi.V1.GradeChangeRequestController do
     send_resp(conn, :no_content, "")
   end
 
-  def build_query(query, [{"student_course_grading_id", student_course_grading_id} | tail ]) do
+  def build_query(query, [{"course_grading_id", course_grading_id} | tail ]) do
     query
-    |> Ecto.Query.where([gcr], gcr.student_course_grading_id == ^student_course_grading_id)
+    |> Ecto.Query.where([gcr], gcr.course_grading_id == ^course_grading_id)
     |> build_query(tail)
   end
   def build_query(query, [{"read", read} | tail ]) do
@@ -81,7 +81,7 @@ defmodule PortalApi.V1.GradeChangeRequestController do
   end
   def build_query(query, [{"closed_by", closed_by} | tail ]) do
     query
-    |> Ecto.Query.where([gcr], gcr.closed_by_staff_id == ^closed_by)
+    |> Ecto.Query.where([gcr], gcr.closed_by_user_id == ^closed_by)
     |> build_query(tail)
   end
   def build_query(query, []), do: query

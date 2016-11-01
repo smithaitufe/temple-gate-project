@@ -1,17 +1,16 @@
 defmodule PortalApi.Faculty do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "faculties" do
     field :name, :string
-    belongs_to :faculty_type, PortalApi.Term
+    belongs_to :faculty_type, PortalApi.Term, foreign_key: :faculty_type_id
     has_many :departments, PortalApi.Department
 
     timestamps
   end
 
-  @required_fields ~w(name faculty_type_id)a
-  @optional_fields ~w()a
+  @required_fields [:name, :faculty_type_id]
+  @optional_fields []
 
   @doc """
   Creates a changeset based on the `model` and `params`.

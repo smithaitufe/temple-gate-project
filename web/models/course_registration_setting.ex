@@ -1,6 +1,5 @@
 defmodule PortalApi.CourseRegistrationSetting do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "course_registration_settings" do
     field :opening_date, Ecto.Date

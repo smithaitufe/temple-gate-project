@@ -1,19 +1,19 @@
 defmodule PortalApi.CourseTutor do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "course_tutors" do
     field :grades_submitted, :boolean, default: false
     field :grades_submitted_at, Ecto.DateTime
-    belongs_to :course, PortalApi.Course
-    belongs_to :staff, PortalApi.Staff
+    belongs_to :course, PortalApi.Course, foreign_key: :course_id
+    belongs_to :tutor, PortalApi.User, foreign_key: :tutor_user_id
+    belongs_to :assigned_by, PortalApi.User, foreign_key: :assigned_by_user_id
     belongs_to :academic_session, PortalApi.AcademicSession
 
     timestamps
   end
 
-  @required_fields ~w(course_id staff_id academic_session_id)a
-  @optional_fields ~w(grades_submitted grades_submitted_at)a
+  @required_fields [:course_id, :tutor_user_id, :assigned_by_user_id, :academic_session_id]
+  @optional_fields [:grades_submitted, :grades_submitted_at]
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -29,6 +29,6 @@ defmodule PortalApi.CourseTutor do
 
   def preload_associations(query) do
     from q in query,
-    preload: [:course, :staff]
+    preload: [:course, :tutor, :assigner]
   end
 end

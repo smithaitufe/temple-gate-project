@@ -12,7 +12,7 @@ defmodule PortalApi.V1.DepartmentHeadView do
   def render("department_head.json", %{department_head: department_head}) do
     %{id: department_head.id,
       department_id: department_head.department_id,
-      staff_id: department_head.staff_id,
+      user_id: department_head.user_id,
       active: department_head.active,
       appointment_date: department_head.appointment_date,
       effective_date: department_head.effective_date,

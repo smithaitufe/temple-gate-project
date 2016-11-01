@@ -1,6 +1,5 @@
 defmodule PortalApi.Department do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "departments" do
     field :name, :string
@@ -12,15 +11,15 @@ defmodule PortalApi.Department do
 
     has_many :program_departments, PortalApi.ProgramDepartment
     has_many :courses, PortalApi.Course
-    has_many :staff_postings, PortalApi.StaffPosting, foreign_key: :department_id
-    has_many :staffs, through: [:staff_postings, :staff]
+    has_many :postings, PortalApi.Posting, foreign_key: :department_id
+    has_many :users, through: [:postings, :posted_user]
 
     timestamps
   end
 
-  @required_fields ~w(name faculty_id)
-  @optional_fields ~w(code)
-
+  @required_fields [:name, :faculty_id]
+  @optional_fields [:code]
+  
   @doc """
   Creates a changeset based on the `model` and `params`.
 

@@ -1,19 +1,17 @@
 defmodule PortalApi.AcademicSession do
-  use Ecto.Schema
-  import Ecto.Changeset
-  use Timex
+  use PortalApi.Web, :model
 
   schema "academic_sessions" do
     field :description, :string
-    field :opening_date, Timex.Ecto.Date
-    field :closing_date, Timex.Ecto.Date
+    field :opening_date, Ecto.Date
+    field :closing_date, Ecto.Date
     field :active, :boolean, default: true
 
     timestamps
   end
 
-  @required_fields ~w(description opening_date closing_date active)a
-  @optional_fields ~w()a
+  @required_fields [:description, :opening_date, :closing_date, :active]
+  @optional_fields []
 
   @doc """
   Creates a changeset based on the `model` and `params`.

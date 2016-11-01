@@ -3,7 +3,7 @@ defmodule PortalApi.ProjectTopicTest do
 
   alias PortalApi.ProjectTopic
 
-  @valid_attrs %{approved: true, title: "some content"}
+  @valid_attrs %{submitted_by_user_id: 2, approved: true, title: "some content"}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do

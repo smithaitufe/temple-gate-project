@@ -61,9 +61,9 @@ defmodule PortalApi.V1.DepartmentHeadController do
 
 
   defp build_query(query, []), do: query
-  defp build_query(query, [{"staff_id", staff_id} | tail ]) do
+  defp build_query(query, [{"user_id", user_id} | tail ]) do
     query
-    |> Ecto.Query.where([d], d.staff_id == ^staff_id)
+    |> Ecto.Query.where([d], d.user_id == ^user_id)
     |> build_query(tail)
   end
   defp build_query(query, [{"department_id", department_id} | tail ]) do

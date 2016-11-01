@@ -1,6 +1,5 @@
 defmodule PortalApi.TermSet do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "term_sets" do
     field :name, :string
@@ -9,8 +8,8 @@ defmodule PortalApi.TermSet do
     timestamps
   end
 
-  @required_fields ~w(name display_name)a
-  @optional_fields ~w()a
+  @required_fields [:name, :display_name]
+  @optional_fields []
 
   @doc """
   Creates a changeset based on the `model` and `params`.

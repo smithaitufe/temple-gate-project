@@ -8,12 +8,11 @@ defmodule PortalApi.Repo.Migrations.CreateDepartmentHead do
       add :effective_date, :date
       add :end_date, :string
       add :department_id, references(:departments)
-      add :staff_id, references(:staffs)
-
+      add :assigned_user_id, references(:users)
       timestamps
     end
     create index(:department_heads, [:department_id])
-    create index(:department_heads, [:staff_id])
+    create index(:department_heads, [:assigned_user_id])
 
   end
 end

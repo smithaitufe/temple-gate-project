@@ -1,7 +1,5 @@
 defmodule PortalApi.Grade do
-  use Ecto.Schema
-  import Ecto.Changeset
-
+  use PortalApi.Web, :model
 
   schema "grades" do
     field :maximum, :integer

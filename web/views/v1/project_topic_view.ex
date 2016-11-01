@@ -11,9 +11,11 @@ defmodule PortalApi.V1.ProjectTopicView do
   end
 
   def render("project_topic.json", %{project_topic: project_topic}) do
-    %{id: project_topic.id,
+    %{
+      id: project_topic.id,
       title: project_topic.title,
-      student_id: project_topic.student_id,
-      approved: project_topic.approved}
+      submitted_by_user_id: project_topic.submitted_by_user_id,
+      approved: project_topic.approved
+    }
   end
 end

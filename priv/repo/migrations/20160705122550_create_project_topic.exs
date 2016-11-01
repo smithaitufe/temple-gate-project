@@ -5,11 +5,11 @@ defmodule PortalApi.Repo.Migrations.CreateProjectTopic do
     create table(:project_topics) do
       add :title, :string
       add :approved, :boolean, default: false
-      add :student_id, references(:students)
+      add :submitted_by_user_id, references(:users)
 
       timestamps
     end
-    create index(:project_topics, [:student_id])
+    create index(:project_topics, [:submitted_by_user_id])
 
   end
 end

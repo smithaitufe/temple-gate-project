@@ -10,9 +10,10 @@ defmodule PortalApi.V1.FacultyHeadView do
   end
 
   def render("faculty_head.json", %{faculty_head: faculty_head}) do
-    %{id: faculty_head.id,
+    %{
+      id: faculty_head.id,
       faculty_id: faculty_head.faculty_id,
-      staff_id: faculty_head.staff_id,
+      assigned_user_id: faculty_head.assigned_user_id,
       active: faculty_head.active,
       appointment_date: faculty_head.appointment_date,
       effective_date: faculty_head.effective_date,

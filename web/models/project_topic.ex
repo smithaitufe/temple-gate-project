@@ -1,16 +1,16 @@
 defmodule PortalApi.ProjectTopic do
-  use Ecto.Schema
+  use PortalApi.Web, :model
 
   schema "project_topics" do
     field :title, :string
     field :approved, :boolean, default: false
-    belongs_to :student, PortalApi.Student
+    belongs_to :submitted_by, PortalApi.User, foreign_key: :submitted_by_user_id
 
     timestamps
   end
 
-  @required_fields ~w(title approved)a
-  @optional_fields ~w()a
+  @required_fields [:submitted_by_user_id, :title, :approved]
+  @optional_fields []
 
   @doc """
   Creates a changeset based on the `model` and `params`.

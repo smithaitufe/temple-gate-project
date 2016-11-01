@@ -1,7 +1,5 @@
 defmodule PortalApi.Fee do
-  use Ecto.Schema
-  import Ecto.Changeset
-
+  use PortalApi.Web, :model
   alias PortalApi.{Program, Level, Term}
 
   schema "fees" do
@@ -18,8 +16,8 @@ defmodule PortalApi.Fee do
     timestamps
   end
 
-  @required_fields ~w(program_id level_id area_type_id payer_category_id fee_category_id code description amount service_charge)a
-  @optional_fields ~w()a
+  @required_fields [:program_id, :level_id, :area_type_id, :payer_category_id, :fee_category_id, :code, :description, :amount, :service_charge]
+  @optional_fields []
 
   @doc """
   Creates a changeset based on the `model` and `params`.

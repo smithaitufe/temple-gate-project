@@ -1,31 +1,44 @@
 defmodule PortalApi.User do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "users" do
-
+    field :last_name, :string
+    field :first_name, :string
     field :user_name, :string
     field :email, :string
-    field :encrypted_password, :string
-    field :password, :string, virtual: true
-
+    field :encrypted_password, :string    
     field :confirmed, :boolean, default: false
     field :confirmation_code, :string
     field :locked, :boolean, default: false
     field :suspended, :boolean, default: false
+    field :password, :string, virtual: true
 
 
     belongs_to :user_category, PortalApi.Term
-    has_one :student, PortalApi.Student, foreign_key: :user_id
 
-    has_many :user_roles, PortalApi.UserRole
+    has_one :profile, PortalApi.UserProfile, foreign_key: :user_id
+    has_one :jamb_record, PortalApi.JambRecord, foreign_key: :user_id
+    has_one :diploma_qualification, PortalApi.DiplomaQualification, foreign_key: :user_id   
+    
+    has_many :certificates, PortalApi.Certificate, foreign_key: :user_id
+    has_many :program_applications, PortalApi.ProgramApplication, foreign_key: :applicant_user_id
+    has_many :course_enrollments, PortalApi.CourseEnrollment, foreign_key: :enrolled_by_user_id    
+    has_many :courses, through: [:course_enrollments, :course]       
+    has_many :payments, PortalApi.Payment, foreign_key: :paid_by_user_id
+    has_many :user_roles, PortalApi.UserRole, foreign_key: :user_id
     has_many :roles, through: [:user_roles, :role]
+
+
+    has_many :postings, PortalApi.Posting
+    has_many :salary_grade_steps, through: [:postings, :salary_grade_step]
+    has_many :salary_grade_levels, through: [:salary_grade_steps, :salary_grade_level]
+
 
     timestamps
   end
 
-  @required_fields ~w(user_name password user_category_id)a
-  @optional_fields ~w(email confirmed confirmation_code locked suspended)a
+  @required_fields ~w(last_name first_name user_name email password user_category_id)a
+  @optional_fields ~w(confirmed confirmation_code locked suspended)a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -52,10 +65,18 @@ defmodule PortalApi.User do
       _ -> current_changeset
     end
   end
-
-
+  
   def associations do
     [:user_category]
+  end
+
+  def student_associations do
+    [
+      {:program, [:levels]},
+      {:department, [:faculty]},
+      :level, :gender, :marital_status,:entry_mode,
+      {:local_government_area, [:state]}
+    ]
   end
 
 

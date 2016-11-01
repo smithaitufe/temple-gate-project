@@ -4,6 +4,7 @@ defmodule PortalApi.Repo.Migrations.CreateLocalGovernmentArea do
   def change do
     create table(:local_government_areas) do
       add :name, :string, limit: 150, null: false
+      add :is_catchment_area, :boolean, default: true
       add :state_id, references(:states)
 
       timestamps

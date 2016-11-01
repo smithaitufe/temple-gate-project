@@ -3,7 +3,7 @@ defmodule PortalApi.JobPostingTest do
 
   alias PortalApi.JobPosting
 
-  @valid_attrs %{active: true, closing_date: "2010-04-17", opening_date: "2010-04-17", salary: "120.5"}
+  @valid_attrs %{posted_by_user_id: 32, active: true, closing_date: "2010-04-17", opening_date: "2010-04-17", salary: "120.5"}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do

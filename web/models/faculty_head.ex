@@ -1,6 +1,5 @@
 defmodule PortalApi.FacultyHead do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "faculty_heads" do
     field :active, :boolean, default: false
@@ -8,13 +7,13 @@ defmodule PortalApi.FacultyHead do
     field :effective_date, Ecto.Date
     field :end_date, :string
     belongs_to :faculty, PortalApi.Faculty
-    belongs_to :staff, PortalApi.Staff
+    belongs_to :user, PortalApi.User, foreign_key: :assigned_user_id
 
     timestamps
   end
 
-  @required_fields ~w(staff_id faculty_id appointment_date effective_date end_date)a
-  @optional_fields ~w(active)a
+  @required_fields [:assigned_user_id, :faculty_id, :appointment_date, :effective_date, :end_date]
+  @optional_fields [:active]
 
   @doc """
   Creates a changeset based on the `model` and `params`.

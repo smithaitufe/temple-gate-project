@@ -27,70 +27,80 @@ defmodule PortalApi.Router do
 
     scope "/v1", V1, as: :v1 do
 
-      post "remitas", RemitaController, :create
-      resources "roles", RoleController, except: [:new, :edit]
-      resources "users", UserController, except: [:new, :edit]
-      resources "user_roles", UserRoleController, except: [:new, :edit]
-      resources "sessions", SessionController, only: [:create, :delete]
-      get "current_user", CurrentUserController, :show
-      resources "term_sets", TermSetController, except: [:new, :edit]
-      resources "terms", TermController, except: [:new, :edit]
-      resources "transaction_responses", TransactionResponseController, except: [:new, :edit]
-      resources "states", StateController, except: [:new, :edit]
-      resources "local_government_areas", LocalGovernmentAreaController, except: [:new, :edit]
-      resources "course_registration_settings", CourseRegistrationSettingController, except: [:new, :edit]
-      resources "newsrooms", NewsroomController, except: [:new, :edit]
+      post "/remitas", RemitaController, :create
+      resources "/roles", RoleController, except: [:new, :edit]
+      resources "/users", UserController, except: [:new, :edit]
+      resources "/user_roles", UserRoleController, except: [:new, :edit]
+      
+      post "/sessions", SessionController, :create
+      delete "/sessions", SessionController, :delete
+      get "/current_user", CurrentUserController, :show
+
+      resources "/term_sets", TermSetController, except: [:new, :edit]
+      resources "/terms", TermController, except: [:new, :edit]
+      resources "/transaction_responses", TransactionResponseController, except: [:new, :edit]
+      resources "/states", StateController, except: [:new, :edit]
+      resources "/local_government_areas", LocalGovernmentAreaController, except: [:new, :edit]
+      resources "/jamb_records", JambRecordController, except: [:new, :edit]
+      resources "/diploma_qualifications", DiplomaQualificationController, except: [:new, :edit]
+      resources "/direct_entry_qualifications", DirectEntryQualificationController, except: [:new, :edit]
+      resources "/certificates", CertificateController, except: [:new, :edit]
+      resources "/certificate_items", CertificateItemController, except: [:new, :edit]
+      resources "/announcements", AnnouncementController, except: [:new, :edit]
+      resources "/academic_qualifications", AcademicQualificationController, except: [:new, :edit]
+      resources "/program_applications", ProgramApplicationController, except: [:new, :edit]
+      resources "/salary_grade_levels", SalaryGradeLevelController, except: [:new, :edit]
+      resources "/salary_grade_steps", SalaryGradeStepController, except: [:new, :edit]
+      
+      
       # Faculty Module
-      resources "programs", ProgramController, except: [:new, :edit]
-      resources "program_adverts", ProgramAdvertController, except: [:new, :edit]
-      resources "levels", LevelController, except: [:new, :edit]
-      resources "faculties", FacultyController, except: [:new, :edit]
-      resources "faculty_heads", FacultyHeadController, except: [:new, :edit]
-      resources "departments", DepartmentController, except: [:new, :edit]
-      resources "department_heads", DepartmentHeadController, except: [:new, :edit]
-      resources "program_departments", ProgramDepartmentController, except: [:new, :edit]
-      resources "academic_sessions", AcademicSessionController, except: [:new, :edit]
-      resources "assignments", AssignmentController, except: [:new, :edit]
-      # Human Resources Module
-      resources "jobs", JobController, except: [:new, :edit]
-      resources "job_postings", JobPostingController, except: [:new, :edit]
-      resources "job_titles", JobTitleController, except: [:new, :edit]
-      resources "leave_durations", LeaveDurationController, except: [:new, :edit]
-      resources "staffs", StaffController, except: [:new, :edit]
-      resources "staff_postings", StaffPostingController, except: [:new, :edit]
-      resources "staff_academic_qualifications", StaffAcademicQualificationController, except: [:new, :edit]
-      resources "staff_leave_entitlements", StaffLeaveEntitlementController, except: [:new, :edit]
-      resources "staff_leave_requests", StaffLeaveRequestController, except: [:new, :edit]
-      # Courses Module
-      resources "grades", GradeController, except: [:new, :edit]
-      resources "grade_change_requests", GradeChangeRequestController, except: [:new, :edit]
-      resources "courses", CourseController, except: [:new, :edit]
-      resources "course_tutors", CourseTutorController, except: [:new, :edit]
-      # Accounts/Bursary
-      resources "salary_grade_levels", SalaryGradeLevelController, except: [:new, :edit]
-      resources "salary_grade_steps", SalaryGradeStepController, except: [:new, :edit]
-      resources "fees", FeeController, except: [:new, :edit]
-      resources "payments", PaymentController, except: [:new, :edit]
-      resources "payment_items", PaymentItemController, except: [:new, :edit]
-      # Student Module
-      resources "students", StudentController, except: [:new, :edit]
-      resources "student_programs", StudentProgramController, except: [:new, :edit]
-      resources "student_courses", StudentCourseController, except: [:new, :edit]
-      resources "student_course_gradings", StudentCourseGradingController, except: [:new, :edit]
-      resources "student_payments", StudentPaymentController, only: [:index, :create]
-      resources "student_jamb_records", StudentJambRecordController, except: [:new, :edit]
-      resources "student_diploma_qualifications", StudentDiplomaQualificationController, except: [:new, :edit]
-      resources "student_direct_entry_qualifications", StudentDirectEntryQualificationController, except: [:new, :edit]
-      resources "student_certificates", StudentCertificateController, except: [:new, :edit]
-      resources "student_certificate_items", StudentCertificateItemController, except: [:new, :edit]
+      resources "/programs", ProgramController, except: [:new, :edit]
+      resources "/program_adverts", ProgramAdvertController, except: [:new, :edit]
+      resources "/levels", LevelController, except: [:new, :edit]
+      resources "/faculties", FacultyController, except: [:new, :edit]
+      resources "/faculty_heads", FacultyHeadController, except: [:new, :edit]
+      resources "/departments", DepartmentController, except: [:new, :edit]
+      resources "/department_heads", DepartmentHeadController, except: [:new, :edit]
+      resources "/program_departments", ProgramDepartmentController, except: [:new, :edit]
+      resources "/academic_sessions", AcademicSessionController, except: [:new, :edit]
+      resources "/assignments", AssignmentController, except: [:new, :edit]
+      
+      resources "/jobs", JobController, except: [:new, :edit]
+      resources "/job_postings", JobPostingController, except: [:new, :edit]
+      resources "/job_titles", JobTitleController, except: [:new, :edit]            
+      resources "/postings", PostingController, except: [:new, :edit]
+      
+      resources "/leave_durations", LeaveDurationController, except: [:new, :edit]      
+      resources "/leave_requests", LeaveRequestController, except: [:new, :edit]
+
+      
+      resources "/grades", GradeController, except: [:new, :edit]
+      resources "/grade_change_requests", GradeChangeRequestController, except: [:new, :edit]
+
+      resources "/courses", CourseController, except: [:new, :edit]
+      resources "/course_tutors", CourseTutorController, except: [:new, :edit]      
+      
+      resources "/fees", FeeController, except: [:new, :edit]
+      resources "/payments", PaymentController, except: [:new, :edit]
+      resources "/payment_items", PaymentItemController, except: [:new, :edit]
+      
+      
+      resources "/course_registration_settings", CourseRegistrationSettingController, except: [:new, :edit]
+      resources "/course_enrollments", CourseEnrollmentController, except: [:new, :edit]
+      resources "/course_enrollment_assessments", CourseEnrollmentAssessmentController, except: [:new, :edit]
+      resources "/course_gradings", CourseGradingController, except: [:new, :edit]
+
+      resources "/project_topics", ProjectTopicController, except: [:new, :edit]
+      resources "/student_project_supervisors", StudentProjectSupervisorController, except: [:new, :edit]
+      
+      resources "/results", ResultController, except: [:new, :edit]
+      resources "/result_grades", ResultGradeController, except: [:new, :edit]
+      resources "/student_assignments", StudentAssignmentController, except: [:new, :edit]
 
 
-      resources "project_topics", ProjectTopicController, except: [:new, :edit]
-      resources "student_project_supervisors", StudentProjectSupervisorController, except: [:new, :edit]
-      resources "student_course_assessments", StudentCourseAssessmentController, except: [:new, :edit]
-      resources "student_results", StudentResultController, except: [:new, :edit]
-      resources "student_result_grades", StudentResultGradeController, except: [:new, :edit]
-      resources "student_assignments", StudentAssignmentController, except: [:new, :edit]
+
+      resources "/products", ProductController, except: [:new, :edit]
+      resources "/orders", OrderController, except: [:new, :edit]
 
 
     end

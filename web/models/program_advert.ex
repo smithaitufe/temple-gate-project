@@ -1,8 +1,5 @@
 defmodule PortalApi.ProgramAdvert do
-  use Ecto.Schema
-  import Ecto.Changeset
-
-
+  use PortalApi.Web, :model
 
   schema "program_adverts" do
     field :opening_date, Ecto.Date

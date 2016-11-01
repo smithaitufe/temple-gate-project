@@ -3,7 +3,7 @@ defmodule PortalApi.StateTest do
 
   alias PortalApi.State
 
-  @valid_attrs %{name: "some content"}
+  @valid_attrs %{name: "some content", country_id: 2, is_catchment_area: false}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do

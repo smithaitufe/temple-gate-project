@@ -1,6 +1,5 @@
 defmodule PortalApi.LeaveDuration do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "leave_durations" do
     field :minimum_grade_level, :integer

@@ -1,6 +1,6 @@
 defmodule PortalApi.Course do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
+
 
   schema "courses" do
     field :code, :string
@@ -15,13 +15,13 @@ defmodule PortalApi.Course do
 
     timestamps
 
-    has_many :student_courses, PortalApi.StudentCourse
+    has_many :course_enrollments, PortalApi.CourseEnrollment, foreign_key: :course_id
 
 
   end
 
-  @required_fields ~w(code title units hours department_id level_id semester_id course_category_id)a
-  @optional_fields ~w(description)a
+  @required_fields [:code, :title, :units, :hours, :department_id, :level_id, :semester_id, :course_category_id]
+  @optional_fields [:description]
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -47,6 +47,6 @@ defmodule PortalApi.Course do
   end
 
   def associations() do
-    [:semester, :level, {:department, [:faculty, :department_type]}, :course_category]
+    [:semester, :level, {:department, [:faculty]}, :course_category]
   end
 end

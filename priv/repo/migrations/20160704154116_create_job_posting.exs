@@ -6,8 +6,8 @@ defmodule PortalApi.Repo.Migrations.CreateJobPosting do
       add :opening_date, :date
       add :closing_date, :date
       add :application_method, :text
-      add :active, :boolean, default: false
-      add :posted_by_user_id, references(:users)
+      add :active, :boolean, default: true
+      add :posted_by_user_id, references(:users), null: false
 
       timestamps
     end

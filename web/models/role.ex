@@ -1,6 +1,5 @@
 defmodule PortalApi.Role do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use PortalApi.Web, :model
 
   schema "roles" do
     field :name, :string

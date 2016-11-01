@@ -2,7 +2,7 @@ defmodule PortalApi.V1.JobPostingControllerTest do
   use PortalApi.ConnCase
 
   alias PortalApi.V1.JobPosting
-  @valid_attrs %{active: true, application_method: "some content", closing_date: "2010-04-17", opening_date: "2010-04-17"}
+  @valid_attrs %{posted_by_user_id: 3, active: true, application_method: "some content", closing_date: "2010-04-17", opening_date: "2010-04-17"}
   @invalid_attrs %{}
 
   setup do
