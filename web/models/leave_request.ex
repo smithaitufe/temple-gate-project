@@ -41,7 +41,7 @@ defmodule PortalApi.LeaveRequest do
   end
 
   def associations do
-    [:requested_by, :closed_by, :signed_by, :leave_type]
+    [{:requested_by, [:user_category]}, {:closed_by, [:user_category]}, {:signed_by, [:user_category]}, :leave_type]
   end
 
 

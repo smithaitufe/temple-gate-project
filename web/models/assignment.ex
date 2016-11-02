@@ -30,7 +30,7 @@ defmodule PortalApi.Assignment do
     |> validate_required(@required_fields)
   end
   def associations do
-    [:course, :academic_session, :assigner]
+    [:course, :academic_session, :assigned_by]
   end
 
 

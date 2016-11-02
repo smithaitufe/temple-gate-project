@@ -13,7 +13,7 @@ defmodule PortalApi.V1.AssignmentView do
   
   def render("assignment.json", %{assignment: assignment}) do
     %{id: assignment.id,
-      assigner_user_id: assignment.assigner_user_id,
+      assigned_by_user_id: assignment.assigned_by_user_id,
       course_id: assignment.course_id,
       question: assignment.question,
       note: assignment.note,
