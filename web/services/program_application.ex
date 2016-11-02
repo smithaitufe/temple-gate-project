@@ -15,8 +15,8 @@ defmodule PortalApi.Service.ProgramApplication do
 
             registration_no = academic_session <> generate_no(number_of_characters)
             case Repo.get_by(ProgramApplication, [registration_no: registration_no]) do
-              program_application -> generate_registration_no(changeset, number_of_characters)
-              _ -> put_change(changeset, :registration_no, registration_no)
+              nil -> put_change(changeset, :registration_no, registration_no)
+              _ -> generate_registration_no(changeset, number_of_characters)              
             end            
         _ -> changeset
     end
@@ -71,9 +71,8 @@ defmodule PortalApi.Service.ProgramApplication do
 
   end
 
-  defp generate_no(number_of_characters) do
-    :random.seed(:os.timestamp)
-    Stream.repeatedly(fn -> trunc(:random.uniform * 10) end ) |> Enum.take(number_of_characters) |> Enum.join
+  defp generate_no(number_of_characters) do    
+    Stream.repeatedly(fn -> trunc(:rand.uniform * 10) end ) |> Enum.take(number_of_characters) |> Enum.join
   end
 
 end

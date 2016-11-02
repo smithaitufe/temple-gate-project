@@ -87,7 +87,7 @@ defmodule PortalApi.User do
       :profile,
       {:department, [:faculty]},
       :level, :gender, :marital_status,
-      {:local_government_area, [:state]}
+      {:local_government_area, [:state]},
       {:salary_grade_level, [ :salary_grade_steps ]},
       :leave_request,
       :postings,
