@@ -2561,18 +2561,13 @@ for st <- salary_structure_types do
   |> Ecto.Query.where([t,ts], t.description == ^st and ts.name == ^"salary_structure_type")
   |> Repo.all
   |> List.first
-  start_point = 0
-  stop_point  = 0
-  case st do
-    "CONPCASS" ->
-      start_point = 7
-      stop_point = 15
-    "CONTEDISS" ->
-      start_point = 1
-      stop_point = 15
+ 
+  %{begin_at, end_at} = case st do
+    "CONPCASS" ->  %{7, 15}
+    "CONTEDISS" -> %{1, 15}
   end
 
-  for i <- start_point..stop_point do
+  for i <- begin_at..end_at do
     description = i |> Integer.to_string |> String.rjust(2, ?0)
     if st == "CONPCASS" && i != 11 do
       grade_level = %{description: description, salary_structure_type_id: salary_structure_type.id}

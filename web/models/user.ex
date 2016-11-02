@@ -70,14 +70,32 @@ defmodule PortalApi.User do
     [:user_category]
   end
 
-  def student_associations do
+  def preload_student_associations do
     [
+      :profile,
       {:program, [:levels]},
       {:department, [:faculty]},
       :level, :gender, :marital_status,:entry_mode,
-      {:local_government_area, [:state]}
+      {:local_government_area, [:state]},
+      :jamb_record, :diploma_qualification, :certificates,
+      :program_applications, :course_enrollments, :courses, :payments,
+      :roles, :user_roles
     ]
   end
+  def preload_staff_associations do
+    [
+      :profile,
+      {:department, [:faculty]},
+      :level, :gender, :marital_status,
+      {:local_government_area, [:state]}
+      {:salary_grade_level, [ :salary_grade_steps ]},
+      :leave_request,
+      :postings,
+      :roles, :user_roles
+    ]
+  end
+
+
 
 
 end
