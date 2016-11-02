@@ -2562,9 +2562,9 @@ for st <- salary_structure_types do
   |> Repo.all
   |> List.first
  
-  %{begin_at, end_at} = case st do
-    "CONPCASS" ->  %{7, 15}
-    "CONTEDISS" -> %{1, 15}
+  [begin_at, end_at] = case st do
+    "CONPCASS" ->  [7, 15]
+    "CONTEDISS" -> [1, 15]
   end
 
   for i <- begin_at..end_at do
