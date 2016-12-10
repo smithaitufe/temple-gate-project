@@ -13,8 +13,8 @@ defmodule PortalApi.UserProfile do
       timestamps  
   end
 
-  @required_fields [:gender_id, :marital_status_id, :birth_date, :local_government_area_id]
-  @optional_fields []
+  @required_fields [ :user_id, :gender_id, :marital_status_id, :birth_date, :local_government_area_id]
+  @optional_fields [:middle_name, :phone_number]
 
   @doc """
   Creates a changeset based on the `model` and `params`.

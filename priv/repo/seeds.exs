@@ -22,10 +22,9 @@ get_term = fn description, term_set ->
   |> Ecto.Query.where([t, ts],t.description == ^description and ts.name == ^term_set)
   |> Repo.one
 end
-assign_role = fn %{user_name: user_name, role: role, default: default} ->
-  role = Role |> Repo.get_by(name: role)
-  user = Repo.get_by(User, [user_name: String.downcase(user_name)])
-  IO.inspect("#{user.email} - #{role.slug}")
+assign_role = fn %{email: email, role: role, default: default} ->
+  role = Repo.get_by(Role, name: role)
+  user = Repo.get_by(User, [email: email])  
   %UserRole{}
   |> UserRole.changeset(%{user_id: user.id, role_id: role.id, default: default})
   |> Repo.insert()
@@ -88,7 +87,7 @@ term_sets = [
   %{ name: "department_type", display_name: "Department Type" },
   %{ name: "faculty_type", display_name: "Faculty Type" },
   %{ name: "admission_status", display_name: "Admission Status" },
-  %{ name: "examination_body", display_name: "Examination Body" },
+  %{ name: "examination_type", display_name: "Examination Body" },
   %{ name: "salary_structure_type", display_name: "Salary Structure Type" },
   %{ name: "allowance", display_name: "Allowance" },
   %{ name: "assessment_type", display_name: "Assessment Type" },
@@ -188,7 +187,7 @@ terms = [
 commit.(term_set, terms)
 
 
-term_set = TermSet |> Repo.get_by(name: "examination_body")
+term_set = TermSet |> Repo.get_by(name: "examination_type")
 terms = [
   %{description: "WAEC"},
   %{description: "WAEC GCE"},
@@ -392,8 +391,16 @@ terms = [
 ]
 commit.(term_set, terms)
 
+nd_program_details = ~s(
+# GUIDELINES FOR ADMISSION INTO THE ACADEMIC PROGRAMMES
+
+Candidates are advised to study the brochure before completing the application forms. 
+Application forms, which are ot not properly completed, may not be processed. 
+Candidates who do not meet the required entry qualifications will not be considered for admission.)
+
 programs = [
-  %{name: "ND", description: "National Diploma", duration: 2 }, %{name: "HND", description: "Higher National Diploma", duration: 2 }
+  %{name: "ND", description: "National Diploma", duration: 2, details:  nd_program_details},
+   %{name: "HND", description: "Higher National Diploma", duration: 2 }
 ]
 for program <- programs do
   if(Repo.get_by(Program, [name: program[:name]]) == nil) do
@@ -2393,9 +2400,9 @@ local_government_area = LocalGovernmentArea |> Repo.all |> Enum.random
 user_category = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Applicant" and ts.name == ^"user_category")
 registration_no = "DS151690003478"
 
-user = %{first_name: "Jane", last_name: "Brown", user_name: String.downcase(registration_no), email: "jane.brown@dspg.edu.ng", password: "password", user_category_id: user_category.id}
+user = %{first_name: "Jane", last_name: "Brown", email: "jane.brown@walden.edu.ng", password: "password"}
 
-if Repo.get_by(User, [user_name: user.user_name]) == nil do
+if Repo.get_by(User, [email: user.email]) == nil do
   changeset = User.changeset(%User{}, user)
   if changeset.valid? do
     {:ok, user} = Repo.insert(changeset)
@@ -2409,7 +2416,7 @@ if Repo.get_by(User, [user_name: user.user_name]) == nil do
     }
     UserProfile.changeset(%UserProfile{}, user_profile_params) |> Repo.insert!
     program_application_params = %{
-      applicant_user_id: user.id, 
+      user_id: user.id, 
       registration_no: registration_no, 
       matriculation_no: "#{program.name}/#{department.code}/#{2015}/00001",
       program_id: program.id, 
@@ -2428,7 +2435,7 @@ end
 local_government_area = LocalGovernmentArea |> Repo.all |> Enum.random
 registration_no = "DS151690003470"
 user_category = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"user_category")
-User.changeset(%User{}, %{first_name: "Ufuoma", last_name: "Brown", user_name: String.downcase(registration_no), email: "ufuoma.brown@walden.edu.ng", password: "password", user_category_id: user_category.id})
+User.changeset(%User{}, %{first_name: "Ufuoma", last_name: "Brown", email: "ufuoma.brown@walden.edu.ng", password: "password"})
 |> Repo.insert()
 |> case do
     {:ok, user} ->
@@ -2440,7 +2447,7 @@ User.changeset(%User{}, %{first_name: "Ufuoma", last_name: "Brown", user_name: S
         local_government_area_id: local_government_area.id
       } 
       program_application_params = %{
-        applicant_user_id: user.id, 
+        user_id: user.id, 
         registration_no: registration_no, 
         matriculation_no: "#{program.name}/#{department.code}/#{2015}/00002",
         program_id: program.id, 
@@ -2460,8 +2467,8 @@ end
 
 local_government_area = LocalGovernmentArea |> Repo.all |> Enum.random
 registration_no = "DS151690003477"
-if Repo.get_by(User, [user_name: String.downcase(registration_no)]) == nil do
-  changeset = User.changeset(%User{}, %{first_name: "Brown", last_name: "Fish", user_name: String.downcase(registration_no), email: "brown.fish@dspg.edu.ng", password: "password", user_category_id: user_category.id})
+if Repo.get_by(User, [email: "brown.fish@walden.edu.ng"]) == nil do
+  changeset = User.changeset(%User{}, %{first_name: "Brown", last_name: "Fish", email: "brown.fish@walden.edu.ng", password: "password" })
   if changeset.valid? do
     {:ok, user} = Repo.insert(changeset)
     user_profile_params = %{
@@ -2474,7 +2481,7 @@ if Repo.get_by(User, [user_name: String.downcase(registration_no)]) == nil do
     UserProfile.changeset(%UserProfile{}, user_profile_params) |> Repo.insert!
 
     program_application_params = %{
-      applicant_user_id: user.id, 
+      user_id: user.id, 
       registration_no: registration_no,
       matriculation_no: "#{program.name}/#{department.code}/#{2015}/00003",
       program_id: program.id, 
@@ -2491,37 +2498,37 @@ if Repo.get_by(User, [user_name: String.downcase(registration_no)]) == nil do
 end
 
 [
-%{user_name: "DS151690003477", role: "Student", default: true},
-%{user_name: "DS151690003478", role: "Applicant", default: true}
+%{email: "jane.brown@walden.edu.ng", role: "Student", default: true},
+%{email: "ufuoma.brown@walden.edu.ng", role: "Applicant", default: true}
 ]
 |> Enum.each(&(assign_role.(&1)))
 
 user_category = Repo.all(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Staff" and ts.name == ^"user_category") |> List.first
 users = [
-  %{first_name: "Clinton", last_name: "John", user_name: String.downcase("WLD/STF/000301"), email: "evragab@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{first_name: "Smith", last_name: "Samuel", user_name: String.downcase("WLD/STF/000300"), email: "smithsamuel@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{first_name: "John", last_name: "Gospel", user_name: String.downcase("WLD/STF/000302"), email: "jun.gospel@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{first_name: "Efemena", last_name: "Agbi", user_name: String.downcase("WLD/STF/000303"), email: "efemena.agbi@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{first_name: "ThankGod", last_name: "Goodwill", user_name: String.downcase("WLD/STF/000304"), email: "thankgod.goodwill@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{first_name: "Stephen", last_name: "Oboh", user_name: String.downcase("WLD/STF/000305"), email: "stephen.oboh@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{first_name: "Ogechi", last_name: "Onouha", user_name: String.downcase("WLD/STF/000306"), email: "ogechi.onouha@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{first_name: "Juliet", last_name: "Jeb", user_name: String.downcase("WLD/STF/000307"), email: "juliet.jeb@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{first_name: "Uche", last_name: "Okeke", user_name: String.downcase("WLD/STF/000308"), email: "uche.okeke@walden.edu.ng", password: "password", user_category_id: user_category.id},
-  %{first_name: "Jose", last_name: "Conte", user_name: String.downcase("WLD/STF/000309"), email: "jose.conte@walden.edu.ng", password: "password", user_category_id: user_category.id},
+  %{first_name: "Clinton", last_name: "John", email: "evragab@walden.edu.ng", password: "password"},
+  %{first_name: "Smith", last_name: "Samuel", email: "smithsamuel@walden.edu.ng", password: "password"},
+  %{first_name: "John", last_name: "Gospel", email: "jun.gospel@walden.edu.ng", password: "password"},
+  %{first_name: "Efemena", last_name: "Agbi", email: "efemena.agbi@walden.edu.ng", password: "password"},
+  %{first_name: "ThankGod", last_name: "Goodwill", email: "thankgod.goodwill@walden.edu.ng", password: "password"},
+  %{first_name: "Stephen", last_name: "Oboh", email: "stephen.oboh@walden.edu.ng", password: "password"},
+  %{first_name: "Ogechi", last_name: "Onouha", email: "ogechi.onouha@walden.edu.ng", password: "password"},
+  %{first_name: "Juliet", last_name: "Jeb", email: "juliet.jeb@walden.edu.ng", password: "password"},
+  %{first_name: "Uche", last_name: "Okeke", email: "uche.okeke@walden.edu.ng", password: "password"},
+  %{first_name: "Jose", last_name: "Conte", email: "jose.conte@walden.edu.ng", password: "password"},
 ]
 Enum.each(users, fn user -> User.changeset(%User{}, user) |> Repo.insert!
 end)
 
 
-staff_1_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000300")])
-staff_2_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000302")])
-staff_3_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000303")])
-staff_4_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000304")])
-staff_5_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000305")])
-staff_6_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000306")])
-staff_7_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000307")])
-staff_8_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000308")])
-staff_9_user = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000309")])
+staff_1_user = Repo.get_by(User, [email: "evragab@walden.edu.ng"])
+staff_2_user = Repo.get_by(User, [email: "smithsamuel@walden.edu.ng"])
+staff_3_user = Repo.get_by(User, [email: "jun.gospel@walden.edu.ng"])
+staff_4_user = Repo.get_by(User, [email: "efemena.agbi@walden.edu.ng"])
+staff_5_user = Repo.get_by(User, [email: "thankgod.goodwill@walden.edu.ng"])
+staff_6_user = Repo.get_by(User, [email: "stephen.oboh@walden.edu.ng"])
+staff_7_user = Repo.get_by(User, [email: "ogechi.onouha@walden.edu.ng"])
+staff_8_user = Repo.get_by(User, [email: "juliet.jeb@walden.edu.ng"])
+staff_9_user = Repo.get_by(User, [email: "uche.okeke@walden.edu.ng"])
 
 [
   %{user_id: staff_1_user.id, gender_id: gender.id, marital_status_id: marital_status.id, local_government_area_id: (LocalGovernmentArea |> Repo.all |> Enum.random).id, birth_date: "1975-02-10"},
@@ -2614,17 +2621,17 @@ for st <- salary_structure_types do
 end
 
 [
-  %{user_name: "WLD/STF/000300", role: "Lecturer", default: true},
-  %{user_name: "WLD/STF/000301", role: "Lecturer", default: true},
-  %{user_name: "WLD/STF/000302", role: "Lecturer", default: true},
-  %{user_name: "WLD/STF/000303", role: "Lecturer", default: true},
-  %{user_name: "WLD/STF/000304", role: "Lecturer", default: true},
-  %{user_name: "WLD/STF/000305", role: "Lecturer", default: true},
-  %{user_name: "WLD/STF/000305", role: "FacultyHead", default: false},
-  %{user_name: "WLD/STF/000302", role: "DepartmentHead", default: false},
-  %{user_name: "WLD/STF/000307", role: "Registry", default: true},
-  %{user_name: "WLD/STF/000308", role: "RegistryAssist", default: true},
-  %{user_name: "WLD/STF/000309", role: "RegistryOfficer", default: false}
+  %{email: "evragab@walden.edu.ng", role: "Lecturer", default: true},
+  %{email: "smithsamuel@walden.edu.ng", role: "Lecturer", default: true},
+  %{email: "jun.gospel@walden.edu.ng", role: "Lecturer", default: true},
+  %{email: "efemena.agbi@walden.edu.ng", role: "Lecturer", default: true},
+  %{email: "thankgod.goodwill@walden.edu.ng", role: "Lecturer", default: true},
+  %{email: "stephen.oboh@walden.edu.ng", role: "Lecturer", default: true},
+  %{email: "stephen.oboh@walden.edu.ng", role: "FacultyHead", default: false},
+  %{email: "jun.gospel@walden.edu.ng", role: "DepartmentHead", default: false},
+  %{email: "ogechi.onouha@walden.edu.ng", role: "Registry", default: true},
+  %{email: "juliet.jeb@walden.edu.ng", role: "RegistryAssist", default: true},
+  %{email: "uche.okeke@walden.edu.ng", role: "RegistryOfficer", default: false}
 ]
 |> Enum.each(&(assign_role.(&1)))
 
@@ -2639,7 +2646,7 @@ assign_office_head.(%{type: "department", user: staff_2_user, name: "Mechanical 
 
 academic_session = Repo.get_by!(AcademicSession, [description: "2017/2018"])
 course = Repo.get_by!(Course, [code: "MEC 211"])
-user = Repo.get_by!(User, [user_name: String.downcase("WLD/STF/000302")])
+user = Repo.get_by!(User, [email: "jun.gospel@walden.edu.ng"])
 %CourseTutor{}
 |> CourseTutor.changeset(%{course_id:  course.id, tutor_user_id: user.id, academic_session_id: academic_session.id, assigned_by_user_id: staff_2_user.id})
 |> Repo.insert!
@@ -2736,7 +2743,7 @@ user = Repo.get_by!(User, [user_name: String.downcase("WLD/STF/000302")])
 )
 
 user_name = "DS151690003477"
-student = Repo.get_by(User, user_name: String.downcase(user_name))
+student = Repo.get_by(User, email: "brown.fish@walden.edu.ng")
 
 fee = Repo.get_by(Fee, code: "212")
 payment_method = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"WebPAY" and ts.name == ^"payment_method")
@@ -2804,8 +2811,8 @@ Enum.each(courses, fn course ->
   |> CourseTutor.changeset(%{course_id: course.id, academic_session_id: academic_session.id, tutor_user_id: Enum.random(staff_postings).posted_user_id})
   |> Repo.insert()
 end)
+student = User |> where([u], u.email == ^"brown.fish@walden.edu.ng") |> Repo.one
 
-student = User |> where([u], u.user_name == ^String.downcase("DS151690003477")) |> Repo.one
 student_courses_enrolled = student 
 |> Ecto.assoc(:course_enrollments) 
 |> join(:inner, [sc], c in assoc(sc, :course)) 
@@ -2827,8 +2834,8 @@ Enum.each(student_courses_enrolled, fn student_course ->
 ]
 |> Enum.each(fn leave_duration -> LeaveDuration.changeset(%LeaveDuration{}, leave_duration) |> Repo.insert!() end)
 
-user_1 = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000300")])
-user_2 = Repo.get_by(User, [user_name: String.downcase("WLD/STF/000302")])
+user_1 = Repo.get_by(User, [email: "evragab@walden.edu.ng"])
+user_2 = Repo.get_by(User, [email: "jun.gospel@walden.edu.ng"])
 
 leave_types = Term |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set)) |> where([_, ts], ts.name=="leave_type") |> Repo.all
 

@@ -81,7 +81,7 @@ defmodule PortalApi.V1.ProgramDepartmentController do
   end
   defp build_program_department_query(query, []), do: query
   defp preload_models(query) do
-    Repo.preload(query, [{:department, [:faculty, :department_type]}, :program])
+    Repo.preload(query, [{:department, [:faculty]}, {:program, [:levels]}])
   end
 
 

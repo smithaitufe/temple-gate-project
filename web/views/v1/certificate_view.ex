@@ -12,7 +12,7 @@ defmodule PortalApi.V1.CertificateView do
   def render("certificate.json", %{certificate: certificate}) do
     %{id: certificate.id,
       user_id: certificate.user_id,
-      examination_body_id: certificate.examination_body_id,
+      examination_type_id: certificate.examination_type_id,
       year_obtained: certificate.year_obtained,
       registration_no: certificate.registration_no}
   end

@@ -4,11 +4,9 @@ defmodule PortalApi.Repo.Migrations.CreateUser do
   def change do
     create table(:users) do
       add :first_name, :string, limit: 50, null: false
-      add :last_name, :string, limit: 50, null: false
-      add :user_name, :string, limit: 100, null: false
+      add :last_name, :string, limit: 50, null: false      
       add :email, :string, limit: 200, null: false
-      add :encrypted_password, :string, null: false
-      add :user_category_id, references(:terms)
+      add :encrypted_password, :string, null: false      
       add :confirmed, :boolean, default: false
       add :confirmation_code, :string, limit: 20
       add :locked, :boolean, default: false
@@ -16,6 +14,8 @@ defmodule PortalApi.Repo.Migrations.CreateUser do
       
       timestamps
     end
+
+    create index(:users, [:email])
 
   end
 end

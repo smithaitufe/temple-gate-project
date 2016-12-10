@@ -4,12 +4,12 @@ defmodule PortalApi.V1.SessionView do
   def render("show.json", %{user: user, token: token}) do
     user = %{
     id: user.id,
-    user_name: user.user_name,
-    email: user.email,
-    user_category_id: user.user_category_id
+    last_name: user.last_name,
+    first_name: user.first_name,
+    email: user.email    
     }
     |> Map.put(:roles, render_many(user.roles, RoleView, "role.json"))
-    |> Map.put(:user_category, render_one(user.user_category, TermView, "term.json"))
+    
 
     %{ user: user, token: token }
 

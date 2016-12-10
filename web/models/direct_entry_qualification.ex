@@ -9,13 +9,13 @@ defmodule PortalApi.DirectEntryQualification do
     field :year_graduated, :integer
     field :verified, :boolean, default: false
     field :verified_at, Ecto.DateTime
-    belongs_to :entered_by, PortalApi.User, foreign_key: :entered_by_user_id
+    belongs_to :user, PortalApi.User, foreign_key: :user_id
     belongs_to :verified_by, PortalApi.User, foreign_key: :verified_by_user_id
 
     timestamps
   end
 
-  @required_fields [:entered_by_user_id, :school, :course_studied, :cgpa, :year_admitted, :year_graduated]
+  @required_fields [:user_id, :school, :course_studied, :cgpa, :year_admitted, :year_graduated]
   @optional_fields [:verified, :verified_at, :verified_by_user_id]
 
   @doc """

@@ -10,12 +10,12 @@ defmodule PortalApi.Repo.Migrations.CreateDirectEntryQualification do
       add :year_graduated, :integer, null: false
       add :verified, :boolean, default: false
       add :verified_at, :datetime
-      add :entered_by_user_id, references(:users)
+      add :user_id, references(:users)
       add :verified_by_user_id, references(:users)
 
       timestamps
     end
-    create index(:direct_entry_qualifications, [:entered_by_user_id])
+    create index(:direct_entry_qualifications, [:user_id])
     create index(:direct_entry_qualifications, [:verified_by_user_id])
 
   end

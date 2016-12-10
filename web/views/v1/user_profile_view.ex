@@ -1,13 +1,13 @@
 defmodule PortalApi.V1.UserProfileView do
   use PortalApi.Web, :view
-  alias PortalApi.V1.{UserPrfofileView, LocalGovernmentAreaView, StateView, TermView}
+  alias PortalApi.V1.{UserProfileView, LocalGovernmentAreaView, StateView, TermView}
 
   def render("index.json", %{user_profiles: user_profiles}) do
-    render_many(user_profiles, UserPrfofileView, "user_profile.json")
+    render_many(user_profiles, UserProfileView, "user_profile.json")
   end
 
   def render("show.json", %{user_profile: user_profile}) do
-    render_one(user_profile, UserPrfofileView, "user_profile.json")
+    render_one(user_profile, UserProfileView, "user_profile.json")
   end
 
   def render("user_profile.json", %{user_profile: user_profile}) do

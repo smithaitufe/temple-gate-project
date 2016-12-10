@@ -4,16 +4,16 @@ defmodule PortalApi.V1.UserController do
   alias PortalApi.{Repo, User, UserRole, Term}
   # plug Guardian.Plug.EnsureAuthenticated, %{ on_failure: { PortalApi.V1.SessionController, :new } } when not action in [:new, :create]
 
-  def index(conn, _) do
+  def index(conn, params) do
     users = User
-    |> Repo.all
-    |> Repo.preload(User.associations)
+    |> build_query(Map.to_list(params))
+    |> Repo.all  
 
     render(conn, "index.json", users: users)
   end
 
   def show(conn, %{"id" => id}) do
-    user = Repo.get(User,id) |> Repo.preload(User.associations)
+    user = Repo.get(User,id)
     render(conn, "show.json", user: user)
   end
 
@@ -24,9 +24,10 @@ defmodule PortalApi.V1.UserController do
     case Repo.insert(changeset) do
       {:ok, user} ->
         {:ok, token, _full_claims} = Guardian.encode_and_sign(user, :token)
-
+        user = user |> Repo.preload([:roles])
         conn
         |> put_status(:created)
+        |> put_resp_header("location", v1_user_path(conn, :show, user))
         |> render(PortalApi.V1.SessionView, "show.json", user: user, token: token)
 
       {:error, changeset} ->
@@ -55,6 +56,13 @@ defmodule PortalApi.V1.UserController do
         |> render(PortalApi.ChangesetView, "error.json", changeset: changeset)
     end
   end
+
+  defp build_query(query, [{"email", email} | tail]) do
+    query
+    |> Ecto.Query.where([user], user.email == ^email)
+    |> build_query(tail)
+  end
+  defp build_query(query, []), do: query
 
 
 

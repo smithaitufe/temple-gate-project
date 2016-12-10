@@ -4,12 +4,13 @@ defmodule PortalApi.JambRecord do
   schema "jamb_records" do
     field :score, :float
     field :registration_no, :string
+    field :year, :integer
     belongs_to :user, PortalApi.User, foreign_key: :user_id
 
     timestamps
   end
 
-  @required_fields [:user_id, :score, :registration_no]
+  @required_fields [:user_id, :score, :registration_no, :year]
   @optional_fields []
 
   @doc """

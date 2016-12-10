@@ -11,7 +11,7 @@ defmodule PortalApi.V1.ProgramApplicationView do
 
   def render("program_application.json", %{program_application: program_application}) do
     %{id: program_application.id,
-      applicant_user_id: program_application.applicant_user_id,
+      user_id: program_application.user_id,
       registration_no: program_application.registration_no,
       matriculation_no: program_application.matriculation_no,
       program_id: program_application.program_id,

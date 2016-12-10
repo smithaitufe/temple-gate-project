@@ -5,14 +5,14 @@ defmodule PortalApi.Certificate do
     field :year_obtained, :integer
     field :registration_no, :string
     belongs_to :user, PortalApi.User, foreign_key: :user_id
-    belongs_to :examination_body, PortalApi.Term, foreign_key: :examination_body_id
+    belongs_to :examination_type, PortalApi.Term, foreign_key: :examination_type_id
 
     has_many :certificate_items, PortalApi.CertificateItem
 
     timestamps
   end
 
-  @required_fields [:user_id, :year_obtained, :examination_body_id, :registration_no]
+  @required_fields [:user_id, :year_obtained, :examination_type_id, :registration_no]
   @optional_fields []
 
   @doc """

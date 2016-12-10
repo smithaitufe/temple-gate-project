@@ -7,7 +7,7 @@ defmodule PortalApi.V1.LevelController do
 
   def index(conn, params) do
     levels = Level
-    |> build_level_query(Map.to_list(params))
+    |> build_query(Map.to_list(params))
     |> Repo.all
 
     render(conn, "index.json", levels: levels)
@@ -58,10 +58,15 @@ defmodule PortalApi.V1.LevelController do
     send_resp(conn, :no_content, "")
   end
 
-  defp build_level_query(query, [{"program_id", program_id} | tail]) do
+  defp build_query(query, [{"description", description} | tail]) do
+    query
+    |> Ecto.Query.where([l], fragment("lower(?) = ?", l.description, ^String.downcase(description)))
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"program_id", program_id} | tail]) do
     query
     |> Ecto.Query.where([l], l.program_id == ^program_id)
-    |> build_level_query(tail)
+    |> build_query(tail)
   end
-  defp build_level_query(query, []), do: query
+  defp build_query(query, []), do: query
 end

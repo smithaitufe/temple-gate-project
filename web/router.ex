@@ -30,6 +30,7 @@ defmodule PortalApi.Router do
       post "/remitas", RemitaController, :create
       resources "/roles", RoleController, except: [:new, :edit]
       resources "/users", UserController, except: [:new, :edit]
+      resources "/user_profiles", UserProfileController, except: [:new, :edit]
       resources "/user_roles", UserRoleController, except: [:new, :edit]
       
       post "/sessions", SessionController, :create

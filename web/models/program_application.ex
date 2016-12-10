@@ -7,7 +7,7 @@ defmodule PortalApi.ProgramApplication do
     field :matriculation_no, :string    
     field :is_admitted, :boolean, default: false
     field :active, :boolean, default: true
-    belongs_to :user, PortalApi.User, foreign_key: :applicant_user_id
+    belongs_to :user, PortalApi.User, foreign_key: :user_id
     belongs_to :program, PortalApi.Program, foreign_key: :program_id
     belongs_to :department, PortalApi.Department, foreign_key: :department_id
     belongs_to :level, PortalApi.Level, foreign_key: :level_id
@@ -17,7 +17,7 @@ defmodule PortalApi.ProgramApplication do
 
     timestamps()
   end
-  @required_fields [:applicant_user_id, :program_id, :department_id, :level_id, :entry_mode_id, :academic_session_id]
+  @required_fields [:user_id, :program_id, :department_id, :level_id, :entry_mode_id, :academic_session_id]
   @optional_fields [:registration_no, :matriculation_no, :is_admitted, :active]
   @doc """
   Builds a changeset based on the `struct` and `params`.
@@ -29,7 +29,4 @@ defmodule PortalApi.ProgramApplication do
     
   end
 
-  defp generate_registration_no(changeset) do
-    
-  end
 end

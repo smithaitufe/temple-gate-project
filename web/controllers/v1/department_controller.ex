@@ -78,10 +78,9 @@ defmodule PortalApi.V1.DepartmentController do
     |> build_query(tail)
   end
   defp build_query(query, [{"program_id", program_id} | tail]) do
-    query
-    |> Ecto.Query.join(:left, [d], pd in assoc(d, :program_departments))
-    |> Ecto.Query.join(:left, [d, pd], p in assoc(pd, :program))
-    |> Ecto.Query.where([d, pd, p], p.id == ^program_id)
+    department_ids = Repo.all(from pd in PortalApi.ProgramDepartment, where: pd.program_id == ^program_id, select: pd.department_id)
+    query   
+    |> Ecto.Query.where([d], d.id in ^department_ids)
     |> build_query(tail)
   end
   defp build_query(query, [{"admit", admit} | tail]) do

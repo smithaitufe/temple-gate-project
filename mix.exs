@@ -44,15 +44,22 @@ defmodule PortalApi.Mixfile do
      {:timex, "~> 2.1.4"},
      {:timex_ecto, "~> 1.0.4"},
      {:arc, "~> 0.5.2"},
-     {:arc_ecto, "~> 0.4.4"}
+     {:arc_ecto, "~> 0.4.4"},
+     {:phoenix_swagger, "~> 0.1.6"}
    ]
   end
+
+  
 
   defp aliases do
     ["ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
      "ecto.reset": ["ecto.drop", "ecto.setup"],
      "test": ["ecto.create --quiet", "ecto.migrate", "test"]
    ]
+  end
+
+  def swagger_info do
+    [version: "0.0.0", title: "My awesome phoenix application"]
   end
 
 end

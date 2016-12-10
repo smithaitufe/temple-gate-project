@@ -3,7 +3,7 @@ defmodule PortalApi.Repo.Migrations.CreateProgramApplication do
 
   def change do
     create table(:program_applications) do
-      add :applicant_user_id, references(:users, on_delete: :nothing)
+      add :user_id, references(:users, on_delete: :nothing)
       add :registration_no, :string, limit: 50, null: false
       add :matriculation_no, :string, limit: 50, null: true      
       add :is_admitted, :boolean, default: false
@@ -16,7 +16,7 @@ defmodule PortalApi.Repo.Migrations.CreateProgramApplication do
 
       timestamps()
     end
-    create index(:program_applications, [:applicant_user_id])
+    create index(:program_applications, [:user_id])
     create index(:program_applications, [:program_id])
     create index(:program_applications, [:department_id])
     create index(:program_applications, [:level_id])

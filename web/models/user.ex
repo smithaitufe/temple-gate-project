@@ -3,8 +3,7 @@ defmodule PortalApi.User do
 
   schema "users" do
     field :last_name, :string
-    field :first_name, :string
-    field :user_name, :string
+    field :first_name, :string    
     field :email, :string
     field :encrypted_password, :string    
     field :confirmed, :boolean, default: false
@@ -14,7 +13,7 @@ defmodule PortalApi.User do
     field :password, :string, virtual: true
 
 
-    belongs_to :user_category, PortalApi.Term
+    
 
     has_one :profile, PortalApi.UserProfile, foreign_key: :user_id
     has_one :jamb_record, PortalApi.JambRecord, foreign_key: :user_id
@@ -37,8 +36,8 @@ defmodule PortalApi.User do
     timestamps
   end
 
-  @required_fields ~w(last_name first_name user_name email password user_category_id)a
-  @optional_fields ~w(confirmed confirmation_code locked suspended)a
+  @required_fields [:last_name, :first_name, :email, :password]
+  @optional_fields [:confirmed, :confirmation_code, :locked, :suspended]
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -52,6 +51,7 @@ defmodule PortalApi.User do
     |> validate_required(@required_fields)
     |> encrypt_password
   end
+
   def load_user_category_and_roles(query) do
     from q in query,
     join: uc in assoc(q, :user_category),

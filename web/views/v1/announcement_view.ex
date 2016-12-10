@@ -2,7 +2,7 @@ defmodule PortalApi.V1.AnnouncementView do
   use PortalApi.Web, :view
 
   def render("index.json", %{announcements: announcements}) do
-    render_many(announcements, PortalApi.V1.AnnouncementView, "newsroom.json")
+    render_many(announcements, PortalApi.V1.AnnouncementView, "announcement.json")
   end
 
   def render("show.json", %{announcement: announcement}) do

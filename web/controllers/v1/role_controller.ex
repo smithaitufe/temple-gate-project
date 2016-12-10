@@ -5,8 +5,11 @@ defmodule PortalApi.V1.RoleController do
 
   plug :scrub_params, "role" when action in [:create, :update]
 
-  def index(conn, _params) do
-    roles = Repo.all(Role)
+  def index(conn, params) do
+    roles = Role
+    |> build_query(Map.to_list(params))
+    |> Repo.all
+
     render(conn, "index.json", roles: roles)
   end
 
@@ -54,4 +57,12 @@ defmodule PortalApi.V1.RoleController do
 
     send_resp(conn, :no_content, "")
   end
+
+  defp build_query(query, [{ "name", name} | tail]) do
+    query 
+    |> Ecto.Query.where([role], fragment("lower(?) = ?", role.name, ^String.downcase(name)))
+    |> build_query(tail)
+  end
+  defp build_query(query, []), do: query
+  
 end

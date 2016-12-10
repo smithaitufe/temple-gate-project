@@ -11,7 +11,7 @@ defmodule PortalApi.V1.DirectEntryQualificationView do
 
   def render("direct_entry_qualification.json", %{direct_entry_qualification: direct_entry_qualification}) do
     %{id: direct_entry_qualification.id,
-      entered_by_user_id: direct_entry_qualification.entered_by_user_id,
+      user_id: direct_entry_qualification.user_id,
       school: direct_entry_qualification.school,
       course_studied: direct_entry_qualification.course_studied,
       cgpa: direct_entry_qualification.cgpa,
