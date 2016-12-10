@@ -1,7 +1,6 @@
 import { get, post, put, destroy } from '../utils'
-import settings from '../settings'
-export class SessionService {
-  
+import { interswitch, tokenName } from '../settings'
+export class SessionService {  
   setCurrentRole(value){
     localStorage.setItem("access", JSON.stringify(value))
   }
@@ -12,26 +11,23 @@ export class SessionService {
     return get(`/api/v1/current_user`)
   }
 
-  beginSession(email, password){
+  login(email, password){
     const data = {session: { email: email, password: password }}      
-    this.clearSession(settings.token_name);        
+    this.clearSession(tokenName);        
     return post(`/api/v1/sessions`, data)        
   }
-  endSession(){    
+  logOut(){    
     return destroy('/api/v1/sessions').then((response) => {
         if(response.ok){            
-          this.clearSession(settings.token_name)
+          this.clearSession(tokenName)
         }
     })
   }
-  assign_token(token){
-    localStorage.setItem(settings.token_name, token);
-  }
   setToken(token){
-    localStorage.setItem(settings.token_name, token);
+    localStorage.setItem(tokenName, token);
   }
   getToken(){
-    return localStorage.getItem(settings.token_name)
+    return localStorage.getItem(tokenName)
   }
   clearSession(name){    
     if (localStorage.getItem(name) || localStorage.getItem(name) !== null) {       
