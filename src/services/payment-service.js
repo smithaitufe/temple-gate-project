@@ -69,15 +69,14 @@ export class ServiceChargeService{
     return get(`/api/v1/service_charges/${id}`);
   }
   saveServiceCharge(serviceCharge){
-    new Promise((reject) => {
-      if(!serviceCharge) reject();
+    return new Promise((reject) => {
+      if(!serviceCharge) reject("Service charge parameter not specified");
       const { id } = serviceCharge;
       const data = { service_charge: serviceCharge};
       if(id) return put(`/api/v1/service_charges/${id}`, data);
       return post(`api/v1/service_charges`, data);
-    }    
+    });    
   }
-
 }
 
 export class PaymentSplitService{
@@ -91,11 +90,11 @@ export class PaymentSplitService{
   }
   savePaymentSplit(paymentSplit){
     return new Promise(reject => {
-      if(!paymentSplit) reject();
+      if(!paymentSplit) reject("Payment split parameter not specified");
       const { id } = paymentSplit;
       const data = { payment_split: paymentSplit};
       if(id) return put(`/api/v1/payment_splits/${id}`, data);
       return post(`api/v1/payment_splits`, data);      
-    }    
+    });    
   }
 }

@@ -1,3 +1,4 @@
 export { SessionService } from './session-service';
-export { PaymentService } from './payment-service';
+export { PaymentService, ServiceChargeService, PaymentSplitService } from './payment-service';
+
 
