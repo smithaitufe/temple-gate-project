@@ -19,7 +19,7 @@ defmodule PortalApi.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [mod: {PortalApi, []},
-     applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :phoenix_ecto, :postgrex, :comeonin, :arc_ecto]]
+     applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :phoenix_ecto, :postgrex, :comeonin, :arc_ecto, :httpoison]]
   end
 
   # Specifies which paths to compile per environment
@@ -45,7 +45,9 @@ defmodule PortalApi.Mixfile do
      {:timex_ecto, "~> 1.0.4"},
      {:arc, "~> 0.5.2"},
      {:arc_ecto, "~> 0.4.4"},
-     {:phoenix_swagger, "~> 0.1.6"}
+     {:phoenix_swagger, "~> 0.1.6"},
+     {:httpoison, "~> 0.10.0"}
+     
    ]
   end
 
