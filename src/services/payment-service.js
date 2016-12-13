@@ -77,24 +77,21 @@ export class ServiceChargeService{
       return post(`api/v1/service_charges`, data);
     });    
   }
-}
-
-export class PaymentSplitService{
-  getPaymentSplits(params){
-    if(params) return get(`/api/v1/payment_splits?${params}}`)
-    return get(`/api/v1/payment_splits`);
+  getServiceChargeSplits(params){
+    if(params) return get(`/api/v1/service_charge_splits?${params}}`)
+    return get(`/api/v1/service_charge_splits`);
   }
-  getPaymentSplitById(id){
+  getServiceChargeSplitById(id){
     if(!id) throw new Error("Parameter not specified");
-    return get(`/api/v1/payment_splits/${id}`);
+    return get(`/api/v1/service_charge_splits/${id}`);
   }
-  savePaymentSplit(paymentSplit){
+  saveServiceChargeSplit(serviceChargeSplit){
     return new Promise(reject => {
-      if(!paymentSplit) reject("Payment split parameter not specified");
-      const { id } = paymentSplit;
-      const data = { payment_split: paymentSplit};
-      if(id) return put(`/api/v1/payment_splits/${id}`, data);
-      return post(`api/v1/payment_splits`, data);      
+      if(!serviceChargeSplit) reject("Service charge split parameter not specified");
+      const { id } = serviceChargeSplit;
+      const data = { service_charge_split: serviceChargeSplit};
+      if(id) return put(`/api/v1/service_charge_splits/${id}`, data);
+      return post(`api/v1/service_charge_splits`, data);      
     });    
   }
 }
