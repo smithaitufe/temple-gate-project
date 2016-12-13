@@ -1,25 +1,22 @@
 import { get, post, put} from '../utils';
 export class ProgramService {
-  get_programs(params = null){
-    return get(`/api/v1/programs`)
-  }
-  
   getPrograms(params = null){
+    if(params) return get(`/api/v1/programs?${params}`);
     return get(`/api/v1/programs`)
   }
   getProgramById(id){
-    return get(`/api/v1/programs/${id}`)
+    return new Promise((reject) => {
+      if(!id) reject("Program id not specified");
+      return get(`/api/v1/programs/${id}`)
+    });    
   }
-  
-  get_program_by_id(id){
-    return get(`/api/v1/programs/${id}`)
-  }
-  save_program(program){
-    const { id } = program;
-    if(id){
-      return post(`/api/v1/programs/${id}`, {program: program})
-    }
-    return post(`/api/v1/programs`, {program: program})
+  saveProgram(program){
+    return new Promise((reject) => {
+      if (!program) reject("Program parameter not specified");
+      const { id } = program;
+      if (id) return post(`/api/v1/programs/${id}`, { program: program })
+      return post(`/api/v1/programs`, { program: program })
+    });
   }
 
 }

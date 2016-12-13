@@ -1,4 +1,3 @@
-import { HttpClient } from 'aurelia-fetch-client';
 import CryptoJS from 'crypto-js';
 import { get, post, put } from '../utils';
 import { interswitch } from '../settings';
@@ -36,20 +35,10 @@ export class PaymentService {
     return performHash(str);
   }
   queryPayment(transactionReferenceNo, amount){
-    const { paymentPostUrl, productId } = interswitch;
-    let http = new HttpClient().configure(config => {
-      config.withDefaults({
-          mode: 'cors',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin':'*',
-            'Hash': this.generateQueryHash(transactionReferenceNo)
-          }
-    })
-  });
-    let url = paymentPostUrl + `productid=${productId}&transactionreference=${transactionReferenceNo}&amount=${amount}`
-    return http.fetch(url, {method: 'get'}).then(response => response.json())
+    const { paymentPostUrl, productId } = interswitch;    
+    let params = `product_id=${productId}&transaction_reference_no=${transactionReferenceNo}&amount=${amount}`
+    params = params + `&url=${paymentPostUrl}&hash=${this.generateQueryHash(transactionReferenceNo)}`
+    return get(`/api/v1/interswitch/webpay?${params}`)    
   }  
 }
 

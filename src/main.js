@@ -11,6 +11,8 @@ Bluebird.config({ warnings: false });
 export async function configure(aurelia) {
   aurelia.use
     .standardConfiguration()
+    .feature("resources")
+    .plugin("aurelia-validation")
     .developmentLogging();
 
   // Uncomment the line below to enable animation.

@@ -15,15 +15,16 @@ export class ProgramAdvertService {
     return get(`/api/v1/program_adverts/${id}`)
   }
   saveProgramAdvert(programAdvert = null){
-    if(programAdvert){
+    return new Promise((reject) => {
+      if(!programAdvert) reject("Program advert not specified");
       const { id } = programAdvert;
       const data = {program_advert: programAdvert}
       if(id){
         return put(`/api/v1/program_adverts/${id}`, data)
       }
       return post(`/api/v1/program_adverts`, data)
-    }
-    throw new Error("Parameter not specified");
+    });   
+    
   }
   isAdmitting(closingDate){
     let currentDate = new Date();

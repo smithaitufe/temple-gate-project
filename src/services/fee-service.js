@@ -1,21 +1,26 @@
 import { get, post, put } from '../utils'
 import moment from 'moment';
 export class FeeService {
-  get_fees(params = null){
-    if(params){
+  getFees(params = null) {
+    if (params) {
       return get(`/api/v1/fees?${params}`)
     }
     return get(`/api/v1/fees`)
   }
-  get_fee_by_id(id){
-    return get(`/api/v1/fees/${id}`)
+  getFeeById(id) {
+    return new Promise((reject) => {
+      if (!id) reject("Paramter not specified")
+      return get(`/api/v1/fees/${id}`)
+    });
   }
-  save_fee(fee){
-    const { id } = fee;
-    if(id){
-      return put(`/api/v1/fees/${id}`, {fee: fee})
-    }
-    return post(`/api/v1/fees`, {fee: fee})
+  saveFee(params) {
+    return new Promise((reject) => {
+      if(!params) reject("Paramter not specified");
+      const data =  { fee: params };
+      const { id } = params;
+      if (id) return put(`/api/v1/fees/${id}`, data);
+      return post(`/api/v1/fees`, data);
+    });
   }
 
 }

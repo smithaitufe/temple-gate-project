@@ -1,17 +1,23 @@
-import { get, post, put} from '../utils';
+import { get, post, put } from '../utils';
 export class FacultyService {
-  get_faculties(params = null){
+  getFaculties(params = null) {
+    if (params) return get(`/api/v1/faculties?${params}`)
     return get(`/api/v1/faculties`)
   }
-  get_faculty_by_id(id){
-    return get(`/api/v1/faculties/${id}`)
+  getFacultyById(id) {
+    return new Promise((reject) => {
+      if (!id) reject("Parameter not specified")
+      return get(`/api/v1/faculties/${id}`)
+    })
   }
-  save_faculty(faculty){
-    const { id } = faculty;
-    if(id){
-      return post(`/api/v1/faculties/${id}`, {faculty: faculty})
-    }
-    return post(`/api/v1/faculties`, {faculty: faculty})
+  saveFaculty(faculty) {
+    return new Promise((reject) => {
+      if (!faculty) reject("Parameter not specified")
+      const { id } = faculty;
+      const data = { faculty: faculty };
+      if (id) return post(`/api/v1/faculties/${id}`, data)
+      return post(`/api/v1/faculties`, data)
+    })
   }
 
 }
