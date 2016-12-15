@@ -1,0 +1,11 @@
+body {
+    background-color: #ddd;
+    margin-top: 5px;
+}
+
+.change-password-wrapper {
+    background-color: #fafafa;
+    box-shadow: 0 5px 10px;
+    padding-top: 10px;
+    padding-bottom: 40px;
+}

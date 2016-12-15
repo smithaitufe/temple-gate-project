@@ -1,0 +1,23 @@
+<template>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4 col-sm-offset-4">
+
+        <h1>Login</h1>
+        
+        <form role="form" submit.delegate="loginClicked()">
+          <div class="form-group">
+            <label for="email" class="control-label">Email</label>
+            <input type="text" id="email" class="form-control" placeholder="Email" value.bind="email & validate">
+          </div>
+          <div class="form-group">
+            <label for="password" class="control-label">Password</label>
+            <input type="password" id="password" class="form-control" placeholder="Password" value.bind="password & validate">
+          </div>
+
+          <button type="submit" class="btn btn-default">Login</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</template>

@@ -1,5 +1,5 @@
 import { HttpClient } from 'aurelia-fetch-client';
-import settings from '../settings';
+import {tokenName, restUrl} from '../settings';
 
 const get_headers = () => {
   let headers = {
@@ -7,15 +7,15 @@ const get_headers = () => {
    'Content-Type': 'application/json',
    'Access-Control-Allow-Origin':'*'
  }
- if(localStorage.getItem(settings.token_name)){
-   headers = Object.assign({}, ...headers, {'Authorization': localStorage.getItem(settings.token_name)})
+ if(localStorage.getItem(tokenName)){
+   headers = Object.assign({}, ...headers, {'Authorization': localStorage.getItem(tokenName)})
  }
  return headers;
 }
 const http = () => {
   return new HttpClient().configure(config => {
     config
-    .withBaseUrl(settings.rest_url)
+    .withBaseUrl(restUrl)
     .withDefaults({
         mode: 'cors',
         headers: {...get_headers()}

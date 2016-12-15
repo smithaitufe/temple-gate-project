@@ -1,0 +1,23 @@
+body {
+    background-color: #fff;
+}
+.disabled{
+  pointer-events: none;
+  outline: 0;
+}
+[class^="fa fa-"]{
+  display: inline-block;
+  padding-right: 10px;  
+  width: 20px;
+}
+.private-section-header {
+  display: block;
+}
+.private-section-header .navbar{
+  border-radius: 0 !important;
+  box-shadow: 0 2.5px 20px #ccc;
+}
+
+.private-section-header .navbar .navbar-header .navbar-brand {
+    font-size: 25pt;
+}

@@ -1,0 +1,75 @@
+<template>
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
+
+
+  <form role="form">
+
+    <h1>${user.last_name } Profile</h1>
+
+
+    <div class="form-group">
+      <label for="last_name" class="control-label">Last Name</label>
+      <input type="text" id="last_name" class="form-control disabled" value.bind="entity.last_name">
+    </div>
+    <div class="form-group">
+      <label for="first_name" class="control-label">First Name</label>
+      <input type="text" id="first_name" class="form-control disabled" value.bind="entity.first_name">
+    </div>
+
+    <div class="form-group">
+      <label for="gender_id" class="control-label">Gender</label>
+      <select id="gender_id" class="form-control" value.bind="entity.profile.gender_id">
+        <option value="">Select gender</option>
+        <option repeat.for="item of genders" model.bind="item.id">${item.description}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="marital_status_id" class="control-label">Marital Status</label>
+      <select id="marital_status_id" class="form-control" value.bind="entity.profile.marital_status_id">
+        <option value="">Select marital status</option>
+        <option repeat.for="item of marital_statuses" model.bind="item.id">${item.description}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="birth_date" class="control-label">Birth Date</label>
+      <input type="text" id="birth_date" class="form-control" value.bind="entity.profile.birth_date" datepicker>
+    </div>
+
+    <div class="form-group">
+      <label for="state_id" class="control-label">State of Origin</label>
+      <select id="state_id" class="form-control" value.bind="entity.profile.local_government_area.state_id"  change.delegate="stateChanged()">
+        <option value="">Select state</option>
+        <option repeat.for="item of states" model.bind="item.id">${item.name}</option>
+      </select>
+    </div>
+
+     <div class="form-group">
+      <label for="local_government_area_id" class="control-label">Local Government Area</label>
+      <select id="local_government_area_id" class="form-control" value.bind="entity.profile.local_government_area_id">
+        <option value="">Select local government area</option>
+        <option repeat.for="item of local_government_areas" model.bind="item.id">${item.name}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="email" class="control-label">Email Address</label>
+      <input type="text" id="email" class="form-control disabled" value.bind="entity.email">
+    </div>
+
+    <div class="form-group">
+      <label for="phone_number" class="control-label">Phone Number</label>
+      <input type="text" id="phone_number" class="form-control" value.bind="entity.profile.phone_number">
+    </div>
+
+    <button type="submit" class="btn btn-default">Save Profile</button>
+
+
+
+
+  </form>
+  
+    </div>
+  </div>  
+</template>

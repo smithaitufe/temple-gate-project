@@ -1,0 +1,21 @@
+<template>
+  <div class="container">
+      <div class="row">
+        <div class="col-sm-4 col-sm-offset-4">
+
+           <div>
+            <div style="padding: 10px 10px 80px 20px; background-color: #ff0000">
+              <span style="color: #fafafa; font-size: 30pt">Programs</span>
+            </div>
+            <ul class="list-group">
+              <li repeat.for ="item of programs" class="list-group-item cursor-pointer">
+                <div style="font-size: 120%; font-weight: 700">${item.description}</div>
+                <small>${item.name}</small>
+              </li>
+            </ul>
+
+           </div>
+        </div>
+      </div>    
+  </div>
+</template>

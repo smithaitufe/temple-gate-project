@@ -1,5 +1,5 @@
 export const brand = "Temple Gate Polytechnic"; 
-export const restUrl =  "ttp://localhost:4000";
+export const restUrl =  "http://localhost:4000";
 export const siteUrl =  "http://127.0.0.1:9000";
 export const tokenName = "cupid16_t";
 export const recaptchaSiteKey = "6Ld1xSUTAAAAAGlo03e4qEIGpp6UcLlWYfrsbph9";

@@ -15,6 +15,7 @@ export { StateService } from './state-service';
 export { LocalGovernmentAreaService } from './local-government-area-service';
 export { ProgramApplicationService } from './program-application-service';
 export { ProgramAdvert } from './program-advert-service';
+export { TermService } from './term-service';
 
 
 
