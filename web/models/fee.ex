@@ -6,18 +6,20 @@ defmodule PortalApi.Fee do
     field :code, :string
     field :description, :string
     field :amount, :decimal
-    field :service_charge, :decimal
     belongs_to :program, Program
     belongs_to :level, Level
-    belongs_to :fee_category, Term
-    belongs_to :payer_category, Term
-    belongs_to :area_type, Term
+    belongs_to :fee_category, Term, foreign_key: :fee_category_id
+    belongs_to :payer_category, Term, foreign_key: :payer_category_id
+    belongs_to :service_charge, Term, foreign_key: :service_charge_id
+    field :is_catchment, :boolean
+    field :is_all, :boolean
+    
 
     timestamps
   end
 
-  @required_fields [:program_id, :level_id, :area_type_id, :payer_category_id, :fee_category_id, :code, :description, :amount, :service_charge]
-  @optional_fields []
+  @required_fields [:program_id, :level_id, :payer_category_id, :fee_category_id, :code, :description, :amount]
+  @optional_fields [:is_catchment, :is_all]
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -34,7 +36,7 @@ defmodule PortalApi.Fee do
 
   def associations do
     level_query = from l in PortalApi.Level, order_by: [asc: l.id]
-    [{:program, [levels: level_query]}, :level, :fee_category, :payer_category, :area_type]
+    [{:program, [levels: level_query]}, :level, :fee_category, :payer_category]
   end
 
 

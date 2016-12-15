@@ -11,13 +11,13 @@ defmodule PortalApi.V1.CourseEnrollmentView do
   end
 
   def render("course_enrollment.json", %{course_enrollment: course_enrollment}) do
-    %{id: course_enrollment.id,
+    %{
+      id: course_enrollment.id,
       course_id: course_enrollment.course_id,
-      enrolled_by_user_id: course_enrollment.enrolled_by_user_id,
+      user_id: course_enrollment.user_id,
       academic_session_id: course_enrollment.academic_session_id,
       graded: course_enrollment.graded
-    }
-
+      }
     |> Map.put(:enrolled_by, render_one(course_enrollment.enrolled_by, UserView, "user.json"))
     |> Map.put(:academic_session, render_one(course_enrollment.academic_session, AcademicSessionView, "academic_session.json"))
     |> Map.put(:course, render_one(course_enrollment.course, CourseView, "course.json"))

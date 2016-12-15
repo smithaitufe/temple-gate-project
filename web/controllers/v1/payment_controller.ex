@@ -1,17 +1,12 @@
 defmodule PortalApi.V1.PaymentController do
   use PortalApi.Web, :controller
-
   alias PortalApi.Payment
 
   plug :scrub_params, "payment" when action in [:create, :update]
 
   def index(conn, params) do
     payments = Payment
-    |> Ecto.Query.join(:inner, [sp], f in assoc(sp, :fee))
-    |> Ecto.Query.join(:inner, [sp, f], l in assoc(f, :level))
-    |> Ecto.Query.join(:inner, [sp, f, l], fc in assoc(f, :fee_category))
-    |> Ecto.Query.join(:inner, [sp, f, l, fc], pm in assoc(sp, :payment_method))
-    |> Ecto.Query.join(:inner, [sp, f, l, fc, pm], tr in assoc(sp, :transaction_response))
+    |> Ecto.Query.join(:inner, [sp], f in assoc(sp, :fee))    
     |> build_query(Map.to_list(params))
     |> Repo.all
     |> Repo.preload(Payment.associations)
@@ -70,49 +65,36 @@ defmodule PortalApi.V1.PaymentController do
     send_resp(conn, :no_content, "")
   end
 
-  defp build_query(query, [{"student_id", student_id} | tail]) do
+  defp build_query(query, [{"user_id", user_id} | tail]) do
     query
-    |> Ecto.Query.where([sp], sp.student_id == ^student_id)
+    |> Ecto.Query.where([p], p.user_id == ^user_id)
     |> build_query(tail)
   end
   defp build_query(query, [{"level_id", level_id} | tail]) do
     query
-    |> Ecto.Query.where([sp], sp.level_id == ^level_id)
+    |> Ecto.Query.where([p], p.level_id == ^level_id)
     |> build_query(tail)
-  end
-  defp build_query(query, [{"fee_description", fee_description} | tail]) do
-    query
-    |> Ecto.Query.join(:inner, [sp], f in assoc(sp, :fee))
-    |> Ecto.Query.where([sp, f], fragment("lower(?) = ?", f.description, type(^String.downcase(fee_description), :string)))
-    |> build_query(tail)
-  end
+  end  
   defp build_query(query, [{"fee_id", fee_id} | tail]) do
     query
-    |> Ecto.Query.where([sp], sp.fee_id == ^fee_id)
+    |> Ecto.Query.where([p, f], p.fee_id == ^fee_id)
     |> build_query(tail)
   end
   defp build_query(query, [{"fee_category_id", fee_category_id} | tail]) do
     query
-    |> Ecto.Query.where([f], f.fee_category_id == ^fee_category_id )
+    |> Ecto.Query.where([p, f], f.fee_category_id == ^fee_category_id )
     |> build_query(tail)
   end
-  defp build_query(query, [{"payment_method_id", payment_method_id} | tail]) do
+  defp build_query(query, [{"online", online} | tail]) do
     query
-    |> Ecto.Query.where([sp, f], sp.payment_method_id == ^payment_method_id )
+    |> Ecto.Query.where([p, f], p.online == ^online )
     |> build_query(tail)
   end
   defp build_query(query, [{"successful", successful} | tail]) do
     query
-    |> Ecto.Query.where([sp, f], sp.successful == ^successful )
+    |> Ecto.Query.where([p, f], p.successful == ^successful )
     |> build_query(tail)
   end
-  defp build_query(query, [{"transaction_response", transaction_response} | tail]) do
-    query
-    |> Ecto.Query.join(:inner, [sp], tr in assoc(sp, :transaction_response))
-    |> Ecto.Query.where([sp, tr], fragment("lower(?) = ?", tr.description, type(^String.downcase(transaction_response), :string)))
-    |> build_query(tail)
-  end
-  defp build_query(query, [{attr, value} | tail]), do: query
   defp build_query(query, []), do: query
 
 end

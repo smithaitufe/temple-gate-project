@@ -29,4 +29,8 @@ defmodule PortalApi.ProgramApplication do
     
   end
 
+  def associations do
+    [{:program, [:levels]},{ :department, [:faculty]}, :level, :entry_mode, :academic_session]
+  end
+
 end

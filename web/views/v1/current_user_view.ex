@@ -1,6 +1,6 @@
 defmodule PortalApi.V1.CurrentUserView do
   use PortalApi.Web, :view
-  alias PortalApi.V1.{UserRoleView, TermView, RoleView}
+  alias PortalApi.V1.{UserProfileView, UserRoleView, TermView, RoleView}
   def render("show.json", %{user: user}) do
     %{
       id: user.id,
@@ -9,6 +9,7 @@ defmodule PortalApi.V1.CurrentUserView do
       email: user.email     
     }
     |> Map.put(:roles, render_many(user.roles, RoleView, "role.json"))
+    |> Map.put(:profile, render_one(user.profile, UserProfileView, "user_profile.json"))
     
 
   end

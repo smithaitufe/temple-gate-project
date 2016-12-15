@@ -1,5 +1,5 @@
 import Ecto.Query
-alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Role, User, UserRole, CourseEnrollment,CourseEnrollmentAssessment,CourseGrading, Fee, Payment, TransactionResponse, Announcement, ProgramAdvert, ProgramApplication, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Posting, CourseTutor, LeaveDuration, LeaveRequest, Assignment, UserProfile}
+alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Role, User, UserRole, CourseEnrollment,CourseEnrollmentAssessment,CourseGrading, Fee, Payment, Announcement, ProgramAdvert, ProgramApplication, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Posting, CourseTutor, LeaveDuration, LeaveRequest, Assignment, UserProfile, ServiceCharge, ServiceChargeSplit}
 
 divider = " = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = "
 commit = fn(term_set, terms) ->
@@ -64,7 +64,7 @@ register_courses = fn (user) ->
   for course <- courses do
     course_params = %{
       course_id: course.id, 
-      enrolled_by_user_id: user.id, 
+      user_id: user.id, 
       academic_session_id: academic_session.id, 
       level_id: level.id
     }
@@ -94,8 +94,6 @@ term_sets = [
   %{ name: "user_category", display_name: "User Category" },
   %{ name: "fee_category", display_name: "Fee Category" },
   %{ name: "payer_category", display_name: "Payer Category" },
-  %{ name: "area_type", display_name: "Area Type" },
-  %{ name: "payment_method", display_name: "Payment Method" },
   %{ name: "entry_mode", display_name: "Entry Mode" },
   %{ name: "grade_change_request_reason", display_name: "Grade Change Request Reason" },
   %{ name: "leave_type", display_name: "Leave Type" },
@@ -196,15 +194,6 @@ terms = [
   %{description: "NABTEB"}
 ]
 commit.(term_set, terms)
-
-term_set = TermSet |> Repo.get_by(name: "payment_method")
-terms = [
-  %{description: "WebPAY"},
-  %{description: "Bank"}
-]
-commit.(term_set, terms)
-
-
 
 term_set = TermSet |> Repo.get_by(name: "semester")
 terms = [
@@ -338,11 +327,7 @@ commit.(term_set, terms)
   %{name: "Applicant", description: "Applicant"}
 
 ]
-|> Enum.each(&(
-%Role{}
-|> Role.changeset(&1)
-|> Repo.insert()
-))
+|> Enum.each(&(%Role{} |> Role.changeset(&1) |> Repo.insert()))
 
 term_set = TermSet |> Repo.get_by(name: "payer_category")
 terms =[
@@ -360,15 +345,6 @@ terms =[
   %{description: "Departmental"}
 ]
 commit.(term_set, terms)
-
-term_set = TermSet |> Repo.get_by(name: "area_type")
-terms =[
-  %{description: "Catchment"},
-  %{description: "Non-Catchment"},
-  %{description: "All"}
-]
-commit.(term_set, terms)
-
 
 term_set = TermSet |> Repo.get_by(name: "allowance")
 terms = [
@@ -2651,59 +2627,253 @@ user = Repo.get_by!(User, [email: "jun.gospel@walden.edu.ng"])
 |> CourseTutor.changeset(%{course_id:  course.id, tutor_user_id: user.id, academic_session_id: academic_session.id, assigned_by_user_id: staff_2_user.id})
 |> Repo.insert!
 
+
+
+[
+  %{
+    amount: 500, 
+    program_id: Repo.get_by(Program, [name: "ND"]).id, 
+    payer_category_id: get_term.("Applicant", "payer_category").id,
+    fee_category_id: get_term.("Form", "fee_category").id,
+    active: true    
+   },
+   %{
+    amount: 750, 
+    program_id: Repo.get_by(Program, [name: "HND"]).id, 
+    payer_category_id: get_term.("Applicant", "payer_category").id,
+    active: true    
+   },
+   %{
+    amount: 1500, 
+    program_id: Repo.get_by(Program, [name: "ND"]).id, 
+    payer_category_id: get_term.("Student", "payer_category").id,
+    active: true    
+   },
+  %{
+    amount: 2000, 
+    program_id: Repo.get_by(Program, [name: "HND"]).id, 
+    payer_category_id: get_term.("Student", "payer_category").id,
+    active: true    
+   }
+] |> Enum.each(fn service_charge -> ServiceCharge.changeset(%ServiceCharge{}, service_charge) |> Repo.insert! end)
+
+[
+  %{
+    amount: 246.25, 
+    name: "Temple Gate Polytechnic",
+    bank_code: "104", 
+    account: "00000000", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "ND"]).id, payer_category_id: get_term.("Applicant", "payer_category").id]).id
+  },
+  %{
+    amount: 100.00,
+    name: "Aitufe Smith", 
+    bank_code: "107", 
+    account: "2084146108", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "ND"]).id, payer_category_id: get_term.("Applicant", "payer_category").id]).id
+  },
+   %{
+    amount: 100.00,
+    name: "Tobi", 
+    bank_code: "107", 
+    account: "2084146100", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "ND"]).id, payer_category_id: get_term.("Applicant", "payer_category").id]).id
+  },
+  %{
+    amount: 46.25,
+    name: "Accelerar", 
+    bank_code: "107", 
+    account: "2084146111", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "ND"]).id, payer_category_id: get_term.("Applicant", "payer_category").id]).id
+  },
+  %{
+    amount: 369.4, 
+    name: "Temple Gate Polytechnic",
+    bank_code: "104", 
+    account: "00000000", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "HND"]).id, payer_category_id: get_term.("Applicant", "payer_category").id]).id
+  },
+  %{
+    amount: 120.00,
+    name: "Aitufe Smith", 
+    bank_code: "107", 
+    account: "2084146108", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "HND"]).id, payer_category_id: get_term.("Applicant", "payer_category").id]).id
+  },
+   %{
+    amount: 120.00,
+    name: "Tobi", 
+    bank_code: "107", 
+    account: "2084146100", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "HND"]).id, payer_category_id: get_term.("Applicant", "payer_category").id]).id
+  },
+  %{
+    amount: 129.4,
+    name: "Accelerar", 
+    bank_code: "107", 
+    account: "2084146111", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "HND"]).id, payer_category_id: get_term.("Applicant", "payer_category").id]).id
+  },
+  %{
+    amount: 600.00, 
+    name: "Temple Gate Polytechnic",
+    bank_code: "104", 
+    account: "00000000", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "ND"]).id, payer_category_id: get_term.("Student", "payer_category").id]).id
+  },
+  %{
+    amount: 250.00,
+    name: "Aitufe Smith", 
+    bank_code: "107", 
+    account: "2084146108", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "ND"]).id, payer_category_id: get_term.("Student", "payer_category").id]).id
+  },
+   %{
+    amount: 260.00,
+    name: "Tobi", 
+    bank_code: "107", 
+    account: "2084146100", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "ND"]).id, payer_category_id: get_term.("Student", "payer_category").id]).id
+  },
+  %{
+    amount: 90,
+    name: "Accelerar", 
+    bank_code: "107", 
+    account: "2084146111", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "ND"]).id, payer_category_id: get_term.("Student", "payer_category").id]).id
+  },
+  %{
+    amount: 850, 
+    name: "Temple Gate Polytechnic",
+    bank_code: "104", 
+    account: "00000000", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "HND"]).id, payer_category_id: get_term.("Student", "payer_category").id]).id
+  },
+  %{
+    amount: 320.00,
+    name: "Aitufe Smith", 
+    bank_code: "107", 
+    account: "2084146108", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "HND"]).id, payer_category_id: get_term.("Student", "payer_category").id]).id
+  },
+   %{
+    amount: 350.00,
+    name: "Tobi", 
+    bank_code: "107", 
+    account: "2084146100", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "HND"]).id, payer_category_id: get_term.("Student", "payer_category").id]).id
+  },
+  %{
+    amount: 180,
+    name: "Accelerar", 
+    bank_code: "107", 
+    account: "2084146111", 
+    is_required: true, 
+    service_charge_id: Repo.get_by(ServiceCharge, [program_id: Repo.get_by(Program, [name: "HND"]).id, payer_category_id: get_term.("Student", "payer_category").id]).id
+  }
+]
+|> Enum.each(fn service_charge_split -> ServiceChargeSplit.changeset(%ServiceChargeSplit{}, service_charge_split) |> Repo.insert! end)
+
 [
   %{
     code: "200", 
     description: "ND Application Fee", 
     amount: 2000, 
-    service_charge: 1000, program_id: Repo.get_by(Program, [name: "ND"]).id, 
-    area_type_id: get_term.("All", "area_type").id, 
+    program_id: Repo.get_by(Program, [name: "ND"]).id, 
+    is_all: true, 
     payer_category_id: get_term.("Applicant", "payer_category").id, 
     fee_category_id: get_term.("Form", "fee_category").id,
     level_id: Repo.get_by(Level, [description: "ND I"]).id
-
     },
   %{
     code: "201", 
     description: "HND Application Fee", 
     amount: 8000, 
-    service_charge: 1000, 
     program_id: Repo.get_by(Program, [name: "HND"]).id, 
     level_id: Repo.get_by(Level, [description: "HND I"]).id,
-    area_type_id: get_term.("All", "area_type").id, 
+    is_all: true, 
     payer_category_id: get_term.("Applicant", "payer_category").id, 
     fee_category_id: get_term.("Form", "fee_category").id 
     },
   %{
-    code: "202", description: "ND Acceptance Fee", amount: 10000, service_charge: 1000, 
+    code: "202", description: "ND Acceptance Fee", amount: 10000, 
     program_id: Repo.get_by(Program, [name: "ND"]).id, 
-    level_id: Repo.get_by(Level, [description: "ND I"]).id,
-    area_type_id: get_term.("Non-Catchment", "area_type").id, 
-    payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Form", "fee_category").id
+    level_id: Repo.get_by(Level, [description: "ND I"]).id, 
+    is_all: true,
+    payer_category_id: get_term.("Student", "payer_category").id,
+    fee_category_id: get_term.("Form", "fee_category").id
     },
   %{
     code: "203", description: "HND Acceptance Fee", 
     amount: 14000, service_charge: 1000, program_id: Repo.get_by(Program, [name: "HND"]).id, 
-    level_id: Repo.get_by(Level, [description: "HND I"]).id,
-    area_type_id: get_term.("Non-Catchment", "area_type").id, 
+    level_id: Repo.get_by(Level, [description: "HND I"]).id,     
     payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Form", "fee_category").id 
     },
-  %{code: "204", description: "ND I School Fee", amount: 24000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "205", description: "ND I School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "206", description: "ND II School Fee", amount: 23000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "207", description: "ND II School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "208", description: "HND I School Fee", amount: 29000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "209", description: "HND I School Fee", amount: 32000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "210", description: "HND II School Fee", amount: 34500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "211", description: "HND II School Fee", amount: 37500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "212", description: "ND I School Fee", amount: 24000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "213", description: "ND II School Fee", amount: 23000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "214", description: "HND I School Fee", amount: 29000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "216", description: "HND II School Fee", amount: 34500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  area_type_id: get_term.("Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "219", description: "ND I School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "220", description: "ND II School Fee", amount: 27000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "221", description: "HND I School Fee", amount: 32000, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
-  %{code: "222", description: "HND II School Fee", amount: 37500, service_charge: 1500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  area_type_id: get_term.("Non-Catchment", "area_type").id, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id }
+  %{
+    code: "204", description: "ND I School Fee", 
+    amount: 24000, 
+    program_id: Repo.get_by(Program, [name: "ND"]).id, 
+    level_id: Repo.get_by(Level, [description: "ND I"]).id,  
+    is_catchment: true, 
+    payer_category_id: get_term.("Student", "payer_category").id, 
+    fee_category_id: get_term.("Tuition", "fee_category").id
+  },
+  %{
+    code: "205", description: "ND I School Fee", 
+    amount: 27000, 
+    program_id: Repo.get_by(Program, [name: "ND"]).id, 
+    level_id: Repo.get_by(Level, [description: "ND I"]).id,
+    payer_category_id: get_term.("Student", "payer_category").id, 
+    fee_category_id: get_term.("Tuition", "fee_category").id
+  },
+  %{
+    code: "206", 
+    description: "ND II School Fee", amount: 23000,     
+    program_id: Repo.get_by(Program, [name: "ND"]).id, 
+    level_id: Repo.get_by(Level, [description: "ND II"]).id,  
+    is_catchment: true, payer_category_id: get_term.("Student", "payer_category").id, 
+    fee_category_id: get_term.("Tuition", "fee_category").id 
+  },
+  %{
+    code: "207", description: "ND II School Fee", 
+    amount: 27000, program_id: Repo.get_by(Program, [name: "ND"]).id, 
+    level_id: Repo.get_by(Level, [description: "ND II"]).id,
+    payer_category_id: get_term.("Student", "payer_category").id, 
+    fee_category_id: get_term.("Tuition", "fee_category").id 
+  },
+  %{
+    code: "208", 
+    description: "HND I School Fee", 
+    amount: 29000, 
+    program_id: Repo.get_by(Program, [name: "HND"]).id, 
+    level_id: Repo.get_by(Level, [description: "HND I"]).id,  
+    is_catchment: true, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "209", description: "HND I School Fee", amount: 32000, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,   payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "210", description: "HND II School Fee", amount: 34500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  is_catchment: true, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "211", description: "HND II School Fee", amount: 37500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,   payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "212", description: "ND I School Fee", amount: 24000, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,  is_catchment: true, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "213", description: "ND II School Fee", amount: 23000, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,  is_catchment: true, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "214", description: "HND I School Fee", amount: 29000, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,  is_catchment: true, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "216", description: "HND II School Fee", amount: 34500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,  is_catchment: true, payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "219", description: "ND I School Fee", amount: 27000, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND I"]).id,   payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "220", description: "ND II School Fee", amount: 27000, program_id: Repo.get_by(Program, [name: "ND"]).id, level_id: Repo.get_by(Level, [description: "ND II"]).id,   payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "221", description: "HND I School Fee", amount: 32000, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND I"]).id,   payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id },
+  %{code: "222", description: "HND II School Fee", amount: 37500, program_id: Repo.get_by(Program, [name: "HND"]).id, level_id: Repo.get_by(Level, [description: "HND II"]).id,   payer_category_id: get_term.("Student", "payer_category").id, fee_category_id: get_term.("Tuition", "fee_category").id }
 ]
 |> Enum.each(fn fee -> 
     case Repo.get_by(Fee, code: fee.code) do
@@ -2712,49 +2882,12 @@ user = Repo.get_by!(User, [email: "jun.gospel@walden.edu.ng"])
     end
   end)
 
-[
-  %{code: "Z4", description: "Interface Integration Error"},
-  %{code: "51", description: "Insufficient Funds"},
-  %{code: "41", description: "Lost(Card, Pick - Up)"},
-  %{code: "Z6", description: "Incomplete(Transaction)"},
-  %{code: "Z1", description: "Incorrect PIN"},
-  %{code: "59", description: "Suspected Fraud"},
-  %{code: "54", description: "Expired Card"},
-  %{code: "00", description: "Approved Successful"},
-  %{code: "91", description: "Issuer or Switch Inoperative"},
-  %{code: "59", description: "Unable to process CVV2"},
-  %{code: "Z5", description: "Duplicate Reference Error"},
-  %{code: "00", description: "Approved Successfuf"},
-  %{code: "57", description: "Transaction not permitted to Cardholder"},
-  %{code: "Z6", description: "Customer cancellation"},
-  %{code: "04", description: "Pick-up card"},
-  %{code: "43", description: "Stolen Card, Pick-Up"},
-  %{code: "Z2", description: "Bank account error"},
-  %{code: "61", description: "Exceeds Withdrawal Limit"},
-  %{code: "Z0", description: "Transaction Status Unconfirmed"}
-]
-|> Enum.each(
-  fn transaction_response -> 
-    case Repo.get_by(TransactionResponse,[code: transaction_response[:code]]) do
-      nil -> TransactionResponse.changeset(%TransactionResponse{}, transaction_response) |> Repo.insert!
-      _ -> IO.inspect "Duplicate"
-    end
-  end
-)
-
 user_name = "DS151690003477"
 student = Repo.get_by(User, email: "brown.fish@walden.edu.ng")
 
 fee = Repo.get_by(Fee, code: "212")
-payment_method = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"WebPAY" and ts.name == ^"payment_method")
 academic_session = Repo.get_by(AcademicSession, active: true)
-transaction_response = Repo.get_by(TransactionResponse, [code: "00"])
-
-
-
-
-payment_params = %{paid_by_user_id: student.id, fee_id: fee.id, amount: fee.amount, service_charge: fee.service_charge, payment_method_id: payment_method.id, successful: true, transaction_response_id: transaction_response.id, academic_session_id: academic_session.id}
-Payment.changeset(%Payment{}, payment_params) |> Repo.insert!
+Payment.changeset(%Payment{}, %{user_id: student.id, fee_id: fee.id, amount: fee.amount, service_charge: 1500, online: true, successful: true, academic_session_id: academic_session.id, payment_date: "2016-12-11 22:21:34"}) |> Repo.insert!
 
 academic_session = Repo.get_by(AcademicSession, active: true)
 program = Repo.get_by(Program, name: "ND")
@@ -2788,8 +2921,6 @@ program_id = Program
 %ProgramAdvert{}
 |> ProgramAdvert.changeset(%{academic_session_id: academic_session_id, program_id: program_id, closing_date: "2016-07-25", opening_date: "2016-07-20", active: true })
 |> Repo.insert()
-
-
 
 %JobPosting{}
 |> JobPosting.changeset(%{opening_date: "2016-05-21", closing_date: "2016-08-21", active: true, application_method: "<p>Interested applicants should forward their applications together with fifteen (15) copies of detailed curriculum vitae stating among others, qualification, work experience, present employment, rank, Local Government of origin, extracurricular activities and names of three (3) referees.</p><p>All applications, which should be in sealed envelopes labeled <b>APPLICATION FOR THE POST OF WALDEN POLYTECHNIC, ABUJA</b>, are to be forwarded to:</p><p><b>The Registrar,<br>
@@ -2857,4 +2988,6 @@ course_tutor = %{"course_id": course_id, "tutor_user_id": tutor_user_id } = Repo
 |> Enum.each(fn question ->
     Assignment.changeset(%Assignment{}, %{course_id: course_id, assigned_by_user_id: user_1.id, academic_session_id: academic_session.id, question: question, start_date: "2016-11-20", start_time: "12:00:00", stop_date: "2016-11-22", stop_time: "12:00:00" })
           |> Repo.insert!
-        end)
+end)
+
+

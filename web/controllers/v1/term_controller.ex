@@ -5,15 +5,9 @@ defmodule PortalApi.V1.TermController do
 
   plug :scrub_params, "term" when action in [:create, :update]
 
-
-  # def index(conn, %{"name" => name}) do
-  #   query = from t in Term, join: ts in assoc(t, :term_set), where: ts.name == ^name
-  #   terms = Repo.all query
-  #   render(conn, "index.json", terms: terms)
-  # end
   def index(conn, params) do
     terms = Term
-    |> build_term_query(Map.to_list(params))
+    |> build_query(Map.to_list(params))
     |> Repo.all
 
     render(conn, "index.json", terms: terms)
@@ -65,24 +59,23 @@ defmodule PortalApi.V1.TermController do
   end
 
 
-  defp build_term_query(query, [{"name", name} | tail]) do
+  defp build_query(query, [{"name", name} | tail]) do
     query
     |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set))
     |> Ecto.Query.where([t, ts], ts.name == ^name)
-    |> build_term_query(tail)
+    |> build_query(tail)
   end
-  defp build_term_query(query, [{"description", description} | tail]) do
+  defp build_query(query, [{"description", description} | tail]) do
     query
     |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set))
     |> Ecto.Query.where([t, ts], fragment("lower(?) = ?", t.description, ^String.downcase(description)))
-    |> build_term_query(tail)
+    |> build_query(tail)
   end
-  defp build_term_query(query, [{"term_set_id", term_set_id} | tail]) do
-    query
-    # |> Ecto.Query.join(:inner, [t], ts in assoc(t, :term_set))
+  defp build_query(query, [{"term_set_id", term_set_id} | tail]) do
+    query    
     |> Ecto.Query.where([t], t.term_set_id == ^term_set_id)
-    |> build_term_query(tail)
+    |> build_query(tail)
   end
-  defp build_term_query(query, []), do: query
+  defp build_query(query, []), do: query
 
 end

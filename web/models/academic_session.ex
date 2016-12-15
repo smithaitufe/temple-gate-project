@@ -24,4 +24,14 @@ defmodule PortalApi.AcademicSession do
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
   end
+
+  def active(query) do
+    query
+    |> where([query], query.active == true)    
+  end
+  def sorted(query, field) do
+    query
+    |> order_by([query], [asc: ^String.to_existing_atom(field)])
+  end
+ 
 end

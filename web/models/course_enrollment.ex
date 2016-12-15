@@ -4,7 +4,7 @@ defmodule PortalApi.CourseEnrollment do
   schema "course_enrollments" do
     belongs_to :course, PortalApi.Course, foreign_key: :course_id
     belongs_to :level, PortalApi.Level, foreign_key: :level_id
-    belongs_to :enrolled_by, PortalApi.User, foreign_key: :enrolled_by_user_id
+    belongs_to :user, PortalApi.User, foreign_key: :user_id
     belongs_to :academic_session, PortalApi.AcademicSession, foreign_key: :academic_session_id
     field :graded, :boolean, default: false
     
@@ -15,7 +15,7 @@ defmodule PortalApi.CourseEnrollment do
     timestamps
   end
 
-  @required_fields [:enrolled_by_user_id, :course_id, :level_id, :academic_session_id]
+  @required_fields [:user_id, :course_id, :level_id, :academic_session_id]
   @optional_fields [:graded]
 
   @doc """
@@ -48,15 +48,4 @@ defmodule PortalApi.CourseEnrollment do
       :course_grading, {:assessments, [:assessment_type]}
     ]
   end
-
-
-  def filter_by(query, {"student", value}) do
-    from [q, c, s, a] in query,
-    where: q.student_id == ^value
-  end
-  def filter_by(query, {"level", value}) do
-    from [q, c, s, a] in query,
-    where: c.level_id == ^value
-  end
-
 end

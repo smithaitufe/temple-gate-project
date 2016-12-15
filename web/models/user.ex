@@ -21,9 +21,9 @@ defmodule PortalApi.User do
     
     has_many :certificates, PortalApi.Certificate, foreign_key: :user_id
     has_many :program_applications, PortalApi.ProgramApplication, foreign_key: :applicant_user_id
-    has_many :course_enrollments, PortalApi.CourseEnrollment, foreign_key: :enrolled_by_user_id    
+    has_many :course_enrollments, PortalApi.CourseEnrollment, foreign_key: :user_id    
     has_many :courses, through: [:course_enrollments, :course]       
-    has_many :payments, PortalApi.Payment, foreign_key: :paid_by_user_id
+    has_many :payments, PortalApi.Payment, foreign_key: :user_id
     has_many :user_roles, PortalApi.UserRole, foreign_key: :user_id
     has_many :roles, through: [:user_roles, :role]
 

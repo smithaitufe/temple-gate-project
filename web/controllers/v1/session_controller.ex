@@ -24,7 +24,7 @@ defmodule PortalApi.V1.SessionController do
   defp check_password(conn, password, user) do
     if Comeonin.Bcrypt.checkpw(password, user.encrypted_password) do
           {:ok, token, _} = Guardian.encode_and_sign(user, :api)
-          user = user |> Repo.preload([:roles])
+          user = user |> Repo.preload([:roles, {:profile, PortalApi.UserProfile.associations}])
           render(conn, "show.json", user: user, token: token)
         else
           login_failed(conn)

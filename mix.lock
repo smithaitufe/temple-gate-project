@@ -34,6 +34,7 @@
   "postgrex": {:hex, :postgrex, "0.12.0", "bdeeb4c42768c47c3c92228e66c70357fe9a9384fbc9de06abba774b22dd0635", [:mix], [{:connection, "~> 1.0", [hex: :connection, optional: false]}, {:db_connection, "~> 1.0-rc.4", [hex: :db_connection, optional: false]}, {:decimal, "~> 1.0", [hex: :decimal, optional: false]}]},
   "ranch": {:hex, :ranch, "1.2.1", "a6fb992c10f2187b46ffd17ce398ddf8a54f691b81768f9ef5f461ea7e28c762", [:make], []},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.1", "28a4d65b7f59893bc2c7de786dec1e1555bd742d336043fe644ae956c3497fbe", [:make, :rebar], []},
+  "sweet_xml": {:hex, :sweet_xml, "0.6.2", "8f8aadd902dcc62fb85b7a308bb6a083874e97eb51ccddaf855d97c8ffad7d64", [:mix], []},
   "timex": {:hex, :timex, "2.1.6", "2c59cd03074bccea47acd668c4dd6aad269879bcc9d6d4dd98fe0ffbaf48fcaa", [:mix], [{:combine, "~> 0.7", [hex: :combine, optional: false]}, {:gettext, "~> 0.10", [hex: :gettext, optional: false]}, {:tzdata, "~> 0.1.8 or ~> 0.5", [hex: :tzdata, optional: false]}]},
   "timex_ecto": {:hex, :timex_ecto, "1.0.4", "9ce697dcd96777093640500cbfcfde8dbea362884f229b15859acec25a7d0202", [:mix], [{:ecto, "~> 1.1 or ~> 2.0", [hex: :ecto, optional: false]}, {:timex, "~> 2.1", [hex: :timex, optional: false]}]},
   "tzdata": {:hex, :tzdata, "0.5.9", "575be217b039057a47e133b72838cbe104fb5329b19906ea4e66857001c37edb", [:mix], [{:hackney, "~> 1.0", [hex: :hackney, optional: false]}]},

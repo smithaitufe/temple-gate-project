@@ -21,5 +21,7 @@ defmodule PortalApi.V1.ProgramApplicationView do
       academic_session_id: program_application.academic_session_id,
       is_admitted: program_application.is_admitted,
       active: program_application.active}
+      |> Map.put(:program, render_one(program_application.program, PortalApi.V1.ProgramView, "program.json"))
+      |> Map.put(:department, render_one(program_application.department, PortalApi.V1.DepartmentView, "department.json"))
   end
 end

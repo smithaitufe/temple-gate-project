@@ -46,7 +46,8 @@ defmodule PortalApi.Mixfile do
      {:arc, "~> 0.5.2"},
      {:arc_ecto, "~> 0.4.4"},
      {:phoenix_swagger, "~> 0.1.6"},
-     {:httpoison, "~> 0.10.0"}
+     {:httpoison, "~> 0.10.0"},
+     {:sweet_xml, "0.6.2"}
      
    ]
   end

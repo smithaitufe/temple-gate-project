@@ -18,7 +18,8 @@ defmodule PortalApi.V1.UserProfileView do
       gender_id: user_profile.gender_id,
       marital_status_id: user_profile.marital_status_id,
       phone_number: user_profile.phone_number,
-      user_id: user_profile.user_id
+      user_id: user_profile.user_id,
+      local_government_area_id: user_profile.local_government_area_id
     }      
     |> Map.put(:marital_status, render_one(user_profile.marital_status, TermView, "term.json"))
     |> Map.put(:gender, render_one(user_profile.gender, TermView, "term.json"))

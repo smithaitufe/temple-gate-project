@@ -29,4 +29,8 @@ defmodule PortalApi.UserProfile do
     
   end
 
+  def associations do
+    [{:local_government_area, :state},:marital_status, :gender]
+  end
+
 end

@@ -11,10 +11,7 @@ defmodule PortalApi.V1.PaymentView do
 
   def render("payment.json", %{payment: payment}) do
     render("payment_lite.json", payment: payment)
-    |> Map.put(:fee, render_one(payment.fee, PortalApi.V1.FeeView, "fee.json"))
-    |> Map.put(:payment_method, render_one(payment.payment_method, PortalApi.V1.TermView, "term.json"))
-    # |> Map.put(:payment_status, render_one(payment.payment_status, PortalApi.V1.TermView, "term.json"))
-    |> Map.put(:transaction_response, render_one(payment.transaction_response, PortalApi.V1.TransactionResponseView, "transaction_response.json"))
+    |> Map.put(:fee, render_one(payment.fee, PortalApi.V1.FeeView, "fee.json"))       
     |> Map.put(:academic_session, render_one(payment.academic_session, PortalApi.V1.AcademicSessionView, "academic_session.json"))  
 
   end
@@ -22,21 +19,24 @@ defmodule PortalApi.V1.PaymentView do
   def render("payment_lite.json", %{payment: payment}) do
     %{
       id: payment.id,
-      paid_by_user_id: payment.paid_by_user_id,
-      transaction_no: payment.transaction_no,
+      user_id: payment.user_id,
+      transaction_reference_no: payment.transaction_reference_no,
       fee_id: payment.fee_id,
       amount: payment.amount,
-      service_charge: payment.service_charge,
-      payment_status_id: payment.payment_status_id,
-      payment_method_id: payment.payment_method_id,
-      transaction_response_id: payment.transaction_response_id,
+      service_charge: payment.service_charge,     
       academic_session_id: payment.academic_session_id,
       inserted_at: payment.inserted_at,
-
       response_code: payment.response_code,
       response_description: payment.response_description,
       payment_reference_no: payment.payment_reference_no,
-      merchant_reference_no: payment.merchant_reference_no
+      merchant_reference_no: payment.merchant_reference_no,
+      payment_date: payment.payment_date,
+      settlement_date: payment.settlement_date,
+      receipt_no: payment.receipt_no,
+      online: payment.online,
+      successful: payment.successful
+
+
     }
   end
 end

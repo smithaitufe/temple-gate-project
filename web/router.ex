@@ -27,19 +27,21 @@ defmodule PortalApi.Router do
 
     scope "/v1", V1, as: :v1 do
 
-      post "/remitas", RemitaController, :create
+      scope "/interswitch", Interswitch, as: :interswitch do
+          post "/webpay", WebPayController, :create
+          post "/customer", CustomerController, :show
+          post "/payment", PaymentController, :create 
+      end
+
       resources "/roles", RoleController, except: [:new, :edit]
       resources "/users", UserController, except: [:new, :edit]
       resources "/user_profiles", UserProfileController, except: [:new, :edit]
-      resources "/user_roles", UserRoleController, except: [:new, :edit]
-      
+      resources "/user_roles", UserRoleController, except: [:new, :edit]      
       post "/sessions", SessionController, :create
       delete "/sessions", SessionController, :delete
       get "/current_user", CurrentUserController, :show
-
       resources "/term_sets", TermSetController, except: [:new, :edit]
-      resources "/terms", TermController, except: [:new, :edit]
-      resources "/transaction_responses", TransactionResponseController, except: [:new, :edit]
+      resources "/terms", TermController, except: [:new, :edit]      
       resources "/states", StateController, except: [:new, :edit]
       resources "/local_government_areas", LocalGovernmentAreaController, except: [:new, :edit]
       resources "/jamb_records", JambRecordController, except: [:new, :edit]
@@ -51,9 +53,7 @@ defmodule PortalApi.Router do
       resources "/academic_qualifications", AcademicQualificationController, except: [:new, :edit]
       resources "/program_applications", ProgramApplicationController, except: [:new, :edit]
       resources "/salary_grade_levels", SalaryGradeLevelController, except: [:new, :edit]
-      resources "/salary_grade_steps", SalaryGradeStepController, except: [:new, :edit]
-      
-      
+      resources "/salary_grade_steps", SalaryGradeStepController, except: [:new, :edit]      
       # Faculty Module
       resources "/programs", ProgramController, except: [:new, :edit]
       resources "/program_adverts", ProgramAdvertController, except: [:new, :edit]
@@ -64,28 +64,21 @@ defmodule PortalApi.Router do
       resources "/department_heads", DepartmentHeadController, except: [:new, :edit]
       resources "/program_departments", ProgramDepartmentController, except: [:new, :edit]
       resources "/academic_sessions", AcademicSessionController, except: [:new, :edit]
-      resources "/assignments", AssignmentController, except: [:new, :edit]
-      
+      resources "/assignments", AssignmentController, except: [:new, :edit]      
       resources "/jobs", JobController, except: [:new, :edit]
       resources "/job_postings", JobPostingController, except: [:new, :edit]
       resources "/job_titles", JobTitleController, except: [:new, :edit]            
-      resources "/postings", PostingController, except: [:new, :edit]
-      
+      resources "/postings", PostingController, except: [:new, :edit]      
       resources "/leave_durations", LeaveDurationController, except: [:new, :edit]      
-      resources "/leave_requests", LeaveRequestController, except: [:new, :edit]
-
-      
+      resources "/leave_requests", LeaveRequestController, except: [:new, :edit]      
       resources "/grades", GradeController, except: [:new, :edit]
       resources "/grade_change_requests", GradeChangeRequestController, except: [:new, :edit]
-
       resources "/courses", CourseController, except: [:new, :edit]
-      resources "/course_tutors", CourseTutorController, except: [:new, :edit]      
-      
+      resources "/course_tutors", CourseTutorController, except: [:new, :edit]            
       resources "/fees", FeeController, except: [:new, :edit]
       resources "/payments", PaymentController, except: [:new, :edit]
       resources "/payment_items", PaymentItemController, except: [:new, :edit]
-      
-      
+      resources "/service_charge_splits", ServiceChargeSplitController, except: [:new, :edit]      
       resources "/course_registration_settings", CourseRegistrationSettingController, except: [:new, :edit]
       resources "/course_enrollments", CourseEnrollmentController, except: [:new, :edit]
       resources "/course_enrollment_assessments", CourseEnrollmentAssessmentController, except: [:new, :edit]

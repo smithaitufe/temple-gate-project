@@ -3,25 +3,27 @@ defmodule PortalApi.Payment do
 
   schema "payments" do
 
-    field :transaction_no, :string
+    field :transaction_reference_no, :string
     field :amount, :decimal
     field :service_charge, :decimal
     field :successful, :boolean, default: false
-    belongs_to :paid_by, PortalApi.User, foreign_key: :paid_by_user_id
-    belongs_to :fee, PortalApi.Fee
-    belongs_to :payment_method, PortalApi.Term
-    belongs_to :transaction_response, PortalApi.TransactionResponse
+    field :online, :boolean, default: false
+    belongs_to :user, PortalApi.User, foreign_key: :user_id
+    belongs_to :fee, PortalApi.Fee    
     belongs_to :academic_session, PortalApi.AcademicSession
     field :response_description, :string
     field :response_code, :string
     field :payment_reference_no, :string
     field :merchant_reference_no, :string
+    field :receipt_no, :string
+    field :payment_date, :string
+    field :settlement_date, :string
 
     timestamps
   end
 
-  @required_fields [:paid_by_user_id, :academic_session_id, :fee_id, :amount, :service_charge, :payment_method_id, :transaction_response_id]
-  @optional_fields [:transaction_no, :successful]
+  @required_fields [:user_id, :academic_session_id, :fee_id, :amount, :service_charge, :payment_date]
+  @optional_fields [:transaction_reference_no, :successful, :online, :receipt_no, :payment_reference_no, :merchant_reference_no, :response_code, :response_description, :settlement_date, :site_redirect_url]
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -33,22 +35,27 @@ defmodule PortalApi.Payment do
     struct
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
-    |> generate_transaction_no()
+    |> generate_transaction_reference_no()
   end
 
 
   def associations do
     [
-      {:user, [:program, {:department, [:faculty]}, :level, :marital_status, :gender]},
-      :transaction_response, :academic_session, {:fee, [:level, {:program, [:levels]}] }, :payment_method
+      {
+        :user, [
+        {:profile, [:marital_status, :gender]},                
+        ]
+      },
+      {:fee, [:payer_category, :fee_category, :level, {:program, [:levels]}] },
+      :academic_session
     ]
   end
-  defp generate_transaction_no(changeset) do
-    case get_change(changeset, :transaction_no) do
+  defp generate_transaction_reference_no(changeset) do
+    case get_change(changeset, :transaction_reference_no) do
         nil ->
             :random.seed(:os.timestamp)
-            transaction_no = Stream.repeatedly(fn -> trunc(:random.uniform * 10) end ) |> Enum.take(8) |> Enum.join
-            put_change(changeset, :transaction_no, transaction_no)
+            transaction_reference_no = Stream.repeatedly(fn -> trunc(:random.uniform * 10) end ) |> Enum.take(10) |> Enum.join
+            put_change(changeset, :transaction_reference_no, transaction_reference_no)
 
         _ -> changeset
     end

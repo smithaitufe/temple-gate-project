@@ -3,8 +3,12 @@ defmodule PortalApi.V1.ProgramApplicationController do
 
   alias PortalApi.ProgramApplication
 
-  def index(conn, _params) do
-    program_applications = Repo.all(ProgramApplication)
+  def index(conn, params) do
+    program_applications = ProgramApplication
+    |> build_query(Map.to_list(params))
+    |> Repo.all()
+    |> Repo.preload(ProgramApplication.associations)
+
     render(conn, "index.json", program_applications: program_applications)
   end
 
@@ -52,4 +56,16 @@ defmodule PortalApi.V1.ProgramApplicationController do
 
     send_resp(conn, :no_content, "")
   end
+
+
+  defp build_query(query, []) do
+    query
+  end
+  defp build_query(query, [{"user_id", user_id} | tail ]) do
+    query
+    |> Ecto.Query.where([program_application], program_application.user_id == ^user_id)
+    |> build_query(tail)
+
+  end
+
 end
