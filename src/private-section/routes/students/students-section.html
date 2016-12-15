@@ -1,19 +1,18 @@
 <template>
   <div class="row">
-    <div class="col-sm-3">
-      ${program_applications | stringify }
+    <div class="col-sm-3">      
       <div class="sidebar-wrapper">
         <div class="programs">
-          <select name="program_application" id="program_application" class="form-control input-sm">
-            <option repeat.for="item of program_applications" model.bind="item">${item.program.name} - ${item.department.name} </option>
+          <select name="program_application" id="program_application" class="form-control input-sm" value.bind="program_application" change.delegate="programApplicationChanged()">
+            <option repeat.for="item of program_applications" model.bind="item">${item.program.name} - ${item.department.name}</option>
           </select>
         </div>
         <div class="sidebar">
-
+          <require from="./sidebar"></require>
+          <sidebar mapper.bind="routeMapper" router.bind="router"></sidebar>
         </div>
       </div>
     </div>
-    <div class="col-sm-9"></div>
-  </div>
-  <router-view></router-view>
+    <div class="col-sm-9"><router-view></router-view></div>
+  </div>  
 </template>

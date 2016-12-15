@@ -1,0 +1,25 @@
+<template>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Code</th>
+        <th>Title</th>
+        <th>Unit</th>
+        <th>Hours</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr repeat.for="index of courses.length">
+        <td>${index + 1}</td>
+        <td>          
+            <input type="checkbox" model.bind="courses[index]" checked.bind="selections">
+            ${courses[index].code}          
+        </td>
+        <td>${courses[index].title}</td>
+        <td>${courses[index].units}</td>
+        <td>${courses[index].hours}</td>
+      </tr>
+    </tbody>
+  </table>
+</template>

@@ -1,0 +1,21 @@
+<template>
+<h2>Enrollment</h2>
+
+
+
+<div class="box">
+  <div class="box-header">Academic Session</div>
+  <div class ="box-label">${academic_session.description}</div>
+</div>
+
+<div if.bind="!registration_allowed">
+  <require from="../../../../resources/components/course-enrollment"></require>
+  <course-enrollment courses.two-way='courses' selections.two-way='selected_courses'></course-enrollment>
+  <button class="btn btn-default" click.delegate="enroll()">Enroll</button>
+</div>
+<div if.bind="!registration_allowed">
+  <h2 style="color: red">You are not allowed to make registration!!!</h2>
+  <small>Registration closed on ${course_registration_setting.closing_date | dateFormat:"DD MMMM, YYYY"}</small>
+</div>
+
+</template>

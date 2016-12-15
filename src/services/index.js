@@ -5,6 +5,7 @@ export { AnnouncementService } from './announcement-service';
 export { AcademicSessionService } from './academic-session-service';
 export { DirectEntryQualificationService, JambRecordService } from './credentials-service';
 export { FeeService } from './fee-service';
+export { CourseService } from './course-service';
 export { FacultyService } from './faculty-service';
 export { DepartmentService } from './department-service';
 export { ProgramService } from './program-service';

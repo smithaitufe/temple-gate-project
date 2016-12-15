@@ -31,7 +31,7 @@ export class PrivateSection {
     }
     roleChanged() {
       const { slug } = this.role;
-      Object.assign(this.user, {role: {...this.role}});
+      this.user = Object.assign(this.user, {role: {...this.role}});
 
       switch (slug){
         case "student":
@@ -40,8 +40,9 @@ export class PrivateSection {
         case "applicant":
           this.router.navigate("/applicants");
           break;
-        default:
-          this.router.navigate("/");
+        // default:
+        //   this.router.navigate("/");
+        //   break;
       }            
     }
 }

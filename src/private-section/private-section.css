@@ -21,3 +21,17 @@ body {
 .private-section-header .navbar .navbar-header .navbar-brand {
     font-size: 25pt;
 }
+
+.box{
+  border: 1px solid #ccc;
+  display: inline-block;
+  
+}
+
+.box-header{
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+.box-label{
+  padding: 5px;
+}
