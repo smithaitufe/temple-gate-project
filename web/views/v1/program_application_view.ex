@@ -23,5 +23,6 @@ defmodule PortalApi.V1.ProgramApplicationView do
       active: program_application.active}
       |> Map.put(:program, render_one(program_application.program, PortalApi.V1.ProgramView, "program.json"))
       |> Map.put(:department, render_one(program_application.department, PortalApi.V1.DepartmentView, "department.json"))
+      |> Map.put(:level, render_one(program_application.level, PortalApi.V1.LevelView, "level.json"))
   end
 end
