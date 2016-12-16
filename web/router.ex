@@ -78,6 +78,7 @@ defmodule PortalApi.Router do
       resources "/fees", FeeController, except: [:new, :edit]
       resources "/payments", PaymentController, except: [:new, :edit]
       resources "/payment_items", PaymentItemController, except: [:new, :edit]
+      resources "/service_charges", ServiceChargeController, except: [:new, :edit]
       resources "/service_charge_splits", ServiceChargeSplitController, except: [:new, :edit]      
       resources "/course_registration_settings", CourseRegistrationSettingController, except: [:new, :edit]
       resources "/course_enrollments", CourseEnrollmentController, except: [:new, :edit]

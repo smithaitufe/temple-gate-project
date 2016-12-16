@@ -7,9 +7,9 @@ defmodule PortalApi.V1.CourseRegistrationSettingController do
 
   def index(conn, params) do
     course_registration_settings = CourseRegistrationSetting
-    |> build_course_registration_setting_query(Map.to_list(params))
+    |> build_filters(Map.to_list(params))
     |> Repo.all
-    |> preload_models
+    |> Repo.preload(CourseRegistrationSetting.associations)
 
     render(conn, "index.json", course_registration_settings: course_registration_settings)
   end
@@ -19,7 +19,7 @@ defmodule PortalApi.V1.CourseRegistrationSettingController do
 
     case Repo.insert(changeset) do
       {:ok, course_registration_setting} ->
-        course_registration_setting = preload_models(course_registration_setting)
+        course_registration_setting = course_registration_setting|> Repo.preload(CourseRegistrationSetting.associations)
         conn
         |> put_status(:created)
         |> put_resp_header("location", v1_course_registration_setting_path(conn, :show, course_registration_setting))
@@ -32,8 +32,7 @@ defmodule PortalApi.V1.CourseRegistrationSettingController do
   end
 
   def show(conn, %{"id" => id}) do
-    course_registration_setting = Repo.get(CourseRegistrationSetting, id)
-    |> preload_models
+    course_registration_setting = Repo.get(CourseRegistrationSetting, id) |> Repo.preload(CourseRegistrationSetting.associations)
 
     render(conn, "show.json", course_registration_setting: course_registration_setting)
   end
@@ -44,8 +43,8 @@ defmodule PortalApi.V1.CourseRegistrationSettingController do
 
     case Repo.update(changeset) do
       {:ok, course_registration_setting} ->
-
-        render(conn, "show.json", course_registration_setting: preload_models(course_registration_setting))
+        course_registration_setting = course_registration_setting |> Repo.preload(CourseRegistrationSetting.associations)
+        render(conn, "show.json", course_registration_setting: course_registration_setting)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -62,21 +61,19 @@ defmodule PortalApi.V1.CourseRegistrationSettingController do
 
     send_resp(conn, :no_content, "")
   end
-  defp build_course_registration_setting_query(query, [{"program_id", program_id} | tail]) do
+  defp build_filters(query, [{"program_id", program_id} | tail]) do
     query
     |> Ecto.Query.where([crs], crs.program_id == ^program_id)
-    |> build_course_registration_setting_query(tail)
+    |> build_filters(tail)
   end
-  defp build_course_registration_setting_query(query, [{"academic_session_id", academic_session_id} | tail]) do
+  defp build_filters(query, [{"academic_session_id", academic_session_id} | tail]) do
     query
     |> Ecto.Query.where([crs], crs.academic_session_id == ^academic_session_id)
-    |> build_course_registration_setting_query(tail)
+    |> build_filters(tail)
   end
-  defp build_course_registration_setting_query(query, []), do: query
-  defp build_course_registration_setting_query(query, [_ | tail]), do: query
+  defp build_filters(query, []), do: query
+  defp build_filters(query, [_ | tail]), do: query
 
 
-  defp preload_models(query) do
-    Repo.preload(query, [{:program, [:levels]}, :academic_session])
-  end
+  
 end

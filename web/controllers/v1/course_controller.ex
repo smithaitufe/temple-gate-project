@@ -60,24 +60,17 @@ defmodule PortalApi.V1.CourseController do
   end
 
 
-  def get_courses_by_department_and_level(conn, %{"department_id" => department_id, "level_id" => level_id}) do
-    query = from c in Course,
-            where: c.department_id == ^department_id and c.level_id == ^level_id
-
-    courses = query
-    |> Course.load_associations
-    |> Repo.all
-
-    render(conn, "index.json", courses: courses)
-  end
-
   defp build_query(query, []),  do: query
-  defp build_query(query, [{"department_id", value} | tail]) do
+  # defp build_query(query, [{"program_id", program_id} | tail]) do
+  #   query
+  #   |> Ecto.Query.where([c], c.program_id == ^program_id)
+  #   |> build_query(tail)
+  # end
+defp build_query(query, [{"department_id", value} | tail]) do
     query
     |> Ecto.Query.where([c], c.department_id == ^value)
     |> build_query(tail)
   end
-
   defp build_query(query, [{"level_id", value} | tail])  do
     query
     |> Ecto.Query.where([c], c.level_id == ^value)
@@ -86,13 +79,6 @@ defmodule PortalApi.V1.CourseController do
   defp build_query(query, [{"semester_id", value} | tail])  do
     query
     |> Ecto.Query.where([c], c.semester_id == ^value)
-    |> build_query(tail)
-  end
-  defp build_query(query, [{"student_id", student_id} | tail]) do
-    query
-    |> Ecto.Query.join(:inner, [c], sc in assoc(c, :student_courses))
-    |> Ecto.Query.join(:inner, [c, sc], s in assoc(sc, :student))
-    |> Ecto.Query.where([_, sc, _], sc.student_id == ^student_id)
     |> build_query(tail)
   end
   defp build_query(query, [{"core", core} | tail]) do

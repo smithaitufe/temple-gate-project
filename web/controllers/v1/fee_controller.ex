@@ -8,8 +8,7 @@ defmodule PortalApi.V1.FeeController do
   def index(conn, params) do
     fees = Fee
     |> Ecto.Query.join(:inner, [f], fc in assoc(f, :fee_category))
-    |> Ecto.Query.join(:inner, [f, fc], pc in assoc(f, :payer_category))
-    |> Ecto.Query.join(:inner, [f, fc, pc], at in assoc(f, :area_type))
+    |> Ecto.Query.join(:inner, [f, fc], pc in assoc(f, :payer_category))    
     |> build_query(Map.to_list(params))
     |> Repo.all
     |> Repo.preload(Fee.associations)
@@ -78,9 +77,19 @@ defmodule PortalApi.V1.FeeController do
     |> Ecto.Query.where([f], f.program_id == ^program_id)
     |> build_query(tail)
   end
-  defp build_query(query, [{"area_type_id", area_type_id} |  tail]) do
+  defp build_query(query, [{"level_id", level_id} |  tail]) do
     query
-    |> Ecto.Query.where([f], f.area_type_id == ^area_type_id)
+    |> Ecto.Query.where([f], f.level_id == ^level_id)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"is_all", is_all} |  tail]) do
+    query
+    |> Ecto.Query.where([f], f.is_all == ^is_all)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"is_catchment", is_catchment} |  tail]) do
+    query
+    |> Ecto.Query.where([f], f.is_catchment == ^is_catchment)
     |> build_query(tail)
   end
   defp build_query(query, [{"payer_category_id", payer_category_id} |  tail]) do

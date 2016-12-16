@@ -24,4 +24,9 @@ defmodule PortalApi.CourseRegistrationSetting do
       |> cast(params, @required_fields ++ @optional_fields)
       |> validate_required(@required_fields)
   end
+
+
+  def associations do
+    [{:program, [:levels]}, :academic_session]
+  end
 end

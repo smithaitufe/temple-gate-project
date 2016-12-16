@@ -65,6 +65,11 @@ defmodule PortalApi.V1.PaymentController do
     send_resp(conn, :no_content, "")
   end
 
+  defp build_query(query, [{"academic_session_id", academic_session_id} | tail]) do
+    query
+    |> Ecto.Query.where([p], p.academic_session_id == ^academic_session_id)
+    |> build_query(tail)
+  end
   defp build_query(query, [{"user_id", user_id} | tail]) do
     query
     |> Ecto.Query.where([p], p.user_id == ^user_id)

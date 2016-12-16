@@ -52,4 +52,11 @@ defmodule PortalApi.V1.ServiceChargeSplitController do
 
     send_resp(conn, :no_content, "")
   end
+
+  defp build_query_clauses(query, []), do: query
+  defp build_query_clauses(query, [{"service_charge_id", service_charge_id}, tail ] do
+    query
+    |> Ecto.Query.where([service_charge_split], service_charge_split.service_charge_id == ^service_charge_id)
+    |> build_query_clauses(tail)
+  end
 end
