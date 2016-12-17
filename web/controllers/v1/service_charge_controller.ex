@@ -8,7 +8,7 @@ defmodule PortalApi.V1.ServiceChargeController do
     |> build_query_clauses(Map.to_list(params))
     |> Repo.all
     |> Repo.preload(ServiceCharge.associations)
-    
+
     render(conn, "index.json", service_charges: service_charges)
   end
 
@@ -58,12 +58,12 @@ defmodule PortalApi.V1.ServiceChargeController do
   end
 
   defp build_query_clauses(query, []), do: query
-  defp build_query_clauses(query, [{"program_id", program_id}, tail ] do
+  defp build_query_clauses(query, [{"program_id", program_id} | tail ]) do
     query
     |> Ecto.Query.where([service_charge], service_charge.program_id == ^program_id)
     |> build_query_clauses(tail)
   end
-   defp build_query_clauses(query, [{"payer_category_id", payer_category_id}, tail ] do
+  defp build_query_clauses(query, [{"payer_category_id", payer_category_id} | tail ]) do
     query
     |> Ecto.Query.where([service_charge], service_charge.payer_category_id == ^payer_category_id)
     |> build_query_clauses(tail)

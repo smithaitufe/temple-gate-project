@@ -28,7 +28,8 @@ defmodule PortalApi.Router do
     scope "/v1", V1, as: :v1 do
 
       scope "/interswitch", Interswitch, as: :interswitch do
-          post "/webpay", WebPayController, :create
+          post "/webpay", WebpayController, :create
+          get "/webpay", WebpayController, :index
           post "/customer", CustomerController, :show
           post "/payment", PaymentController, :create 
       end

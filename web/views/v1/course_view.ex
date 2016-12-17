@@ -29,7 +29,7 @@ defmodule PortalApi.V1.CourseView do
       units: course.units,
       hours: course.hours,
       description: course.description,
-      course_category_id: course.course_category_id
+      core: course.core
     }
   end
 

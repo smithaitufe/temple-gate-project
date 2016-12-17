@@ -15,11 +15,10 @@ defmodule PortalApi.V1.PaymentController do
   end
 
   def create(conn, %{"payment" => payment_params}) do
-    changeset = Payment.changeset(%Payment{}, payment_params)
-
+    changeset = Payment.create_changeset(%Payment{}, payment_params)    
     case Repo.insert(changeset) do
       {:ok, payment} ->
-
+        IO.inspect payment
         payment = payment |> Repo.preload(Payment.associations)
         conn
         |> put_status(:created)
@@ -33,8 +32,7 @@ defmodule PortalApi.V1.PaymentController do
   end
 
   def show(conn, %{"id" => id}) do
-    payment = Repo.get!(Payment, id)
-    |> Repo.preload(Payment.associations)
+    payment = Repo.get!(Payment, id) |> Repo.preload(Payment.associations)
 
     render(conn, "show.json", payment: payment)
   end
@@ -68,6 +66,11 @@ defmodule PortalApi.V1.PaymentController do
   defp build_query(query, [{"academic_session_id", academic_session_id} | tail]) do
     query
     |> Ecto.Query.where([p], p.academic_session_id == ^academic_session_id)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"transaction_reference_no", transaction_reference_no} | tail]) do
+    query
+    |> Ecto.Query.where([p], p.transaction_reference_no == ^transaction_reference_no)
     |> build_query(tail)
   end
   defp build_query(query, [{"user_id", user_id} | tail]) do

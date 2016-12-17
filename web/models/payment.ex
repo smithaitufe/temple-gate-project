@@ -18,6 +18,7 @@ defmodule PortalApi.Payment do
     field :receipt_no, :string
     field :payment_date, :string
     field :settlement_date, :string
+    field :site_redirect_url, :string
 
     timestamps
   end
@@ -35,9 +36,12 @@ defmodule PortalApi.Payment do
     struct
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+  end
+  def create_changeset(struct, params \\ %{}) do
+    struct
+    |> changeset(params)
     |> generate_transaction_reference_no()
   end
-
 
   def associations do
     [
