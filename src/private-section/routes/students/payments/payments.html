@@ -1,0 +1,38 @@
+<template>
+  <h3>Payments</h3>
+
+<div class="row">
+  <div class="form-group col-sm-4">
+    <label for="academic_session" class="control-label">Academic Session</label>
+    <select name="academic_session" id="academic_session" class="form-control" value.bind="academic_session" change.delegate="fetchPayments()">
+      <option value="">Select academic session</option>
+      <option repeat.for="item of academic_sessions" model.bind="item">${item.description}</option>
+    </select>
+
+  </div>
+</div>
+
+<h4 if.bind="payments.length == 0">No payments found yet. Choose an academic session</h4>
+
+  <table class="table table-bordered" if.bind="payments.length">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Item</th>
+        <th>Amount Paid</th>
+        <th>Transaction Ref</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr repeat.for="index of payments.length">
+        <td>${index + 1}</td>
+        <td>${payments[index].fee.description}</td>
+        <td>${payments[index].amount | currencyFormat }</td>
+        <td>${payments[index].transaction_reference_no}</td>
+        <td>${payments[index].successful}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</template>

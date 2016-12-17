@@ -19,18 +19,6 @@ export class StudentsSection {
     this.programApplicationService = programApplicationService;
     this.academicSessionService = academicSessionService;
   }
-  // activate() {
-  //   return new Promise(resolve => {
-  //     return this.academicSessionService.getAcademicSessions(`active=true&order_by=id`).then(response => {
-  //       this.user = { ...this.user, academic_session: { ...response[0] } };
-  //       return this.programApplicationService.getProgramApplications(`user_id=${this.user.id}`).then(response => {
-  //         this.program_applications = [...response];
-  //         this.programApplicationChanged();
-  //         resolve();
-  //       });
-  //     });
-  //   });
-  // }
   async activate() {
     let responses = await Promise.all([
       this.academicSessionService.getAcademicSessions(`active=true&order_by=id`),
@@ -76,5 +64,6 @@ export let routes = [
   { route: '/', redirect: 'courses' },
   { route: '/courses', name: 'courses-section', moduleId: './courses/courses-section', title: 'Courses', nav: false, settings: { childRoutes: coursesRoutes } },
   { route: '/enrollment', name: 'enrollment', moduleId: './enrollment/enrollment', title: 'Enrollment', nav: false },
-  { route: '/fees', name: 'fees-section', moduleId: './fees/fees-section', title: 'Fees', nav: false, settings: { childRoutes: feesRoutes } }
+  { route: '/fees', name: 'fees-section', moduleId: './fees/fees-section', title: 'Fees', nav: false, settings: { childRoutes: feesRoutes } },
+  { route: '/payments', name: 'payments', moduleId: './payments/payments', title: 'Payments', nav: false}
 ];
