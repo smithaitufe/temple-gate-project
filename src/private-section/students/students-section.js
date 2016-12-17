@@ -1,8 +1,8 @@
 import { inject } from 'aurelia-framework';
 import { Router } from 'aurelia-router';
 import { RouteMapper } from 'aurelia-route-mapper';
-import { User } from '../../user';
-import { ProgramApplicationService, AcademicSessionService } from '../../../services';
+import { User } from '../user';
+import { ProgramApplicationService, AcademicSessionService } from '../../services';
 import { routes as feesRoutes } from './fees/fees-section';
 import { routes as coursesRoutes } from './courses/courses-section';
 
@@ -62,8 +62,8 @@ export class StudentsSection {
 }
 export let routes = [
   { route: '/', redirect: 'courses' },
-  { route: '/courses', name: 'courses-section', moduleId: './courses/courses-section', title: 'Courses', nav: false, settings: { childRoutes: coursesRoutes } },
-  { route: '/enrollment', name: 'enrollment', moduleId: './enrollment/enrollment', title: 'Enrollment', nav: false },
-  { route: '/fees', name: 'fees-section', moduleId: './fees/fees-section', title: 'Fees', nav: false, settings: { childRoutes: feesRoutes } },
-  { route: '/payments', name: 'payments', moduleId: './payments/payments', title: 'Payments', nav: false}
+  { route: '/courses', name: 'courses-section', moduleId: './routes/courses/courses-section', title: 'Courses', nav: false, settings: { childRoutes: coursesRoutes } },
+  { route: '/enrollment', name: 'enrollment', moduleId: './routes/enrollment/enrollment', title: 'Enrollment', nav: false },
+  { route: '/fees', name: 'fees-section', moduleId: './routes/fees/fees-section', title: 'Fees', nav: false, settings: { childRoutes: feesRoutes } },
+  { route: '/payments', name: 'payments', moduleId: './routes/payments/payments', title: 'Payments', nav: false}
 ];

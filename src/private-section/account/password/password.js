@@ -1,6 +1,6 @@
 import { inject } from 'aurelia-framework';
 import { ValidationControllerFactory, ValidationRules, validateTrigger } from 'aurelia-validation';
-import { BootstrapFormRenderer } from '../../../../resources/renderers/bootstrap-form-renderer';
+import { BootstrapFormRenderer } from '../../../resources/renderers/bootstrap-form-renderer';
 
 @inject(ValidationControllerFactory)
 export class Password {

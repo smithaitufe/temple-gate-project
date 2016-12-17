@@ -9,6 +9,6 @@ export function configure(aurelia) {
       './attributes/markdown-component',
       './attributes/datepicker',
       './elements/markdown',      
-      './elements/spinner'
+      './elements/loading-indicator'
     );
 }

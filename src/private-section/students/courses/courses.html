@@ -1,0 +1,43 @@
+<template>
+  <div class="row">
+    <div class="col-sm-4">
+      <div class="form-group">
+        <label for="academic_session_id" class="control-label">Academic Session</label>
+        <select name="academic_session_id" id="academic_session_id" class="form-control" value.bind="academic_session" change.delegate="fetchCourses()">
+          <option value="">Select an academic session</option>
+          <option repeat.for="item of academic_sessions" model.bind="item">${item.description}</option>
+        </select>
+        </div>
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div class="col-sm-12">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Code</th>
+            <th>Title</th>
+            <th>Units</th>
+            <th>Hours</th>
+            <th>Semester</th>
+            <th>Core</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr repeat.for="index of enrollments.length">
+            <td>${index + 1}</td>
+            <td>${enrollments[index].course.code}</td>
+            <td>${enrollments[index].course.title}</td>
+            <td>${enrollments[index].course.units}</td>
+            <td>${enrollments[index].course.hours}</td>
+            <td>${enrollments[index].course.semester.description}</td>
+            <td><div class="${enrollments[index].course.core ? 'core' : 'minor'}"></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>

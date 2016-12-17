@@ -1,6 +1,6 @@
 import { inject } from 'aurelia-framework';
-import { AcademicSessionService, PaymentService } from '../../../../services';
-import { User } from '../../../user';
+import { AcademicSessionService, PaymentService } from '../../../services';
+import { User } from '../../user';
 
 @inject(User, AcademicSessionService, PaymentService)
 export class Payments {

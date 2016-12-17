@@ -11,6 +11,7 @@
 
   </div>
 </div>
+<!--<loading-indicator busy="true"></loading-indicator>-->
 
 <h4 if.bind="payments.length == 0">No payments found yet. Choose an academic session</h4>
 
@@ -21,6 +22,7 @@
         <th>Item</th>
         <th>Amount Paid</th>
         <th>Transaction Ref</th>
+        <th>Payment Date</th>
         <th>Status</th>
       </tr>
     </thead>
@@ -30,7 +32,8 @@
         <td>${payments[index].fee.description}</td>
         <td>${payments[index].amount | currencyFormat }</td>
         <td>${payments[index].transaction_reference_no}</td>
-        <td>${payments[index].successful}</td>
+        <td>${payments[index].payment_date | dateFormat:'DD MMM, YYYY' }</td>
+        <td><div class="${payments[index].successful ? 'successful' : 'failed'}"></div></td>
       </tr>
     </tbody>
   </table>

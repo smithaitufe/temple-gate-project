@@ -1,7 +1,7 @@
 import { inject } from 'aurelia-framework';
 import { Router } from 'aurelia-router';
-import { User } from '../../../user';
-import { FeeService } from '../../../../services';
+import { User } from '../../user';
+import { FeeService } from '../../../services';
 
 @inject(Router, User, FeeService)
 export class Fees {

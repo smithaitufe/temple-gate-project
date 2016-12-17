@@ -7,21 +7,24 @@ export class CourseService {
     return get(`/api/v1/courses`)
   }
   getCourseById(id) {
-    return new Promise((reject) => {
-      if (!id || isNaN(id)) reject("Parameter not specified or invalid");
+    if (!id || isNaN(id)) throw new Error("Parameter not specified or invalid");
       return get(`/api/v1/courses/${id}`)
-    });
   }
+
   saveCourse(course) {
-    return new Promise((reject) => {
-      if (!course) reject("Course parameter not specified");
+    if (!course) throw new Error("Course parameter not specified");
       const { id } = course;
       const data = { course: course};
       if (id) {
         return put(`/api/v1/courses/${id}`, data)
       }
       return post(`/api/v1/courses`, data)
-    })
+  }
+  getEnrolledCourses(params){
+    if(params){
+      return get(`/api/v1/course_enrollments?${params}`)
+    }
+    return get(`/api/v1/course_enrollments`);
   }
   enroll(userId, academicSessionId, levelId, courses) {
     return new Promise((resolve, reject) => {

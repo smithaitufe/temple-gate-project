@@ -16,10 +16,10 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">${user.last_name} ${user.first_name} <b class="caret"></b></a>
               <ul class="dropdown-menu">                
-                <li><a href.bind="routeMapper.generate('profile')"><i class="fa fa-user"></i>Profile</a></li>
+                <li><a href.bind="routeMapper.generate('account-section/profile')"><i class="fa fa-user"></i>Profile</a></li>
                 <li><a href="#"><i class="fa fa-shopping-cart"></i>Market Place</a></li>
                 <li class="divider"></li>
-                <li><a href="/"><i class="fa fa-lock"></i>Change Password</a>
+                <li><a href.bind="routeMapper.generate('account-section/password')"><i class="fa fa-lock"></i>Change Password</a>
                 <li><a href="/" click.delegate="logOut()"><i class="fa fa-times"></i>Log out</a>
                 </li>
               </ul>

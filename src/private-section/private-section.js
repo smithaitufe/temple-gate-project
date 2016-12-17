@@ -5,9 +5,9 @@ import { SessionService } from '../services';
 import { User } from './user';
 
 import { brand } from '../settings';
-
-import { routes as studentsRoutes } from './routes/students/students-section';
-import { routes as applicantsRoutes } from './routes/applicants/applicants-section';
+import { routes as accountRoutes } from './account/account-section';
+import { routes as studentsRoutes } from './students/students-section';
+import { routes as applicantsRoutes } from './applicants/applicants-section';
 
 @inject(Aurelia, Router, RouteMapper, User, SessionService)
 export class PrivateSection {
@@ -57,9 +57,9 @@ export class PrivateSection {
 }
 let routes = [
   { route: '/', redirect: 'welcome' },
-  { route: '/welcome', name: 'welcome', moduleId: './routes/welcome/welcome', title: 'Welcome', nav: true },
-  { route: '/profile', name: 'profile', moduleId: './routes/profile/profile', title: 'Profile', nav: true },
-  { route: '/students', name: 'students-section', moduleId: './routes/students/students-section', title: 'Students', nav: true, settings: { childRoutes: studentsRoutes } },
-  { route: '/applicants', name: 'applicants-section', moduleId: './routes/applicants/applicants-section', title: 'Applicants', nav: true, settings: { childRoutes: applicantsRoutes } },
-  { route: '/payment', name: 'payment', moduleId: './routes/payment/payment', title: 'Payment', nav: true }
+  { route: '/welcome', name: 'welcome', moduleId: './welcome/welcome', title: 'Welcome', nav: true },
+  { route: '/account', name: 'account-section', moduleId: './account/account-section', title: 'Account', nav: true, settings: {childRoutes: accountRoutes} },
+  { route: '/students', name: 'students-section', moduleId: './students/students-section', title: 'Students', nav: true, settings: { childRoutes: studentsRoutes } },
+  { route: '/applicants', name: 'applicants-section', moduleId: './applicants/applicants-section', title: 'Applicants', nav: true, settings: { childRoutes: applicantsRoutes } },
+  { route: '/payment', name: 'payment', moduleId: './payment/payment', title: 'Payment', nav: true }
 ];

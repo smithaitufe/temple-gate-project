@@ -1,8 +1,8 @@
 import { inject } from 'aurelia-framework';
 import { Router } from 'aurelia-router';
-import { doDecrypt } from '../../../utils';
-import { PaymentService } from '../../../services';
-import { User } from '../../user';
+import { doDecrypt } from '../../utils';
+import { PaymentService } from '../../services';
+import { User } from '../user';
 
 
 @inject(Router, User, PaymentService)

@@ -1,11 +1,11 @@
 import { inject } from 'aurelia-framework';
 import { Router } from 'aurelia-router';
 import { ValidationControllerFactory, ValidationRules } from 'aurelia-validation';
-import { BootstrapFormRenderer } from '../../../../resources/renderers/bootstrap-form-renderer';
-import { User } from '../../../user';
-import { TermService, FeeService, PaymentService, ServiceChargeService } from '../../../../services';
-import { printArea, generateRandomNo, doEncrypt } from '../../../../utils';
-import { siteUrl, institution } from '../../../../settings';
+import { BootstrapFormRenderer } from '../../../resources/renderers/bootstrap-form-renderer';
+import { User } from '../../user';
+import { TermService, FeeService, PaymentService, ServiceChargeService } from '../../../services';
+import { printArea, generateRandomNo, doEncrypt } from '../../../utils';
+import { siteUrl, institution } from '../../../settings';
 
 @inject(Router, ValidationControllerFactory, User, TermService, FeeService, PaymentService, ServiceChargeService)
 export class Fee {

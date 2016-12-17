@@ -1,0 +1,11 @@
+.successful, .failed{
+  display: inline-block;
+  width: 30%;
+  min-height: 10px;
+}
+.successful{
+  background-color: lawngreen;
+}
+.failed{
+  background-color: orangered;
+}
