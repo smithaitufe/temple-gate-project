@@ -83,11 +83,12 @@ export const generateRandomNo = (min= 10, max = 10) => {
   max = Math.floor(9 + +"9".repeat(max));  
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-export const encrypt = (str, key) => {
-  CryptoJS.AES.encrypt(str, key);
+export const doEncrypt = (str, key) => {
+  return CryptoJS.AES.encrypt(str, key);
 };
-export const decrypt = (str, key) => {
-  CryptoJS.AES.decrypt(str, key);
+export const doDecrypt = (str, key) => {
+  let decrypted = CryptoJS.AES.decrypt(str, key);
+  return decrypted.toString(CryptoJS.enc.Utf8);
 };
 export const hashString = (str) => {
     var hash = CryptoJS.SHA512(str);

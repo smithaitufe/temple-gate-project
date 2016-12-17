@@ -44,11 +44,10 @@ export class PaymentService {
     let str = `${transactionReferenceNo}${this.productId}${this.payItemId}${amount}${this.redirectUrl}${this.macKey}`;
     return hashString(str);
   }
-  queryPayment(transactionReferenceNo, amount){
-    const { paymentPostUrl, productId } = interswitch;    
-    let params = `product_id=${productId}&transaction_reference_no=${transactionReferenceNo}&amount=${amount}`
-    params = params + `&url=${paymentPostUrl}&hash=${this.generateQueryHash(transactionReferenceNo)}`
-    return get(`/api/v1/interswitch/webpay?${params}`)    
+  queryPayment(transactionReferenceNo, amount){     
+    let params = `product_id=${this.productId}&transaction_reference_no=${transactionReferenceNo}&amount=${amount}`
+    params = params + `&url=${interswitch.transactionQueryUrl}&hash=${this.generateQueryHash(transactionReferenceNo)}`
+    return get(`/api/v1/interswitch/webpay?${params}`); 
   }
   splitDefinitions(transactionReferenceNo, serviceChargeSplits)  {
     let item_details = serviceChargeSplits.reduce((prev, serviceChargeSplit, index) => {

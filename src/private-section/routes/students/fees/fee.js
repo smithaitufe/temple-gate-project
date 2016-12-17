@@ -4,7 +4,7 @@ import { ValidationControllerFactory, ValidationRules } from 'aurelia-validation
 import { BootstrapFormRenderer } from '../../../../resources/renderers/bootstrap-form-renderer';
 import { User } from '../../../user';
 import { TermService, FeeService, PaymentService, ServiceChargeService } from '../../../../services';
-import { printArea, generateRandomNo } from '../../../../utils';
+import { printArea, generateRandomNo, doEncrypt } from '../../../../utils';
 import { siteUrl, institution } from '../../../../settings';
 
 @inject(Router, ValidationControllerFactory, User, TermService, FeeService, PaymentService, ServiceChargeService)
@@ -49,7 +49,7 @@ export class Fee {
               });
             });
           } else {
-            this.service_charge_amount = 0; //parseFloat(this.paymentService.interswitchCharge);
+            this.service_charge_amount = parseFloat(this.paymentService.interswitchCharge);
             this.split_definitions = this.paymentService.splitDefinitions(this.transaction_reference_no, []);
           }
       });
@@ -75,13 +75,8 @@ export class Fee {
           site_redirect_url: redirect_url
         };
         this.paymentService.savePayment(payment).then(response => {
-        //   console.log('Product Id',$('#webpayForm').find('input[name="product_id"]').val());
-        //   console.log('pay item Id',$('#webpayForm').find('input[name="pay_item_id"]').val());
-        //   console.log('Cust Id',$('#webpayForm').find('input[name="cust_id"]').val());
-        //  console.log('Amount', $('#webpayForm').find('input[name="amount"]').val());
-        // console.log('Hash', $('#webpayForm').find('input[name="hash"]').val());
-        // console.log('xml data', $('#webpayForm').find('input[name="xml_data"]').val());
-        // console.log('txn ref', $('#webpayForm').find('input[name="txn_ref"]').val());
+          if(localStorage.getItem("pinit")) delete localStorage.getItem("pinit");
+          localStorage.setItem("pinit", doEncrypt(payment.transaction_reference_no, `${payment.fee_id}${this.user.id}`));
           $('form#webpayForm').submit();
         });
       }

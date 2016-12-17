@@ -1,5 +1,28 @@
 <template>
-  <h2>Payment Status</h2>
 
-  
+
+  <div class="row">
+    <div class="col-sm-5 col-sm-offset-4 response">
+
+      <h2>Payment Status</h2>
+      <div if.bind="payment.successful">
+        <h4 style="color: green">Your payment was successful!</h4>
+<p><strong>Transaction Reference Number:</strong> ${payment.transaction_reference_no</p>
+<p><strong>Payment Reference Number:</strong> ${payment.payment_reference_no</p>
+<p>Please view your payment history for more details</p>
+</div>
+
+<div if.bind="!payment.successful">
+  <h4 style="color: red">Your payment was unsuccessful!</h4>
+  <p><strong>Transaction Reference Number:</strong> ${payment.transaction_reference_no}</p>
+  <p><strong>Reason:</strong> ${payment.response_description}</p>
+
+
+  <p>Kindly go to the payment section to view the details of this transaction</p>
+
+</div>
+</div>
+</div>
+
+
 </template>

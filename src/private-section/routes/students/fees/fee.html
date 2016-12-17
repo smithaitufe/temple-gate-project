@@ -1,7 +1,5 @@
 <template>
 
-  <p><strong>Academic Session</strong> ${academic_session.description}</p>
-
   <h2>${fee.description}</h2>
 
   <div class="box">
@@ -13,6 +11,9 @@
     <div class="box-label">${service_charge_amount | currencyFormat }</div>
   </div>
 
+<hr>
+ <p><strong>Academic Session:</strong> ${academic_session.description}</p>
+<p><strong>Transaction Reference No:</strong> ${transaction_reference_no}</p>
 
   <hr>
   <div class="row">

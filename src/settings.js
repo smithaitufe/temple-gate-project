@@ -12,6 +12,6 @@ export const interswitch = {
     payItemId: 103,
     payItemName: "college_split",
     currency: 566,
-    transactionQuery: "https://sandbox.interswitchng.com/webpay/api/v1/gettransaction.json",
+    transactionQueryUrl: "https://sandbox.interswitchng.com/webpay/api/v1/gettransaction.json",
     charge: 300
 };
