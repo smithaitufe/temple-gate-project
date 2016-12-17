@@ -2,27 +2,54 @@ import { inject } from 'aurelia-framework';
 import { Router } from 'aurelia-router';
 import { RouteMapper } from 'aurelia-route-mapper';
 import { User } from '../../user';
-import { ProgramApplicationService } from '../../../services';
+import { ProgramApplicationService, AcademicSessionService } from '../../../services';
 import { routes as feesRoutes } from './fees/fees-section';
 import { routes as coursesRoutes } from './courses/courses-section';
 
-@inject(Router, RouteMapper, User, ProgramApplicationService)
+@inject(Router, RouteMapper, User, ProgramApplicationService, AcademicSessionService)
 export class StudentsSection {
   program_applications = [];
   program_application = {};
+  user;
 
-  constructor(router, routeMapper, user, programApplicationService) {
+  constructor(router, routeMapper, user, programApplicationService, academicSessionService) {
     this.router = router;
     this.routeMapper = routeMapper;
     this.user = user;
     this.programApplicationService = programApplicationService;
+    this.academicSessionService = academicSessionService;
   }
-  activate() {
-    return this.programApplicationService.getProgramApplications(`user_id=${this.user.id}`).then(response => {
-      this.program_applications = [...response];
-      this.programApplicationChanged();
-    });
+  // activate() {
+  //   return new Promise(resolve => {
+  //     return this.academicSessionService.getAcademicSessions(`active=true&order_by=id`).then(response => {
+  //       this.user = { ...this.user, academic_session: { ...response[0] } };
+  //       return this.programApplicationService.getProgramApplications(`user_id=${this.user.id}`).then(response => {
+  //         this.program_applications = [...response];
+  //         this.programApplicationChanged();
+  //         resolve();
+  //       });
+  //     });
+  //   });
+  // }
+  async activate() {
+    let responses = await Promise.all([
+      this.academicSessionService.getAcademicSessions(`active=true&order_by=id`),
+      this.programApplicationService.getProgramApplications(`user_id=${this.user.id}`)
+    ]);
+    Object.assign(this.user, {academic_session: {...responses[0][0]}});     
+    this.program_applications = [...responses[1]];
+    this.programApplicationChanged();
+
+    // return Promise.all([
+    //   this.academicSessionService.getAcademicSessions(`active=true&order_by=id`),
+    //   this.programApplicationService.getProgramApplications(`user_id=${this.user.id}`)
+    // ]).then(responses => {
+    //   Object.assign(this.user, {academic_session: {...responses[0][0]}});      
+    //   this.program_applications = [...responses[1]];
+    //   this.programApplicationChanged();
+    // });
   }
+
   configureRouter(config) {
     config.map(routes);
   }
@@ -37,7 +64,8 @@ export class StudentsSection {
         redirect = false;
       }
     }
-    Object.assign(this.user, { program: { ...program }, department: { ...department }, level: { ...level } });
+    // this.user = { ...this.user, program: { ...program }, department: { ...department }, level: { ...level } };
+    Object.assign(this.user, {program: { ...program }, department: { ...department }, level: { ...level } });
     localStorage.setItem("department", JSON.stringify(department));
     localStorage.setItem("program", JSON.stringify(program));
     if (redirect) this.router.navigate('/students');

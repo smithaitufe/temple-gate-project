@@ -1,16 +1,21 @@
-import CryptoJS from 'crypto-js';
-import { get, post, put } from '../utils';
-import { interswitch } from '../settings';
+import { get, post, put, hashString } from '../utils';
+import { interswitch, institution, restUrl } from '../settings';
+
 
 
 export class PaymentService {
 
   constructor(){
-    const { productId, macKey, currency, payItemId } = interswitch;
+    const { productId, macKey, currency, payItemId, charge, paymentPostUrl, payItemName } = interswitch;
     this.productId = productId;
     this.macKey = macKey;
     this.currency = currency;
     this.payItemId = payItemId;
+    this.interswitchCharge = charge;
+    this.redirectUrl = restUrl + '/api/v1/interswitch/webpay';
+    this.paymentPostUrl = paymentPostUrl;
+    this.payItemName = payItemName;
+    
   }
   getPayments(params = null){
     if(params){
@@ -20,37 +25,48 @@ export class PaymentService {
   }
   getPaymentById(id){
     if(id){
-      return get(`/api/v1/payments/${student_payment_id}`)
+      return get(`/api/v1/payments/${id}`)
     }
     throw new Error("Student payment id not specified")
   }
-  generateQueryHash(transactionReferenceNo){
-    const { productId, macKey } = interswitch;
-    let str = `${transactionReferenceNo}${productId}${macKey}`;
-    return this.performHash(str);
+  savePayment(payment = null){
+    if(!payment) throw new Error("Payment parameter not specified");
+    const { id } = payment;
+    const data = {payment: payment};
+    if(id) return put(`/api/v1/payments/${id}`, data);
+    return post(`/api/v1/payments`, data)
   }
-  generatePaymentHash(transactionReferenceNo, amount, siteRedirectUrl){
-    const { interswitch : { productId, payItemId, macKey } } = settings
-    let str = `${transactionReferenceNo}${productId}${payItemId}${amount}${siteRedirectUrl}${macKey}`;
-    return performHash(str);
+  generateQueryHash(transactionReferenceNo){    
+    let str = `${transactionReferenceNo}${this.productId}${this.macKey}`;
+    return hashString(str);
+  }
+  generatePaymentHash(transactionReferenceNo, amount){
+    let str = `${transactionReferenceNo}${this.productId}${this.payItemId}${amount}${this.redirectUrl}${this.macKey}`;
+    return hashString(str);
   }
   queryPayment(transactionReferenceNo, amount){
     const { paymentPostUrl, productId } = interswitch;    
     let params = `product_id=${productId}&transaction_reference_no=${transactionReferenceNo}&amount=${amount}`
     params = params + `&url=${paymentPostUrl}&hash=${this.generateQueryHash(transactionReferenceNo)}`
     return get(`/api/v1/interswitch/webpay?${params}`)    
-  }  
-}
+  }
+  splitDefinitions(transactionReferenceNo, serviceChargeSplits)  {
+    let item_details = serviceChargeSplits.reduce((prev, serviceChargeSplit, index) => {
+      if(serviceChargeSplit.is_required) return `<item_detail item_id="${index + 1}" item_name="${serviceChargeSplit.name} item_amt="${parseFloat(serviceChargeSplit.amount) * 100}" acc_num="${serviceChargeSplit.account}" bank_id="${serviceChargeSplit.bank_code}" />`+prev;
+    },"")
+    return `
+    <payment_item_detail>
+    <item_details detail_ref="${transactionReferenceNo}" institution="${institution}">
+    ${item_details}
+    </item_details>
+    </payment_item_detail>
+    `;
 
-const performHash = (str) => {
-    var hash = CryptoJS.SHA512(str);
-    var outString =  hash.toString(CryptoJS.enc.Hex)
-    return outString;
+  }
 }
-
 export class ServiceChargeService{
   getServiceCharges(params){
-    if(params) return get(`/api/v1/service_charges?${params}}`)
+    if(params) return get(`/api/v1/service_charges?${params}`)
     return get(`/api/v1/service_charges`);
   }
   getServiceChargeById(id){
@@ -67,7 +83,7 @@ export class ServiceChargeService{
     });    
   }
   getServiceChargeSplits(params){
-    if(params) return get(`/api/v1/service_charge_splits?${params}}`)
+    if(params) return get(`/api/v1/service_charge_splits?${params}`)
     return get(`/api/v1/service_charge_splits`);
   }
   getServiceChargeSplitById(id){

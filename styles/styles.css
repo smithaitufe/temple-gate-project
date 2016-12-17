@@ -47,8 +47,13 @@ body {
     overflow-y: inherit;
     overflow-x: inherit;
   }
+  #area{
+    display: block;
+  }
 }
-
+#area{
+  display: none;
+}
 section {
   margin: 0 20px;
 }

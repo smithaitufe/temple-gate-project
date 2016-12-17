@@ -1,13 +1,17 @@
 <template>
-  <form post.bind="payment_post_url" submit.delegate="submitCallback()" style="display: inline-block;">
-    <input type="text" name="pay_item_id" value.bind="pay_item_id">
-    <input type="text" name="product_id" value.bind="product_id">
-    <input type="text" name="amount" value.bind="amount">
-    <input type="text" name="cust_id" value.bind="cust_id">
-    <input type="text" name="cust_name" value.bind="cust_name">
-    <input type="text" name="hash" value.bind="hash">
-    <input type="text" name="site_redirect_url" value.bind="site_redirect_url">
-    <input type="text" name="xml_data" value.bind="xml_data">
-    <button type="submit" class="btn btn-default btn-sm">${button_text}</button>
+  <form id="webpayForm" action.bind="post_url" method="POST" style="display: inline-block;">
+    <input type="hidden" name="pay_item_id" value.bind="pay_item_id"></input>
+    <input type="hidden" name="pay_item_name" value.bind="pay_item_name"></input>
+    <input type="hidden" name="product_id" value.bind="product_id"></input>
+    <input type="hidden" name="amount" value.bind="amount"></input>
+    <input type="hidden" name="currency" value.bind="currency"></input>
+    <input type="hidden" name="site_name" value.bind="site_name"></input>
+    <input type="hidden" name="cust_id" value.bind="cust_id"></input>
+    <input type="hidden" name="txn_ref" value.bind="txn_ref"></input>
+    <input type="hidden" name="cust_name" value="${last_name} ${first_name}"></input>
+    <input type="hidden" name="hash" value.bind="hash"></input>
+    <input type="hidden" name="site_redirect_url" value.bind="site_redirect_url"></input>
+    <input type="hidden" name="xml_data" value.bind="xml_data"></input>    
+    <button type="button" class="btn btn-default btn-sm" click.delegate="submitCallback()">${button_text}</button>
   </form>
 </template>

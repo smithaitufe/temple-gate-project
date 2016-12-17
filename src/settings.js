@@ -1,15 +1,17 @@
 export const brand = "Temple Gate Polytechnic"; 
+export const institution = "Temple Gate";
 export const restUrl =  "http://localhost:4000";
-export const siteUrl =  "http://127.0.0.1:9000";
+export const siteUrl =  "http://localhost:9000";
 export const tokenName = "cupid16_t";
 export const recaptchaSiteKey = "6Ld1xSUTAAAAAGlo03e4qEIGpp6UcLlWYfrsbph9";
 export const recaptchaSecretKey = "6Ld1xSUTAAAAADz16z7ybX-reufvQmFNHcPApjY0";
 export const interswitch = {
-    paymentPostUrl: "https://stageserv.interswitchng.com/test_paydirect/pay",
-    macKey: 'D3D1D05AFE42AD50818167EAC73C109168A0F108F32645C8B59E897FA930DA44F9230910DAC9E20641823799A107A02068F7BC0F4CC41D2952E249552255710F',
-    productId: 6205,
-    payItemId: 101,
-    currency: 566,        
-    paymentPage: "https://stageserv.interswitchng.com/test_paydirect/pay",
-    transactionQuery: "https://stageserv.interswitchng.com/test_paydirect/api/v1/gettransaction.json"
+    paymentPostUrl: "https://sandbox.interswitchng.com/webpay/pay",
+    macKey: 'CEF793CBBE838AA0CBB29B74D571113B4EA6586D3BA77E7CFA0B95E278364EFC4526ED7BD255A366CDDE11F1F607F0F844B09D93B16F7CFE87563B2272007AB3',
+    productId: 6207,
+    payItemId: 103,
+    payItemName: "college_split",
+    currency: 566,
+    transactionQuery: "https://sandbox.interswitchng.com/webpay/api/v1/gettransaction.json",
+    charge: 300
 };

@@ -11,14 +11,17 @@
     </thead>
     <tbody>
       <tr repeat.for="index of courses.length">
-        <td>${index + 1}</td>
-        <td>          
-            <input type="checkbox" model.bind="courses[index]" checked.bind="selections">
-            ${courses[index].code}          
+        <td style="width: 5%">${index + 1}</td>
+        <td style="width: 10%">
+       <div>
+            <input type="checkbox" model.bind="courses[index]" checked.bind="selections" style="display: inline-block;">
+            <label for="" style="position: relative; top: -3px;">${courses[index].code}</label>
+       </div>         
         </td>
-        <td>${courses[index].title}</td>
-        <td>${courses[index].units}</td>
-        <td>${courses[index].hours}</td>
+        <td style="width: 60%">${courses[index].title}</td>
+        <td style="width: 5%">${courses[index].units}</td>
+        <td style="width: 5%">${courses[index].hours}</td>
+        
       </tr>
     </tbody>
   </table>

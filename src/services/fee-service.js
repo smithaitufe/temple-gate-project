@@ -1,5 +1,5 @@
 import { get, post, put } from '../utils'
-import moment from 'moment';
+
 export class FeeService {
   getFees(params = null) {
     if (params) {
@@ -8,10 +8,12 @@ export class FeeService {
     return get(`/api/v1/fees`)
   }
   getFeeById(id) {
-    return new Promise((reject) => {
-      if (!id) reject("Paramter not specified")
-      return get(`/api/v1/fees/${id}`)
-    });
+    
+    // return new Promise((resolve, reject) => {      
+      if (!id) throw new Error("Paramter not specified")
+      return get(`/api/v1/fees/${id}`);
+      // resolve();
+    // });
   }
   saveFee(params) {
     return new Promise((reject) => {

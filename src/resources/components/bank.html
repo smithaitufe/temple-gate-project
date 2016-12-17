@@ -1,0 +1,37 @@
+<template>
+<div class="row" id="area">
+  <div class="col-xs-12">
+    <h2>Temple Gate Polytechnic</h2>
+    <small>Knowlege is power</small>
+    
+    <table class="table table-bordered">
+      <tr>
+        <th width="35%">Name</th>
+        <td>${user.last_name} <span if.bind="user.first_name.length">,</span> ${user.first_name}</td>
+      </tr>
+      <tr>
+        <th>Item</th>
+        <td>${description}</td>
+      </tr>
+      <tr>
+        <th>Amount</th>
+        <td>${amount | currencyFormat }</td>
+      </tr>
+      <tr>
+        <th>Service Charge</th>
+        <td>${charge | currencyFormat }</td>
+      </tr>
+      <tr>
+        <th>Academic Session</th>
+        <td>${academic_session}</td>
+      </tr>
+      <tr>
+        <th>Date</th>
+        <td>${date_printed | dateFormat:"DD-MM-YYYY"}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+<button type="button" class.bind="rules" click.delegate="printCallback()">${caption}</button>
+
+</template>

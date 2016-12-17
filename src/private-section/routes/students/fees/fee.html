@@ -1,6 +1,65 @@
 <template>
 
-  <require from="../../../../resources/components/webpay"></require>
-  <webpay></webpay>
+  <p><strong>Academic Session</strong> ${academic_session.description}</p>
+
+  <h2>${fee.description}</h2>
+
+  <div class="box">
+    <div class="box-header">Amount</div>
+    <div class="box-label">${fee.amount | currencyFormat }</div>
+  </div>
+  <div class="box">
+    <div class="box-header">Service Charge</div>
+    <div class="box-label">${service_charge_amount | currencyFormat }</div>
+  </div>
+
+
+  <hr>
+  <div class="row">
+    <div class="col-sm-3">
+      <div class="form-group">
+        <label for="amount" class="control-label">Amount</label>
+        <input type="text" id="amount" class="form-control" placeholder="Enter Amount" value.bind="amount & validate">
+      </div>
+    </div>
+  </div>
   
+  <div class="row">
+    <div class="col-sm-12">
+      <h3>Payment Method</h3>
+      <small>Choose your mode of payment</small>
+      <br><br>
+      <require from="../../../../resources/components/webpay"></require>
+      <require from="../../../../resources/components/bank"></require>
+
+      <bank rules='btn btn-default btn-sm' 
+        user.bind='user' 
+        description.bind='fee.description' 
+        amount.bind='fee.amount' 
+        charge.bind='service_charge_amount'
+        academic_session.bind='academic_session.description'
+        print-callback.call="useBank()">
+      </bank>
+      
+      <webpay 
+        post_url.bind="paymentService.paymentPostUrl" 
+        amount.bind="total" 
+        currency.bind="paymentService.currency"
+        site_name.bind="site_name"
+        xml_data.bind="split_definitions" 
+        cust_id.bind="user.id" 
+        first_name.bind="user.first_name"
+        last_name.bind="user.last_name"
+        pay_item_id.bind="paymentService.payItemId" 
+        pay_item_name.bind="fee.description"
+        txn_ref.bind="transaction_reference_no"
+        product_id.bind="paymentService.productId"
+        xml_data.bind="split_definitions"
+        site_redirect_url.bind="paymentService.redirectUrl"
+        hash.bind="paymentService.hash"
+        submit-callback.call="useWebpay()">
+      </webpay>
+    </div>
+  </div>
+
 </template>
