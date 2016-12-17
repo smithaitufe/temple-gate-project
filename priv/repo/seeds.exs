@@ -2906,7 +2906,7 @@ student = Repo.get_by(User, email: "brown.fish@walden.edu.ng")
 
 fee = Repo.get_by(Fee, code: "204")
 academic_session = Repo.get_by(AcademicSession, active: true)
-Payment.changeset(%Payment{}, %{user_id: student.id, fee_id: fee.id, amount: fee.amount, service_charge: 1500, online: true, successful: true, academic_session_id: academic_session.id, payment_date: "2016-12-11 22:21:34"}) |> Repo.insert!
+Payment.create_changeset(%Payment{}, %{user_id: student.id, fee_id: fee.id, amount: fee.amount, service_charge: 1500, online: true, successful: true, academic_session_id: academic_session.id, payment_date: "2016-12-11 22:21:34"}) |> Repo.insert!
 
 academic_session = Repo.get_by(AcademicSession, active: true)
 program = Repo.get_by(Program, name: "ND")

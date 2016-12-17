@@ -14,7 +14,6 @@ defmodule PortalApi.V1.CourseView do
     render("course_lite.json", course: course)
     |> Map.put(:department, render_one(course.department, DepartmentView, "department.json"))
     |> Map.put(:level, render_one(course.level, LevelView, "level.json"))
-    |> Map.put(:course_category, render_one(course.course_category, TermView, "term.json"))
     |> Map.put(:semester, render_one(course.semester, TermView, "term.json"))
   end
 
