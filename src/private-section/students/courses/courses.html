@@ -27,14 +27,14 @@
           </tr>
         </thead>
         <tbody class="cursor-pointer">
-          <tr repeat.for="index of enrollments.length" click.delegate="open(enrollments[index].id)">
-            <td>${index + 1}</td>
-            <td>${enrollments[index].course.code}</td>
-            <td>${enrollments[index].course.title}</td>
-            <td>${enrollments[index].course.units}</td>
-            <td>${enrollments[index].course.hours}</td>
-            <td>${enrollments[index].course.semester.description}</td>
-            <td><div class="${enrollments[index].course.core ? 'core' : 'minor'}"></div></td>
+          <tr repeat.for="item of enrollments | sort:{obj: 'course', field: 'semester_id', direction: 'asc', depth: 1}" click.delegate="open(enrollments[index].id)">
+            <td>${$index + 1}</td>
+            <td>${item.course.code}</td>
+            <td>${item.course.title}</td>
+            <td>${item.course.units}</td>
+            <td>${item.course.hours}</td>
+            <td>${item.course.semester.description}</td>
+            <td><div class="${item.course.core ? 'core' : 'minor'}"></div></td>
           </tr>
         </tbody>
       </table>
