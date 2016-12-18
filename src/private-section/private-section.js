@@ -3,7 +3,6 @@ import { Router, Redirect } from 'aurelia-router';
 import { RouteMapper } from 'aurelia-route-mapper';
 import { SessionService } from '../services';
 import { User } from './user';
-// import  { PrivateSectionAuthContext }  from './private-section-auth-context';
 import { brand } from '../settings';
 import { routes as accountRoutes } from './account/account-section';
 import { routes as studentsRoutes } from './students/students-section';
@@ -18,8 +17,7 @@ export class PrivateSection {
     this.router = router;
     this.routeMapper = routeMapper;
     this.user = user;
-    this.sessionService = sessionService;
-    
+    this.sessionService = sessionService;    
   }
   configureRouter(config, router) {
     config.title = brand;
@@ -29,8 +27,7 @@ export class PrivateSection {
     this.routeMapper.map(routes);
     this.router = router;
   }
-  activate() {
-    // this.role = sessionService.getCurrentRole();
+  activate() {    
     return this.sessionService.getCurrentUser().then(response => {
       Object.assign(this.user, { ...response })
     });
@@ -39,7 +36,6 @@ export class PrivateSection {
     const { slug } = this.role;
     this.user = Object.assign(this.user, { role: { ...this.role } });
     this.sessionService.setCurrentRole(this.role);
-
     switch (slug) {
       case "student":
         this.router.navigate("/students");
@@ -47,9 +43,6 @@ export class PrivateSection {
       case "applicant":
         this.router.navigate("/applicants");
         break;
-      // default:
-      //   this.router.navigate("/");
-      //   break;
     }
   }
   logOut() {
