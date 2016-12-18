@@ -5,6 +5,8 @@ export function configure(aurelia) {
       './value-converters/currency-format',
       './value-converters/string-format',
       './value-converters/stringify',
+      './value-converters/sort',
+      './value-converters/take',
       './attributes/active-link',
       './attributes/markdown-component',
       './attributes/datepicker',
