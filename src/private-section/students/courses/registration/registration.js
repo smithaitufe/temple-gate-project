@@ -1,10 +1,10 @@
 import { inject } from 'aurelia-framework';
-import { User } from '../../user';
-import { CourseService, AcademicSessionService, CourseRegistrationSettingService } from '../../../services';
+import { User } from '../../../user';
+import { CourseService, AcademicSessionService, CourseRegistrationSettingService } from '../../../../services';
 
 
 @inject(User, CourseService, AcademicSessionService, CourseRegistrationSettingService)
-export class Enrollment {
+export class Registration {
 
   courses = [];
   selected_courses = [];

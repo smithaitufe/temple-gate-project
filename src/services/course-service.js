@@ -26,6 +26,13 @@ export class CourseService {
     }
     return get(`/api/v1/course_enrollments`);
   }
+  getEnrolledCourseById(id){
+    if(id){
+      return get(`/api/v1/course_enrollments/${id}`)
+    }
+    throw new Error("Parameter not specified")
+  }
+
   enroll(userId, academicSessionId, levelId, courses) {
     return new Promise((resolve, reject) => {
       courses.forEach(course => {
@@ -40,4 +47,16 @@ export class CourseService {
     })
   })
 }
+
+
+  getGrades(params = null){
+    if(params) return get(`/api/v1/course_gradings?${params}`);
+    return get(`/api/v1/course_gradings`);
+  }
+  saveGrade(grade){
+
+  }
+  computeGrade(){
+
+  }
 }

@@ -9,3 +9,8 @@
 .minor{
   background-color: #ffff00;
 }
+.course-item{
+  border: 1px solid #ddd;
+  padding: 5px;
+  margin: 0;
+}

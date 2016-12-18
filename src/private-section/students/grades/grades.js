@@ -1,16 +1,14 @@
 import { inject } from 'aurelia-framework';
-import { Router } from 'aurelia-router';
 import { User } from '../../user';
 import { AcademicSessionService, CourseService } from '../../../services';
 
-@inject(Router, User, AcademicSessionService, CourseService)
-export class Courses{
+@inject(User, AcademicSessionService, CourseService)
+export class Grades{
   enrollments = [];
   academic_sessions = [];
   academic_session;
 
-  constructor(router, user, academicSessionService, courseService){
-    this.router = router;
+  constructor(user, academicSessionService, courseService){
     this.user = user;
     this.academicSessionService = academicSessionService;
     this.courseService = courseService;
@@ -20,15 +18,12 @@ export class Courses{
       this.academic_sessions = response;
     });    
   }
-  fetchCourses(){
+  fetchGrades(){
     const { id, department } = this.user;
     let params = `user_id=${id}&department_id=${department.id}&academic_session_id=${this.academic_session.id}`;
 
     this.courseService.getEnrolledCourses(params).then(response => {
       this.enrollments = response;
     });
-  }
-  open(id){
-    this.router.navigateToRoute("course", {enrollment_id: id});
   }
 }

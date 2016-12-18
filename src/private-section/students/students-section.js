@@ -63,7 +63,7 @@ export class StudentsSection {
 export let routes = [
   { route: '/', redirect: 'courses' },
   { route: '/courses', name: 'courses-section', moduleId: './courses/courses-section', title: 'Courses', nav: false, settings: { childRoutes: coursesRoutes } },
-  { route: '/enrollment', name: 'enrollment', moduleId: './enrollment/enrollment', title: 'Enrollment', nav: false },
+  { route: '/grades', name: 'grades', moduleId: './grades/grades', title: 'Grades' },
   { route: '/fees', name: 'fees-section', moduleId: './fees/fees-section', title: 'Fees', nav: false, settings: { childRoutes: feesRoutes } },
   { route: '/payments', name: 'payments', moduleId: './payments/payments', title: 'Payments', nav: false}
 ];

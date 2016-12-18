@@ -21,6 +21,9 @@ body {
 .private-section-header .navbar .navbar-header .navbar-brand {
     font-size: 25pt;
 }
+.private-section-main-content-header{
+  margin-top: -5px;
+}
 
 .box{
   border: 1px solid #ccc;
