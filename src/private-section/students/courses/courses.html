@@ -27,7 +27,7 @@
           </tr>
         </thead>
         <tbody class="cursor-pointer">
-          <tr repeat.for="item of enrollments | sort:{obj: 'course', field: 'semester_id', direction: 'asc', depth: 1}" click.delegate="open(enrollments[index].id)">
+          <tr repeat.for="item of enrollments | sort:{obj: 'course', field: 'semester_id', direction: 'asc', depth: 1}" click.delegate="open(item.id)">
             <td>${$index + 1}</td>
             <td>${item.course.code}</td>
             <td>${item.course.title}</td>

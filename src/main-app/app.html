@@ -1,4 +1,17 @@
 <template>
   <require from="./app.css"></require>
+<header>
+  <nav class="navbar">
+    <div class="container-fluid">
+      <div class="navbar-header"><a href.bind="mapper.generate('welcome')" class="navbar-brand">${router.title}</a></div>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href.bind="mapper.generate('programs-section')">Programs</a></li>
+        <li><a href.bind="mapper.generate('welcome')">Admissions</a></li>
+        <li><a href.bind="mapper.generate('welcome')">News</a></li>        
+      </ul>
+    </div>
+  </nav>
+</header>
+
 <router-view></router-view>
 </template>
