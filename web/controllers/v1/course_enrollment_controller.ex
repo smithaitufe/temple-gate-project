@@ -7,9 +7,9 @@ defmodule PortalApi.V1.CourseEnrollmentController do
 
   def index(conn, params) do
     course_enrollments = CourseEnrollment
-    |> Ecto.Query.join(:inner, [sc], a in assoc(sc, :academic_session))
-    |> Ecto.Query.join(:inner, [sc, a], c in assoc(sc, :course))
+    |> Ecto.Query.join(:inner, [ce], c in assoc(ce, :course))
     |> build_query(Map.to_list(params))
+    |> Ecto.Query.distinct(true)
     |> Repo.all
     |> Repo.preload(CourseEnrollment.associations)
 
@@ -37,7 +37,6 @@ defmodule PortalApi.V1.CourseEnrollmentController do
 
   def show(conn, %{"id" => id}) do
     course_enrollment = Repo.get!(CourseEnrollment, id) |> Repo.preload(CourseEnrollment.associations)
-
     render(conn, "show.json", course_enrollment: course_enrollment)
   end
 
@@ -65,31 +64,36 @@ defmodule PortalApi.V1.CourseEnrollmentController do
     send_resp(conn, :no_content, "")
   end
   defp build_query(query, []), do: query
+  defp build_query(query, [{"academic_session_id", academic_session_id} | tail]) do
+    query
+    |> Ecto.Query.where([ce], ce.academic_session_id == ^academic_session_id)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"department_id", department_id} | tail]) do
+    query
+    |> Ecto.Query.where([_, c], c.department_id == ^department_id)
+    |> build_query(tail)
+  end
   defp build_query(query, [{"level_id", level_id} | tail]) do
     query
-    |> Ecto.Query.where([_, _, c], c.level_id == ^level_id)
+    |> Ecto.Query.where([ce, _], ce.level_id == ^level_id)
     |> build_query(tail)
   end
   defp build_query(query, [{"course_id", course_id} | tail]) do
     query
-    |> Ecto.Query.where([sc, _, _], sc.course_id == ^course_id)
+    |> Ecto.Query.where([ce, _], ce.course_id == ^course_id)
     |> build_query(tail)
-  end
-  defp build_query(query, [{"academic_session_id", academic_session_id} | tail]) do
+  end  
+  defp build_query(query, [{"user_id", user_id} | tail]) do
     query
-    |> Ecto.Query.where([sc,_, _], sc.academic_session_id == ^academic_session_id)
+    |> Ecto.Query.where([ce], ce.user_id == ^user_id)
     |> build_query(tail)
   end
-  defp build_query(query, [{"academic_session", academic_session} | tail]) do
+  defp build_query(query, [{"order_by", "semester_id"} | tail]) do
     query
-    |> Ecto.Query.where([_, a, _], a.description == ^academic_session)
+    |> Ecto.Query.order_by([ce, c], asc: c.semester_id)
     |> build_query(tail)
-  end
-
-  defp build_query(query, [{"enrolled_by_user_id", enrolled_by_user_id} | tail]) do
-    query
-    |> Ecto.Query.where([sc, _, _], sc.enrolled_by_user_id == ^enrolled_by_user_id)
-    |> build_query(tail)
-  end
+  end  
+  
 
 end

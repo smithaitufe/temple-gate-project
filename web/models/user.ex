@@ -20,13 +20,14 @@ defmodule PortalApi.User do
     has_one :diploma_qualification, PortalApi.DiplomaQualification, foreign_key: :user_id   
     
     has_many :certificates, PortalApi.Certificate, foreign_key: :user_id
-    has_many :program_applications, PortalApi.ProgramApplication, foreign_key: :applicant_user_id
+    has_many :program_applications, PortalApi.ProgramApplication, foreign_key: :user_id
+    
     has_many :course_enrollments, PortalApi.CourseEnrollment, foreign_key: :user_id    
     has_many :courses, through: [:course_enrollments, :course]       
     has_many :payments, PortalApi.Payment, foreign_key: :user_id
     has_many :user_roles, PortalApi.UserRole, foreign_key: :user_id
     has_many :roles, through: [:user_roles, :role]
-
+    
 
     has_many :postings, PortalApi.Posting
     has_many :salary_grade_steps, through: [:postings, :salary_grade_step]

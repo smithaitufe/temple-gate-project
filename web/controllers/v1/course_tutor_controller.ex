@@ -13,6 +13,7 @@ defmodule PortalApi.V1.CourseTutorController do
     |> Ecto.Query.join(:inner, [ct, c], a in assoc(ct, :academic_session))
     |> Ecto.Query.join(:inner, [ct, c, a], s in assoc(ct, :tutor))
     |> build_query(Map.to_list(params))
+    |> Ecto.Query.distinct(true)
     |> Repo.all
     |> Repo.preload(associations)
 

@@ -10,6 +10,7 @@ defmodule PortalApi.CourseEnrollment do
     
     has_one :course_grading, PortalApi.CourseGrading
     has_many :assessments, PortalApi.CourseEnrollmentAssessment
+    has_many :course_enrollments, PortalApi.CourseEnrollment
 
 
     timestamps
@@ -31,20 +32,10 @@ defmodule PortalApi.CourseEnrollment do
   end
 
 
-  def load_associations(query) do
-    course_query = from c in PortalApi.Course, preload: [:department, :semester, :level]
-    from q in query,
-    join: c in assoc(q, :course),
-    join: s in assoc(q, :student),
-    join: a in assoc(q, :academic_session),
-    preload: [course: ^course_query, student: s, academic_session: a]
-  end
-
   def associations do
+    course_query = from c in PortalApi.Course, preload: [:department, :semester, :level]
      [
-       {:user,[:gender, :marital_status, {:program, [:levels]}, :level, {:department, [:faculty]}] },
-        :academic_session,
-      {:course, [{:department, [:faculty]}, :level, :semester, :course_category]},
+       :user, :academic_session, {:course, [{:department, [:faculty]}, :level, :semester]},
       :course_grading, {:assessments, [:assessment_type]}
     ]
   end

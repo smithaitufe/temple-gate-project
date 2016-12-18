@@ -2422,8 +2422,7 @@ User.changeset(%User{}, %{first_name: "Ufuoma", last_name: "Brown", email: "ufuo
       UserProfile.changeset(%UserProfile{}, user_profile_params) |> Repo.insert!
       ProgramApplication.changeset(%ProgramApplication{}, program_application_params) 
       |> PortalApi.Service.ProgramApplication.generate_registration_no(8)
-      |> Repo.insert!
-      
+      |> Repo.insert!      
       register_courses.(user)       
      _ -> IO.inspect "failed to create user #{registration_no}"
 end
@@ -2462,6 +2461,7 @@ end
 
 [
 %{email: "jane.brown@walden.edu.ng", role: "Student", default: true},
+%{email: "brown.fish@walden.edu.ng", role: "Student", default: true},
 %{email: "ufuoma.brown@walden.edu.ng", role: "Applicant", default: true}
 ]
 |> Enum.each(&(assign_role.(&1)))
