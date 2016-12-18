@@ -7,6 +7,7 @@ import { brand } from '../settings';
 import { routes as accountRoutes } from './account/account-section';
 import { routes as studentsRoutes } from './students/students-section';
 import { routes as applicantsRoutes } from './applicants/applicants-section';
+import { routes as facultiesRoutes } from './faculties/faculties-section';
 
 
 @inject(Aurelia, Router, RouteMapper, User, SessionService)
@@ -59,6 +60,7 @@ let routes = [
   { route: '/account', name: 'account-section', moduleId: './account/account-section', title: 'Account', nav: true, auth: true, settings: {childRoutes: accountRoutes} },
   { route: '/students', name: 'students-section', moduleId: './students/students-section', title: 'Students', nav: true, auth: true, settings: { childRoutes: studentsRoutes, roles: ['student'] } },
   { route: '/applicants', name: 'applicants-section', moduleId: './applicants/applicants-section', title: 'Applicants', nav: true, settings: { childRoutes: applicantsRoutes, roles: ['applicant'] } },
+  { route: '/faculties', name: 'faculties-section', moduleId: './faculties/faculties-section', title: 'Faculties', nav: true, settings: { childRoutes: facultiesRoutes, roles: ['student'] } },
   { route: '/payment', name: 'payment', moduleId: './payment/payment', title: 'Payment', nav: true },
   { route: '/denied', name: 'denied', moduleId: './denied/denied', title: '', nav: false }
 ];

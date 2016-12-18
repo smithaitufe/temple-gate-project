@@ -59,4 +59,9 @@ export class CourseService {
   computeGrade(){
 
   }
+
+  getAssignedCourses(params){
+    if(params) return get(`/api/v1/course_tutors?${params}`);
+    return get(`/api/v1/course_tutors`)
+  }
 }
