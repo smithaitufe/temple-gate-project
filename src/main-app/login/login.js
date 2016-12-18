@@ -1,8 +1,8 @@
 import { inject, Aurelia } from 'aurelia-framework';
 import { Router } from 'aurelia-router';
 import { ValidationControllerFactory, ValidationRules } from 'aurelia-validation';
-import { BootstrapFormRenderer } from '../../../resources/renderers/bootstrap-form-renderer';
-import { SessionService } from '../../../services';
+import { BootstrapFormRenderer } from '../../resources/renderers/bootstrap-form-renderer';
+import { SessionService } from '../../services';
 
 @inject(Aurelia, Router, ValidationControllerFactory, SessionService)
 export class Login {
