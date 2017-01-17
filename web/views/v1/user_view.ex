@@ -13,8 +13,7 @@ defmodule PortalApi.V1.UserView do
       first_name: user.first_name,
       last_name: user.last_name,      
       email: user.email      
-    }
-    
+    }    
   end
   def render("error.json", %{changeset: changeset}) do
     errors = Enum.map(changeset.errors, fn {field, detail} ->

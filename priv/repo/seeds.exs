@@ -41,12 +41,12 @@ staff_posting = fn(%{user: user, job_title: job_title, department_name: departme
   |> List.first
 
   %Posting{}
-  |> Posting.changeset(%{posted_user_id: user.id, department_id: department.id, salary_grade_step_id: salary_grade_step.id, job_id: job.id, active: true, posted_date: posted_date, effective_date: effective_date})
+  |> Posting.changeset(%{user_id: user.id, department_id: department.id, salary_grade_step_id: salary_grade_step.id, job_id: job.id, active: true, posted_date: posted_date, effective_date: effective_date})
   |> Repo.insert()
 end
 
-assign_office_head = fn %{type: type, user: user, name: name, appointment_date: appointment_date, effective_date: effective_date, end_date: end_date, active: active} ->  
-  params = %{assigned_user_id: user.id, appointment_date: appointment_date, effective_date: effective_date, end_date: end_date, active: active}
+assign_office_head = fn %{type: type, user: user, name: name, appointment_date: appointment_date, effective_date: effective_date, termination_date: termination_date, active: active} ->  
+  params = %{user_id: user.id, appointment_date: appointment_date, effective_date: effective_date, termination_date: termination_date, active: active}
   case type do
     "faculty" ->
       faculty = Faculty |> Repo.get_by(name: name)
@@ -59,7 +59,7 @@ end
 register_courses = fn (user) ->
   department = Repo.get_by(Department, [name: "Mechanical Engineering"])
   level = Repo.get_by(Level, description: "ND I")
-  academic_session = Repo.get_by(AcademicSession, [description: "2016/2017", active: true])
+  academic_session = Repo.get_by(AcademicSession, [description: "2017/2018", active: true])
   courses = Repo.all(from c in Course, where: c.level_id == ^level.id and c.department_id == ^department.id)
   for course <- courses do
     course_params = %{
@@ -2335,16 +2335,12 @@ end
 
 {_, opening_date} = Ecto.Date.cast("2016-05-01")
 {_, closing_date} = Ecto.Date.cast("2016-12-20")
-academic_session_params = %{description: "2016/2017", opening_date: opening_date, closing_date: closing_date, active: true}
-if Repo.get_by(AcademicSession, [description: "2016/2017"]) == nil do
-  changeset = AcademicSession.changeset(%AcademicSession{},academic_session_params)
-  if changeset.valid?, do: Repo.insert!(changeset)
-end
-academic_session_params = %{description: "2017/2018", opening_date: "2016-08-10", closing_date: closing_date, active: false}
-if Repo.get_by(AcademicSession, [description: "2017/2018"]) == nil do
-  changeset = AcademicSession.changeset(%AcademicSession{},academic_session_params)
-  if changeset.valid?, do: Repo.insert!(changeset)
-end
+
+[
+  %{description: "2016/2017", opening_date: opening_date, closing_date: "2016-12-12", active: false},
+  %{description: "2017/2018", opening_date: "2017-01-10", closing_date: "2017-12-20", active: true}  
+]
+|> Enum.each(&(AcademicSession.changeset(%AcademicSession{},&1) |> Repo.insert!))
 
 
 program = Repo.get_by(Program, name: "ND")
@@ -2353,7 +2349,7 @@ level = Repo.get_by(Level, description: "ND I")
 gender = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Male" and ts.name == ^"gender")
 marital_status = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Single" and ts.name == ^"marital_status")
 entry_mode = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Post UTME" and ts.name == ^"entry_mode")
-academic_session = Repo.get_by(AcademicSession, [description: "2016/2017", active: true])
+academic_session = Repo.get_by(AcademicSession, [description: "2017/2018", active: true])
 level = Repo.get_by(Level, description: "ND I")
 semester = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"1st" and ts.name == ^"semester")
 local_government_area = LocalGovernmentArea |> Repo.all |> Enum.random
@@ -2422,7 +2418,10 @@ User.changeset(%User{}, %{first_name: "Ufuoma", last_name: "Brown", email: "ufuo
       UserProfile.changeset(%UserProfile{}, user_profile_params) |> Repo.insert!
       ProgramApplication.changeset(%ProgramApplication{}, program_application_params) 
       |> PortalApi.Service.ProgramApplication.generate_registration_no(8)
-      |> Repo.insert!      
+      |> Repo.insert!     
+
+      IO.inspect user
+
       register_courses.(user)       
      _ -> IO.inspect "failed to create user #{registration_no}"
 end
@@ -2604,15 +2603,20 @@ staff_posting.(%{user: staff_3_user, job_title: "Lecturer II", department_name: 
 staff_posting.(%{user: staff_4_user, job_title: "Principal Lecturer", department_name: "Mechanical Engineering", posted_date: "2016-08-04", effective_date: "2016-09-01"})
 staff_posting.(%{user: staff_5_user, job_title: "Principal Lecturer", department_name: "Mechanical Engineering", posted_date: "2016-08-04", effective_date: "2016-09-01"})
 
-assign_office_head.(%{type: "faculty", user: staff_5_user, name: "School of Engineering", appointment_date: "2016-12-20", effective_date: "2017-02-01", end_date: "2018-05-30", active: true})
-assign_office_head.(%{type: "department", user: staff_2_user, name: "Mechanical Engineering", appointment_date: "2016-12-20", effective_date: "2017-02-01", end_date: "2018-05-30", active: true})
+assign_office_head.(%{type: "faculty", user: staff_6_user, name: "School of Engineering", appointment_date: "2016-12-20", effective_date: "2017-02-01", termination_date: "2018-05-30", active: true})
+assign_office_head.(%{type: "department", user: staff_2_user, name: "Mechanical Engineering", appointment_date: "2016-12-20", effective_date: "2017-02-01", termination_date: "2018-05-30", active: true})
 
 academic_session = Repo.get_by!(AcademicSession, [description: "2017/2018"])
-course = Repo.get_by!(Course, [code: "MEC 211"])
+department = Repo.get_by(Department, name: "Mechanical Engineering")
+codes = ["MEC 111", "MEC 114", "MEC 123", "MEC 211", "MEC 215", "MEC 226", "MEC 223"]
 user = Repo.get_by!(User, [email: "jun.gospel@walden.edu.ng"])
-%CourseTutor{}
-|> CourseTutor.changeset(%{course_id:  course.id, tutor_user_id: user.id, academic_session_id: academic_session.id, assigned_by_user_id: staff_2_user.id})
-|> Repo.insert!
+for code <- codes do
+  course = Repo.get_by!(Course, [code: code, department_id: department.id])
+  %CourseTutor{}
+  |> CourseTutor.changeset(%{course_id:  course.id, tutor_user_id: user.id, academic_session_id: academic_session.id, assigned_by_user_id: staff_2_user.id})
+  |> Repo.insert!
+
+end
 
 
 
@@ -2949,16 +2953,17 @@ P.M.B. 094, Abuja,<br>
 Bauchi State.</b></p>", posted_by_user_id: 3})
 |> Repo.insert()
 
-academic_session = AcademicSession |> where([a], a.description == ^"2016/2017") |> Repo.one
+academic_session = AcademicSession |> where([a], a.description == ^"2017/2018") |> Repo.one
 level = Level |> where([l], l.description == ^"ND I") |> Repo.one
-semester = Term |> join(:inner, [t], ts in assoc(t, :term_set)) |> where([t, ts], t.description == ^"1st" and ts.name == ^"semester") |> Repo.one
+# semester = Term |> join(:inner, [t], ts in assoc(t, :term_set)) |> where([t, ts], t.description == ^"1st" and ts.name == ^"semester") |> Repo.one
 department = Department |> where([d], d.name == ^"Mechanical Engineering") |> Repo.all |> List.first
-courses = Course |> where([c], c.department_id == ^department.id and c.level_id == ^level.id and c.semester_id == ^semester.id) |> Repo.all
+# courses = Course |> where([c], c.department_id == ^department.id and c.level_id == ^level.id and c.semester_id == ^semester.id) |> Repo.all
+courses = Course |> where([c], c.department_id == ^department.id and c.level_id == ^level.id) |> Repo.all
 staff_postings = Posting |> where([sp], sp.department_id == ^department.id and sp.active == ^true) |> Repo.all
 
 Enum.each(courses, fn course ->
   %CourseTutor{}
-  |> CourseTutor.changeset(%{course_id: course.id, academic_session_id: academic_session.id, tutor_user_id: Enum.random(staff_postings).posted_user_id})
+  |> CourseTutor.changeset(%{course_id: course.id, academic_session_id: academic_session.id, tutor_user_id: Enum.random(staff_postings).user_id})
   |> Repo.insert()
 end)
 student = User |> where([u], u.email == ^"brown.fish@walden.edu.ng") |> Repo.one

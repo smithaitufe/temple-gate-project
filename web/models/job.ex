@@ -5,15 +5,15 @@ defmodule PortalApi.Job do
     field :title, :string
     field :description, :string
     field :qualifications, :string
-    field :responsibilities, :string
-    belongs_to :department_type, PortalApi.Term
+    field :responsibilities, :string    
     field :open, :boolean, default: false
+    belongs_to :department_type, PortalApi.Term, foreign_key: :department_type_id
 
     timestamps
   end
 
-  @required_fields ~w(title description department_type_id)a
-  @optional_fields ~w(qualifications responsibilities open)a
+  @required_fields [:title, :description, :department_type_id]
+  @optional_fields [:qualifications, :responsibilities, :open]
 
   @doc """
   Creates a changeset based on the `model` and `params`.

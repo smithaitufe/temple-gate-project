@@ -29,7 +29,7 @@ defmodule PortalApi.User do
     has_many :roles, through: [:user_roles, :role]
     
 
-    has_many :postings, PortalApi.Posting
+    has_many :postings, PortalApi.Posting, foreign_key: :user_id
     has_many :salary_grade_steps, through: [:postings, :salary_grade_step]
     has_many :salary_grade_levels, through: [:salary_grade_steps, :salary_grade_level]
 
@@ -83,14 +83,10 @@ defmodule PortalApi.User do
       :roles, :user_roles
     ]
   end
-  def preload_staff_associations do
+  def staff_associations do
     [
-      :profile,
-      {:department, [:faculty]},
-      :level, :gender, :marital_status,
-      {:local_government_area, [:state]},
-      {:salary_grade_level, [ :salary_grade_steps ]},
-      :leave_request,
+      :profile,      
+      
       :postings,
       :roles, :user_roles
     ]

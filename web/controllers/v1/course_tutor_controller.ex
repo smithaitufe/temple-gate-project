@@ -9,13 +9,14 @@ defmodule PortalApi.V1.CourseTutorController do
 
     IO.inspect params
     course_tutors = CourseTutor
-    |> Ecto.Query.join(:inner, [ct], c in assoc(ct, :course))
+    |> Ecto.Query.join(:inner, [ct], c in assoc(ct, :course))    
     |> Ecto.Query.join(:inner, [ct, c], a in assoc(ct, :academic_session))
     |> Ecto.Query.join(:inner, [ct, c, a], s in assoc(ct, :tutor))
+    |> Ecto.Query.join(:inner, [ct, c, a, s], l in assoc(c, :level))
     |> build_query(Map.to_list(params))
     |> Ecto.Query.distinct(true)
     |> Repo.all
-    |> Repo.preload(associations)
+    |> Repo.preload(CourseTutor.associations)
 
     render(conn, "index.json", course_tutors: course_tutors)
   end
@@ -25,7 +26,7 @@ defmodule PortalApi.V1.CourseTutorController do
 
     case Repo.insert(changeset) do
       {:ok, course_tutor} ->
-        course_tutor = Repo.preload(course_tutor, associations)
+        course_tutor = course_tutor |> Repo.preload(CourseTutor.associations)
         conn
         |> put_status(:created)
         |> put_resp_header("location", v1_course_tutor_path(conn, :show, course_tutor))
@@ -39,7 +40,8 @@ defmodule PortalApi.V1.CourseTutorController do
 
   def show(conn, %{"id" => id}) do
     course_tutor = Repo.get!(CourseTutor, id)
-    |> Repo.preload(associations)
+    |> Repo.preload(CourseTutor.associations)
+
     render(conn, "show.json", course_tutor: course_tutor)
   end
 
@@ -50,7 +52,7 @@ defmodule PortalApi.V1.CourseTutorController do
     case Repo.update(changeset) do
       {:ok, course_tutor} ->
 
-        course_tutor = Repo.preload(course_tutor, associations)
+        course_tutor = course_tutor |> Repo.preload(CourseTutor.associations)
         render(conn, "show.json", course_tutor: course_tutor)
       {:error, changeset} ->
         conn
@@ -84,9 +86,14 @@ defmodule PortalApi.V1.CourseTutorController do
     |> Ecto.Query.where([ct, c, a, s], ct.tutor_user_id == ^tutor_user_id)
     |> build_query(tail)
   end
+  defp build_query(query, [{"program_id", program_id} | tail]) do
+    query
+    |> Ecto.Query.where([_,_,_,_, l], l.program_id == ^program_id)
+    |> build_query(tail)
+  end
   defp build_query(query, [{"level_id", level_id} | tail]) do
     query
-    |> Ecto.Query.where([ct, c, a, s], c.level_id == ^level_id)
+    |> Ecto.Query.where([_, c, _, _,_], c.level_id == ^level_id)
     |> build_query(tail)
   end
   defp build_query(query, [{"semester_id", semester_id} | tail]) do
@@ -96,8 +103,5 @@ defmodule PortalApi.V1.CourseTutorController do
   end
 
 
-  defp associations do
-    [:course, :tutor, :assigner, :academic_session]
-  end
 
 end

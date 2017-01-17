@@ -27,8 +27,7 @@ defmodule PortalApi.CourseTutor do
     |> validate_required(@required_fields)
   end
 
-  def preload_associations(query) do
-    from q in query,
-    preload: [:course, :tutor, :assigner]
+  def associations() do
+    [:course, :tutor, :assigned_by, :academic_session]
   end
 end

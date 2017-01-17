@@ -16,7 +16,8 @@ defmodule PortalApi.V1.CourseEnrollmentView do
       course_id: course_enrollment.course_id,
       user_id: course_enrollment.user_id,
       academic_session_id: course_enrollment.academic_session_id,
-      graded: course_enrollment.graded
+      graded: course_enrollment.graded,
+      inserted_at: course_enrollment.inserted_at
       }
     |> Map.put(:user, render_one(course_enrollment.user, UserView, "user.json"))
     |> Map.put(:academic_session, render_one(course_enrollment.academic_session, AcademicSessionView, "academic_session.json"))

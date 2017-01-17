@@ -23,4 +23,8 @@ defmodule PortalApi.SalaryGradeStep do
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
   end
+
+  def associations do
+    [:salary_grade_level]
+  end
 end

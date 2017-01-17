@@ -6,14 +6,14 @@ defmodule PortalApi.Repo.Migrations.CreateFacultyHead do
       add :active, :boolean, default: false
       add :appointment_date, :date
       add :effective_date, :date
-      add :end_date, :string
+      add :termination_date, :string
       add :faculty_id, references(:faculties)
-      add :assigned_user_id, references(:users)
+      add :user_id, references(:users)
 
       timestamps
     end
     create index(:faculty_heads, [:faculty_id])
-    create index(:faculty_heads, [:assigned_user_id])
+    create index(:faculty_heads, [:user_id])
 
   end
 end

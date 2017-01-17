@@ -32,4 +32,8 @@ defmodule PortalApi.Department do
     |> validate_required(@required_fields)
   end
 
+  def associations do
+    [:faculty]
+  end
+
 end

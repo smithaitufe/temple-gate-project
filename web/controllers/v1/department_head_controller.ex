@@ -16,9 +16,12 @@ defmodule PortalApi.V1.DepartmentHeadController do
 
   def create(conn, %{"department_head" => department_head_params}) do
     changeset = DepartmentHead.changeset(%DepartmentHead{}, department_head_params)
-
+  
     case Repo.insert(changeset) do
       {:ok, department_head} ->
+        department_head = department_head 
+        |> Repo.preload(DepartmentHead.associations)
+
         conn
         |> put_status(:created)
         |> put_resp_header("location", v1_department_head_path(conn, :show, department_head))
@@ -32,6 +35,8 @@ defmodule PortalApi.V1.DepartmentHeadController do
 
   def show(conn, %{"id" => id}) do
     department_head = Repo.get!(DepartmentHead, id)
+    |> Repo.preload(DepartmentHead.associations)
+    
     render(conn, "show.json", department_head: department_head)
   end
 
@@ -41,6 +46,8 @@ defmodule PortalApi.V1.DepartmentHeadController do
 
     case Repo.update(changeset) do
       {:ok, department_head} ->
+        department_head = department_head |> Repo.preload(DepartmentHead.associations)
+
         render(conn, "show.json", department_head: department_head)
       {:error, changeset} ->
         conn
@@ -64,6 +71,12 @@ defmodule PortalApi.V1.DepartmentHeadController do
   defp build_query(query, [{"user_id", user_id} | tail ]) do
     query
     |> Ecto.Query.where([d], d.user_id == ^user_id)
+    |> build_query(tail)
+  end
+  defp build_query(query, [{"faculty_id", faculty_id} | tail ]) do
+    query
+    |> Ecto.Query.join(:inner, [d], f in assoc(d, :department))
+    |> Ecto.Query.where([d, f], f.faculty_id == ^faculty_id)
     |> build_query(tail)
   end
   defp build_query(query, [{"department_id", department_id} | tail ]) do

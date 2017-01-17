@@ -5,14 +5,14 @@ defmodule PortalApi.FacultyHead do
     field :active, :boolean, default: false
     field :appointment_date, Ecto.Date
     field :effective_date, Ecto.Date
-    field :end_date, :string
+    field :termination_date, :string
     belongs_to :faculty, PortalApi.Faculty
-    belongs_to :user, PortalApi.User, foreign_key: :assigned_user_id
+    belongs_to :user, PortalApi.User, foreign_key: :user_id
 
     timestamps
   end
 
-  @required_fields [:assigned_user_id, :faculty_id, :appointment_date, :effective_date, :end_date]
+  @required_fields [:user_id, :faculty_id, :appointment_date, :effective_date, :termination_date]
   @optional_fields [:active]
 
   @doc """
