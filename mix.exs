@@ -19,7 +19,7 @@ defmodule PortalApi.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [mod: {PortalApi, []},
-     applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :phoenix_ecto, :postgrex, :comeonin, :arc_ecto, :httpoison]]
+     applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :phoenix_ecto, :postgrex, :comeonin,:hackney, :ex_aws, :httpoison]]
   end
 
   # Specifies which paths to compile per environment
@@ -35,20 +35,22 @@ defmodule PortalApi.Mixfile do
      {:phoenix_pubsub, "~> 1.0"},
      {:phoenix_ecto, "~> 3.0"},
      {:postgrex, ">= 0.0.0"},
-    #  {:ecto, "~> 2.1"},
      {:phoenix_html, "~> 2.6"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:cowboy, "~> 1.0"},
      {:corsica, "~> 0.4"},
      {:comeonin, "~> 2.1"},
-     {:guardian, "~> 0.10.0"},
+     {:guardian, "~> 0.14.2"},
      {:timex, "~> 2.1.4"},
      {:timex_ecto, "~> 1.0.4"},
-     {:arc, "~> 0.5.2"},
-     {:arc_ecto, "~> 0.4.4"},
+     {:arc, "~> 0.6.0"},
      {:phoenix_swagger, "~> 0.1.6"},
-     {:httpoison, "~> 0.10.0"},
-     {:sweet_xml, "0.6.2"}
+     {:hackney, "~> 1.6", override: true}, 
+     {:ex_aws, "~> 1.0"},
+     {:httpoison, "~> 0.11.0"},
+     {:sweet_xml, "0.6.2"},
+     {:bamboo, "~> 0.8.0"},
+     {:bamboo_smtp, "~> 1.3"}
      
    ]
   end

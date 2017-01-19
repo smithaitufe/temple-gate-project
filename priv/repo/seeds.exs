@@ -2359,7 +2359,7 @@ local_government_area = LocalGovernmentArea |> Repo.all |> Enum.random
 user_category = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Applicant" and ts.name == ^"user_category")
 registration_no = "DS151690003478"
 
-user = %{first_name: "Jane", last_name: "Brown", email: "jane.brown@walden.edu.ng", password: "password"}
+user = %{first_name: "Jane", last_name: "Brown", email: "jane.brown@walden.edu.ng", password: "password", password_confirmation: "password"}
 
 if Repo.get_by(User, [email: user.email]) == nil do
   changeset = User.changeset(%User{}, user)
@@ -2394,7 +2394,7 @@ end
 local_government_area = LocalGovernmentArea |> Repo.all |> Enum.random
 registration_no = "DS151690003470"
 user_category = Repo.one(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Student" and ts.name == ^"user_category")
-User.changeset(%User{}, %{first_name: "Ufuoma", last_name: "Brown", email: "ufuoma.brown@walden.edu.ng", password: "password"})
+User.changeset(%User{}, %{first_name: "Ufuoma", last_name: "Brown", email: "ufuoma.brown@walden.edu.ng", password: "password", password_confirmation: "password"})
 |> Repo.insert()
 |> case do
     {:ok, user} ->
@@ -2429,7 +2429,7 @@ end
 local_government_area = LocalGovernmentArea |> Repo.all |> Enum.random
 registration_no = "DS151690003477"
 if Repo.get_by(User, [email: "brown.fish@walden.edu.ng"]) == nil do
-  changeset = User.changeset(%User{}, %{first_name: "Brown", last_name: "Fish", email: "brown.fish@walden.edu.ng", password: "password" })
+  changeset = User.changeset(%User{}, %{first_name: "Brown", last_name: "Fish", email: "brown.fish@walden.edu.ng", password: "password", password_confirmation: "password" })
   if changeset.valid? do
     {:ok, user} = Repo.insert(changeset)
     user_profile_params = %{
@@ -2467,16 +2467,16 @@ end
 
 user_category = Repo.all(from t in Term, join: ts in assoc(t, :term_set), where: t.description == ^"Staff" and ts.name == ^"user_category") |> List.first
 users = [
-  %{first_name: "Clinton", last_name: "John", email: "evragab@walden.edu.ng", password: "password"},
-  %{first_name: "Smith", last_name: "Samuel", email: "smithsamuel@walden.edu.ng", password: "password"},
-  %{first_name: "John", last_name: "Gospel", email: "jun.gospel@walden.edu.ng", password: "password"},
-  %{first_name: "Efemena", last_name: "Agbi", email: "efemena.agbi@walden.edu.ng", password: "password"},
-  %{first_name: "ThankGod", last_name: "Goodwill", email: "thankgod.goodwill@walden.edu.ng", password: "password"},
-  %{first_name: "Stephen", last_name: "Oboh", email: "stephen.oboh@walden.edu.ng", password: "password"},
-  %{first_name: "Ogechi", last_name: "Onouha", email: "ogechi.onouha@walden.edu.ng", password: "password"},
-  %{first_name: "Juliet", last_name: "Jeb", email: "juliet.jeb@walden.edu.ng", password: "password"},
-  %{first_name: "Uche", last_name: "Okeke", email: "uche.okeke@walden.edu.ng", password: "password"},
-  %{first_name: "Jose", last_name: "Conte", email: "jose.conte@walden.edu.ng", password: "password"},
+  %{first_name: "Clinton", last_name: "John", email: "evragab@walden.edu.ng", password: "password", password_confirmation: "password"},
+  %{first_name: "Smith", last_name: "Samuel", email: "smithsamuel@walden.edu.ng", password: "password", password_confirmation: "password"},
+  %{first_name: "John", last_name: "Gospel", email: "jun.gospel@walden.edu.ng", password: "password", password_confirmation: "password"},
+  %{first_name: "Efemena", last_name: "Agbi", email: "efemena.agbi@walden.edu.ng", password: "password", password_confirmation: "password"},
+  %{first_name: "ThankGod", last_name: "Goodwill", email: "thankgod.goodwill@walden.edu.ng", password: "password", password_confirmation: "password"},
+  %{first_name: "Stephen", last_name: "Oboh", email: "stephen.oboh@walden.edu.ng", password: "password", password_confirmation: "password"},
+  %{first_name: "Ogechi", last_name: "Onouha", email: "ogechi.onouha@walden.edu.ng", password: "password", password_confirmation: "password"},
+  %{first_name: "Juliet", last_name: "Jeb", email: "juliet.jeb@walden.edu.ng", password: "password", password_confirmation: "password"},
+  %{first_name: "Uche", last_name: "Okeke", email: "uche.okeke@walden.edu.ng", password: "password", password_confirmation: "password"},
+  %{first_name: "Jose", last_name: "Conte", email: "jose.conte@walden.edu.ng", password: "password", password_confirmation: "password"},
 ]
 Enum.each(users, fn user -> User.changeset(%User{}, user) |> Repo.insert!
 end)

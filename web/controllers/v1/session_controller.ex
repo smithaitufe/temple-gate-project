@@ -4,25 +4,16 @@ defmodule PortalApi.V1.SessionController do
   plug :scrub_params, "session" when action in [:create]
 
 
-  def create(conn, %{"session" => %{"email" => email, "password" => password}}) do   
-
-        query = Repo.get_by(User, [email: String.downcase(email)])
-        # query = from user in User,
-        #         where: user.email == ^email, 
-        #         select: user 
-
-        # query = User |> Ecto.Query.where([user], user.email == ^String.downcase(email)) |> Repo.one
-
-        case query do
+  def create(conn, %{"session" => %{"email" => email, "password" => password}}) do  
+        case Repo.get_by(User, [email: String.downcase(email)]) do
           nil ->  
             Comeonin.Bcrypt.dummy_checkpw
             login_failed(conn)
           user -> check_password(conn, password, user)
-        end        
-     
+        end     
   end
   defp check_password(conn, password, user) do
-    if Comeonin.Bcrypt.checkpw(password, user.encrypted_password) do
+    if Comeonin.Bcrypt.checkpw(password, user.hashed_password) do
           {:ok, token, _} = Guardian.encode_and_sign(user, :api)
           user = user |> Repo.preload([:roles, {:profile, PortalApi.UserProfile.associations}])
           render(conn, "show.json", user: user, token: token)

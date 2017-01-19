@@ -5,12 +5,14 @@ defmodule PortalApi.User do
     field :last_name, :string
     field :first_name, :string    
     field :email, :string
-    field :encrypted_password, :string    
+    field :hashed_password, :string    
     field :confirmed, :boolean, default: false
     field :confirmation_code, :string
     field :locked, :boolean, default: false
     field :suspended, :boolean, default: false
     field :password, :string, virtual: true
+    field :password_confirmation, :string, virtual: true
+
 
 
     
@@ -37,7 +39,7 @@ defmodule PortalApi.User do
     timestamps
   end
 
-  @required_fields [:last_name, :first_name, :email, :password]
+  @required_fields [:last_name, :first_name, :email, :password, :password_confirmation]
   @optional_fields [:confirmed, :confirmation_code, :locked, :suspended]
 
   @doc """
@@ -50,6 +52,8 @@ defmodule PortalApi.User do
     struct
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> validate_confirmation(:password, message: "does not match password!")
+    |> unique_constraint(:email)
     |> encrypt_password
   end
 
@@ -62,7 +66,7 @@ defmodule PortalApi.User do
 
   defp encrypt_password(current_changeset) do
     case current_changeset do
-      %Ecto.Changeset{valid?: true, changes: %{password: password}} -> put_change(current_changeset, :encrypted_password, Comeonin.Bcrypt.hashpwsalt(password))
+      %Ecto.Changeset{valid?: true, changes: %{password: password}} -> put_change(current_changeset, :hashed_password, Comeonin.Bcrypt.hashpwsalt(password))
       _ -> current_changeset
     end
   end
