@@ -19,7 +19,7 @@ defmodule PortalApi.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [mod: {PortalApi, []},
-     applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :phoenix_ecto, :postgrex, :comeonin,:hackney, :ex_aws, :httpoison]]
+     applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :phoenix_ecto, :postgrex, :comeonin,:hackney, :ex_aws, :httpoison, :bamboo]]
   end
 
   # Specifies which paths to compile per environment
