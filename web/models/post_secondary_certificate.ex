@@ -1,19 +1,22 @@
-defmodule PortalApi.DiplomaQualification do
+defmodule PortalApi.PostSecondaryCertificate do
   use PortalApi.Web, :model
 
-  schema "diploma_qualifications" do
+  schema "post_secondary_certificates" do
     field :school, :string
-    field :course, :string
+    field :course_studied, :string
     field :cgpa, :float
     field :year_admitted, :integer
     field :year_graduated, :integer
+    field :verified, :boolean, default: false
+    field :verified_at, Ecto.DateTime
     belongs_to :user, PortalApi.User, foreign_key: :user_id
+    belongs_to :verified_by, PortalApi.User, foreign_key: :verified_by_user_id
 
     timestamps
   end
 
-  @required_fields [:user_id, :school, :course, :cgpa, :year_admitted, :year_graduated]
-  @optional_fields []
+  @required_fields [:user_id, :school, :course_studied, :cgpa, :year_admitted, :year_graduated]
+  @optional_fields [:verified, :verified_at, :verified_by_user_id]
 
   @doc """
   Creates a changeset based on the `model` and `params`.

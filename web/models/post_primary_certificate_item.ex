@@ -1,15 +1,15 @@
-defmodule PortalApi.CertificateItem do
+defmodule PortalApi.PostPrimaryCertificateItem do
   use PortalApi.Web, :model
 
-  schema "student_certificate_items" do
-    belongs_to :certificate, PortalApi.Certificate
+  schema "post_primary_certificate_items" do
+    belongs_to :post_primary_certificate, PortalApi.PostPrimaryCertificate
     belongs_to :subject, PortalApi.Term, foreign_key: :subject_id
     belongs_to :grade, PortalApi.Term, foreign_key: :grade_id
 
     timestamps
   end
 
-  @required_fields [:certificate_id, :subject_id, :grade_id]
+  @required_fields [:post_primary_certificate_id, :subject_id, :grade_id]
   @optional_fields []
 
   @doc """

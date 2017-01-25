@@ -19,9 +19,8 @@ defmodule PortalApi.User do
 
     has_one :profile, PortalApi.UserProfile, foreign_key: :user_id
     has_one :jamb_record, PortalApi.JambRecord, foreign_key: :user_id
-    has_one :diploma_qualification, PortalApi.DiplomaQualification, foreign_key: :user_id   
-    
-    has_many :certificates, PortalApi.Certificate, foreign_key: :user_id
+    has_one :post_secondary_certificate, PortalApi.PostSecondaryCertificate, foreign_key: :user_id   
+    has_many :post_primary_certificate, PortalApi.PostPrimaryCertificate, foreign_key: :user_id
     has_many :program_applications, PortalApi.ProgramApplication, foreign_key: :user_id
     
     has_many :course_enrollments, PortalApi.CourseEnrollment, foreign_key: :user_id    

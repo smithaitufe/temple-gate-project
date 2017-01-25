@@ -13,6 +13,7 @@ defmodule PortalApi.Repo.Migrations.CreateFee do
       add :fee_category_id, references(:terms, on_delete: :nothing)
       add :is_catchment, :boolean, default: false
       add :is_all, :boolean, default: false
+      
 
       timestamps
     end

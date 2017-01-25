@@ -13,6 +13,7 @@ defmodule PortalApi.Repo.Migrations.CreateProgramApplication do
       add :level_id, references(:levels, on_delete: :nothing)
       add :entry_mode_id, references(:terms, on_delete: :nothing)
       add :academic_session_id, references(:academic_sessions, on_delete: :nothing)
+      add :complete, :boolean, default: false
 
       timestamps()
     end

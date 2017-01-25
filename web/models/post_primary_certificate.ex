@@ -1,18 +1,18 @@
-defmodule PortalApi.AcademicQualification do
+defmodule PortalApi.PostPrimaryCertificate do
   use PortalApi.Web, :model
 
-  schema "academic_qualifications" do
-    field :school, :string
-    field :course_studied, :string
-    field :from, :integer
-    field :to, :integer
+  schema "post_primary_certificates" do
+    field :year_obtained, :integer
+    field :registration_no, :string
     belongs_to :user, PortalApi.User, foreign_key: :user_id
-    belongs_to :certificate_type, PortalApi.Term, foreign_key: :certificate_type_id
+    belongs_to :examination_type, PortalApi.Term, foreign_key: :examination_type_id
+
+    has_many :certificate_items, PortalApi.CertificateItem
 
     timestamps
   end
 
-  @required_fields [:user_id, :certificate_type_id, :school, :course_studied, :from, :to]
+  @required_fields [:user_id, :year_obtained, :examination_type_id, :registration_no]
   @optional_fields []
 
   @doc """

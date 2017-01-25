@@ -18,7 +18,7 @@ defmodule PortalApi.ProgramApplication do
     timestamps()
   end
   @required_fields [:user_id, :program_id, :department_id, :level_id, :entry_mode_id, :academic_session_id]
-  @optional_fields [:registration_no, :matriculation_no, :is_admitted, :active]
+  @optional_fields [:registration_no, :matriculation_no, :is_admitted, :active, :complete]
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
