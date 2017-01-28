@@ -13,6 +13,8 @@ defmodule PortalApi.V1.JambRecordView do
     %{id: jamb_record.id,
       user_id: jamb_record.user_id,
       score: jamb_record.score,
-      registration_no: jamb_record.registration_no}
+      registration_no: jamb_record.registration_no,
+      year: jamb_record.year
+    }
   end
 end

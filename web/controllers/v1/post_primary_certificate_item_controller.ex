@@ -15,6 +15,8 @@ defmodule PortalApi.V1.PostPrimaryCertificateItemController do
 
     case Repo.insert(changeset) do
       {:ok, post_primary_certificate_item} ->
+
+        post_primary_certificate_item = post_primary_certificate_item |> Repo.preload(PostPrimaryCertificateItem.associations)
         conn
         |> put_status(:created)
         |> put_resp_header("location", v1_post_primary_certificate_item_path(conn, :show, post_primary_certificate_item))

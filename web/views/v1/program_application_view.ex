@@ -20,7 +20,9 @@ defmodule PortalApi.V1.ProgramApplicationView do
       entry_mode_id: program_application.entry_mode_id,
       academic_session_id: program_application.academic_session_id,
       is_admitted: program_application.is_admitted,
-      active: program_application.active}
+      active: program_application.active,
+      completed: program_application.completed
+    }
       |> Map.put(:program, render_one(program_application.program, PortalApi.V1.ProgramView, "program.json"))
       |> Map.put(:department, render_one(program_application.department, PortalApi.V1.DepartmentView, "department.json"))
       |> Map.put(:level, render_one(program_application.level, PortalApi.V1.LevelView, "level.json"))

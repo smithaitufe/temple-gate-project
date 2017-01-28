@@ -95,6 +95,8 @@ defmodule PortalApi.Router do
 
       resources "/products", ProductController, except: [:new, :edit]
       resources "/orders", OrderController, except: [:new, :edit]
+      resources "/program_application_jamb_records", ProgramApplicationJambRecordController, except: [:new, :edit]
+      resources "/program_application_post_secondary_certificates", ProgramApplicationPostSecondaryCertificateController, except: [:new, :edit]
 
 
     end

@@ -14,5 +14,7 @@ defmodule PortalApi.V1.PostPrimaryCertificateItemView do
       post_primary_certificate_id: post_primary_certificate_item.post_primary_certificate_id,
       subject_id: post_primary_certificate_item.subject_id,
       grade_id: post_primary_certificate_item.grade_id}
+      |> Map.put(:subject, render_one(post_primary_certificate_item.subject, PortalApi.V1.TermView, "term.json"))
+      |> Map.put(:grade, render_one(post_primary_certificate_item.grade, PortalApi.V1.TermView, "term.json"))
   end
 end

@@ -12,7 +12,7 @@ defmodule PortalApi.V1.PostSecondaryCertificateView do
   def render("post_secondary_certificate.json", %{post_secondary_certificate: post_secondary_certificate}) do
     %{id: post_secondary_certificate.id,
       user_id: post_secondary_certificate.user_id,
-      school: post_secondary_certificate.school,
+      institution: post_secondary_certificate.institution,
       course_studied: post_secondary_certificate.course_studied,
       cgpa: post_secondary_certificate.cgpa,
       year_admitted: post_secondary_certificate.year_admitted,

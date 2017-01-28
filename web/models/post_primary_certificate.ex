@@ -7,7 +7,7 @@ defmodule PortalApi.PostPrimaryCertificate do
     belongs_to :user, PortalApi.User, foreign_key: :user_id
     belongs_to :examination_type, PortalApi.Term, foreign_key: :examination_type_id
 
-    has_many :certificate_items, PortalApi.CertificateItem
+    has_many :certificate_items, PortalApi.PostPrimaryCertificateItem
 
     timestamps
   end
@@ -25,5 +25,9 @@ defmodule PortalApi.PostPrimaryCertificate do
     struct
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+  end
+
+  def associations do
+    [:examination_type, {:certificate_items, PortalApi.PostPrimaryCertificateItem.associations}]
   end
 end

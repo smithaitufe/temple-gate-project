@@ -2,7 +2,7 @@ defmodule PortalApi.PostSecondaryCertificate do
   use PortalApi.Web, :model
 
   schema "post_secondary_certificates" do
-    field :school, :string
+    field :institution, :string
     field :course_studied, :string
     field :cgpa, :float
     field :year_admitted, :integer
@@ -15,7 +15,7 @@ defmodule PortalApi.PostSecondaryCertificate do
     timestamps
   end
 
-  @required_fields [:user_id, :school, :course_studied, :cgpa, :year_admitted, :year_graduated]
+  @required_fields [:user_id, :institution, :course_studied, :cgpa, :year_admitted, :year_graduated]
   @optional_fields [:verified, :verified_at, :verified_by_user_id]
 
   @doc """

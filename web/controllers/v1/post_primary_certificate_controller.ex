@@ -5,8 +5,12 @@ defmodule PortalApi.V1.PostPrimaryCertificateController do
 
   plug :scrub_params, "post_primary_certificate" when action in [:create, :update]
 
-  def index(conn, _params) do
-    post_primary_certificates = Repo.all(PostPrimaryCertificate)
+  def index(conn, params) do
+    post_primary_certificates = PostPrimaryCertificate
+    |> build_query(Map.to_list(params))
+    |> Repo.all()
+    |> Repo.preload(PostPrimaryCertificate.associations)
+
     render(conn, "index.json", post_primary_certificates: post_primary_certificates)
   end
 
@@ -15,6 +19,7 @@ defmodule PortalApi.V1.PostPrimaryCertificateController do
 
     case Repo.insert(changeset) do
       {:ok, post_primary_certificate} ->
+        post_primary_certificate = post_primary_certificate |> Repo.preload(PostPrimaryCertificate.associations)
         conn
         |> put_status(:created)
         |> put_resp_header("location", v1_post_primary_certificate_path(conn, :show, post_primary_certificate))
@@ -28,7 +33,7 @@ defmodule PortalApi.V1.PostPrimaryCertificateController do
 
   def show(conn, %{"id" => id}) do
     post_primary_certificate = Repo.get!(PostPrimaryCertificate, id)
-    render(conn, "show.json", post_primary_certificate: post_primary_certificate)
+    render(conn, "show.json", post_primary_certificate: post_primary_certificate |> Repo.preload(PostPrimaryCertificate.associations))
   end
 
   def update(conn, %{"id" => id, "post_primary_certificate" => post_primary_certificate_params}) do
@@ -37,7 +42,7 @@ defmodule PortalApi.V1.PostPrimaryCertificateController do
 
     case Repo.update(changeset) do
       {:ok, post_primary_certificate} ->
-        render(conn, "show.json", post_primary_certificate: post_primary_certificate)
+        render(conn, "show.json", post_primary_certificate: post_primary_certificate |> Repo.preload(PostPrimaryCertificate.associations))
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)

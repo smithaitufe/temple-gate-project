@@ -1,5 +1,5 @@
 import Ecto.Query
-alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Role, User, UserRole, CourseEnrollment,CourseEnrollmentAssessment,CourseGrading, Fee, Payment, Announcement, ProgramAdvert, ProgramApplication, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Posting, CourseTutor, LeaveDuration, LeaveRequest, Assignment, UserProfile, ServiceCharge, ServiceChargeSplit}
+alias PortalApi.{Repo, TermSet, Term, AcademicSession, Program, Level, Faculty,FacultyHead, Department, DepartmentHead, ProgramDepartment, Grade, Course, CourseRegistrationSetting, State, LocalGovernmentArea, Role, User, UserRole, CourseEnrollment,CourseEnrollmentAssessment,CourseGrading, Fee, Payment, Announcement, ProgramAdvert, ProgramApplication, Job, JobPosting, SalaryGradeLevel, SalaryGradeStep, Posting, CourseTutor, LeaveDuration, LeaveRequest, Assignment, UserProfile, ServiceCharge, ServiceChargeSplit, JambRecord, PostPrimaryCertificate, PostPrimaryCertificateItem, PostSecondaryCertificate}
 
 divider = " = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = "
 commit = fn(term_set, terms) ->
@@ -3014,4 +3014,23 @@ course_tutor = %{"course_id": course_id, "tutor_user_id": tutor_user_id } = Repo
           |> Repo.insert!
 end)
 
+user = Repo.get_by(User, email: "ufuoma.brown@walden.edu.ng")
+JambRecord.changeset(%JambRecord{}, %{user_id: user.id, registration_no: "12874590UJ", score: 256, year: 2015}) |> Repo.insert!
 
+examination_type_id = get_term.("WAEC", "examination_type").id
+changeset = PostPrimaryCertificate.changeset(%PostPrimaryCertificate{}, %{registration_no: "7889907812", year_obtained: 2014, examination_type_id: examination_type_id, user_id: user.id})
+case Repo.insert(changeset) do
+  {:ok, certificate} -> 
+    subjects = ["Mathematics", "English Language", "Physics", "Chemistry", "Geography", "Biology", "Economics", "Agricultural Science"]
+    grades = Term |> join(:inner, [term], term_set in assoc(term, :term_set)) |> where([term, term_set], term_set.name == "subject_grade") |> Repo.all
+    scores = ["56", "89", "78", "67", "97", "71"]
+    
+    for subject <- subjects do
+      score = Enum.random(scores)
+      # grade = Enum.filter(grades, fn grade -> grade.score <= score and grade.score >= score end)
+      
+      PostPrimaryCertificateItem.changeset(%PostPrimaryCertificateItem{}, %{post_primary_certificate_id: certificate.id, grade_id: Enum.random(grades).id, subject_id: get_term.(subject, "subject").id})
+      |> Repo.insert
+    end
+  _ -> IO.inspect ""
+end

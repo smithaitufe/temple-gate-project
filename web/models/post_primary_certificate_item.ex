@@ -23,4 +23,8 @@ defmodule PortalApi.PostPrimaryCertificateItem do
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
   end
+
+  def associations do
+    [:subject, :grade]
+  end
 end
